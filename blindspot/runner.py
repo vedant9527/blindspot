@@ -460,10 +460,12 @@ def run_audit(
     from concurrent.futures import Future, ThreadPoolExecutor
     from playwright.sync_api import sync_playwright
 
+    from blindspot.axe_runner import run_axe
     from blindspot.browser import launch_browser
     from blindspot.checks import run_checks
     from blindspot.decide import decide_findings, filter_checks_for_scoring, is_under_overlay
     from blindspot.gemini import score_page_state, summarize_calls
+    from blindspot.injector import inject as inject_bug, write_manifest
     from blindspot.preflight import dismiss_banner, run_preflight
 
     host = urlparse(url).netloc.replace("www.", "") or Path(urlparse(url).path).stem or "local"
@@ -548,6 +550,16 @@ def run_audit(
             _log(f"Late popup dismissed before run: {late}")
             page.wait_for_timeout(500)
 
+        manifest: dict[str, Any] | None = None
+        if inject:
+            manifest = inject_bug(page, inject, seed=seed)
+            manifest_hash = write_manifest(manifest, out_dir / "manifest.json")
+            manifest["sha256"] = manifest_hash
+            _log(
+                f"Injected bug={manifest['bug_type']} seed={manifest['seed']} "
+                f"target={manifest['target_selector']} sha256={manifest_hash[:12]}"
+            )
+
         vw = page.viewport_size["width"] if page.viewport_size else 1280
         step_futures: dict[int, Future[dict[str, Any]]] = {}
         prev_step_holder: list[dict[str, Any] | None] = [None]
@@ -591,6 +603,7 @@ def run_audit(
                     call_log,
                 )
 
+        axe_res: dict[str, Any] = {"violations": [], "violation_count": 0, "mapped_bugs": [], "mapped_checks": []}
         try:
             run = run_keyboard(
                 page,
@@ -598,6 +611,11 @@ def run_audit(
                 max_tabs=max_tabs,
                 on_step=_on_step,
                 dismiss_popup=dismiss_banner,
+            )
+            axe_res = run_axe(page)
+            _log(
+                f"axe-core: {axe_res['violation_count']} violations "
+                f"(mapped_bugs={axe_res['mapped_bugs']}) in {axe_res.get('duration_s', 0)}s"
             )
         finally:
             context.close()
@@ -627,6 +645,9 @@ def run_audit(
     run["run_id"] = run_id
     run["late_banner_action"] = late
     run["preflight"] = pre_payload
+    if manifest is not None:
+        run["manifest"] = manifest
+    run["axe"] = axe_res
     raw_checks = run_checks(run)
     steps_map = {s["index"]: s for s in run["steps"]}
     filtered_checks = filter_checks_for_scoring(raw_checks, steps_map)
@@ -647,6 +668,8 @@ def run_audit(
             "screenshot_url": _rel_path(ev.get("full_screenshot")),
         }
         _emit("finding", sse_finding)
+
+    _emit("axe", {"run_id": run_id, **axe_res})
 
     for c in call_log:
         _log(
@@ -675,6 +698,7 @@ def run_audit(
     (out_dir / "steps.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
     (out_dir / "checks.json").write_text(json.dumps(raw_checks, indent=2), encoding="utf-8")
     (out_dir / "findings.json").write_text(json.dumps(findings_payload, indent=2), encoding="utf-8")
+    (out_dir / "axe.json").write_text(json.dumps(axe_res, indent=2), encoding="utf-8")
     (out_dir / "run.log").write_text("\n".join(log_lines) + "\n", encoding="utf-8")
 
     done_payload = {
@@ -685,6 +709,8 @@ def run_audit(
         "confirmed": len(decisions["confirmed"]),
         "needs_human": len(decisions["needs_human"]),
         "dropped": len(decisions["dropped"]),
+        "axe_violations": axe_res["violation_count"],
+        "manifest": manifest,
         "duration_s": total_duration,
         "gemini_usage": gemini_summary,
     }
@@ -695,28 +721,43 @@ def run_audit(
         "run": run,
         "checks": raw_checks,
         "decisions": decisions,
+        "axe": axe_res,
+        "manifest": manifest,
         "gemini_usage": gemini_summary,
         "duration_s": total_duration,
     }
 
 
 def main() -> None:
-    """Preflight, keyboard run, code checks, and optional Phase 3 Gemini scoring."""
+    """Preflight, keyboard run, code checks, and optional Phase 3/4 scoring, injection and axe-core."""
     ap = argparse.ArgumentParser()
     ap.add_argument("--url", required=True)
     ap.add_argument("--tabs", type=int, default=config.MAX_TABS)
     ap.add_argument("--headless", action="store_true")
     ap.add_argument("--score", action="store_true", help="Run Hydrogen reader + Decisions API scorer + decide.py")
+    ap.add_argument("--inject", default=None, help="Inject one bug (hide_focus|keyboard_trap|covering_banner|positive_tabindex|label_mismatch|random)")
+    ap.add_argument("--seed", type=int, default=None, help="RNG seed for --inject")
     args = ap.parse_args()
 
-    if args.score:
-        res = run_audit(args.url, headless=args.headless, max_tabs=args.tabs, use_gemini=True)
+    if args.score or args.inject:
+        res = run_audit(
+            args.url,
+            headless=args.headless,
+            max_tabs=args.tabs,
+            inject=args.inject,
+            seed=args.seed,
+            use_gemini=args.score,
+        )
         if res.get("status") == "blocked":
             print(f"Preflight: blocked — {res['reason']}")
             return
         run = res["run"]
         dec = res["decisions"]
         gu = res["gemini_usage"]
+        axe = res["axe"]
+        if res.get("manifest"):
+            m = res["manifest"]
+            print(f"Injected: {m['bug_type']} seed={m['seed']} target={m['target_selector']} ({m['target_text']!r})")
         print(
             f"\nFinished in {res['duration_s']}s ({len(run['steps'])} steps, stop={run['stop_reason']}, "
             f"gemini_calls={gu['calls']}, tokens={gu['total_tokens']})"
@@ -730,6 +771,7 @@ def main() -> None:
                     f"step {f['evidence'].get('step', '-')} ({fp_s}): {f['detail']}"
                 )
         print(f"  Dropped scorer evaluations: {len(dec['dropped'])}")
+        print(f"  axe-core: {axe['violation_count']} violations (mapped_bugs={axe['mapped_bugs']})")
         print(f"Saved to {res['out_dir']}")
         return
 

@@ -2,7 +2,7 @@
 
 Read AGENTS.md first. This file says where the build stands.
 
-**Status (Nov 21, ~12:45, Google Antigravity):** Phases 0, 1, 2 and 3 done and verified. Next: Phase 4 (injector + axe-core).
+**Status (Nov 21, ~13:00, Google Antigravity):** Phases 0, 1, 2, 3 and 4 done and verified (1:30 gate passed ahead of schedule). Next: Phase 5 (baselines, dev-set tuning, 2:00 freeze & held-out manifest).
 
 ## Setup and run (exact commands)
 
@@ -11,10 +11,10 @@ cd ~/blindspot
 source .venv/bin/activate              # Python 3.12; create with: python3 -m venv .venv
 pip install -r requirements.txt
 playwright install ffmpeg              # screen recordings (already installed on this laptop)
-pytest -q                              # 20 tests, ~90 s, headless Chrome
+pytest -q                              # 26 tests, ~110 s, headless Chrome
 uvicorn app.main:app --host 0.0.0.0 --port 8000     # app + run API + SSE + stranger form at /submit
 ipconfig getifaddr en0                 # laptop IP; regenerate eval/submit_qr.png if it changed
-python -m blindspot.runner --url https://nyulangone.org/doctors --score   # full Phase 3 run + Gemini scoring
+python -m blindspot.runner --url https://medlineplus.gov/ --score --inject hide_focus --seed 101
 ```
 
 Keys in `.env` (never commit it; `.env.example` stays blank): `GEMINI_API_KEY` (required, used by every model and the Managed Agent) and `GEMINI_API_KEY_BACKUP` (optional; `blindspot/gemini.py` falls back to it on any error). Suggested: event credits key as primary, the free AI Studio key as backup.
@@ -126,6 +126,16 @@ API quirks found so far: the first Decisions API call is ~3 s (cold), later ones
 - Verified 40-step real-page latency on `https://nyulangone.org/doctors` (`--headless --score`): **52.76s** total (preflight warm-up + 40 Tab steps + 40 Hydrogen calls + 40 Decisions calls = 81 Gemini calls, 121,810 tokens; **0 confirmed**, 13 needs_human, 144 dropped) — inside the 60s hard cap.
 - Tests: `tests/test_decide.py` added (parser, `decide_one`, deduplication, overlay gating, end-to-end `/api/run` + SSE). `pytest -q`: **20 passed**.
 
+## Phase 4: bug injector and axe-core baseline (done, Antigravity, ~13:00)
+
+- `blindspot/injector.py`: `inject(page, bug_type, seed)` injects any of the five WCAG bugs (`hide_focus`, `keyboard_trap`, `covering_banner`, `positive_tabindex`, `label_mismatch`, or `"random"`) using `random.Random(seed)`, tags the target with `data-bs-target`, and returns a manifest (`url`, `bug_type`, `expected_check`, `seed`, `target_selector`, `target_text`, `timestamp`). Includes `write_manifest` / `manifest_sha256` for the held-out protocol. Prefers first-viewport early-DOM targets (first 15) so the 40-Tab runner reaches the target even on large pages.
+- `blindspot/axe_runner.py`: `run_axe(page)` injects `vendor/axe.min.js`, enables `label-content-name-mismatch` alongside standard rules, and maps `tabindex` -> `positive_tabindex` and `label-content-name-mismatch` -> `label_mismatch` honestly.
+- Wired into `run_audit` in `blindspot/runner.py` (CLI `--inject`, `--seed`; writes `manifest.json` and `axe.json`; emits the `axe` SSE event before `done`).
+- Tests: `tests/test_injector.py` verifies all 5 bugs + `"random"` + SHA-256 manifest + axe-core honesty on `fixtures/clean.html`. `pytest -q`: **26 passed**.
+- Live verification on `https://medlineplus.gov/` (`--headless --score`, seeds 101–105):
+  - **Blindspot: 5/5 confirmed** on the exact injected target (`hide_focus` step 11 `fail_p=0.92`, `keyboard_trap` step 4, `covering_banner` step 13 `fail_p=0.82`, `positive_tabindex`, `label_mismatch` step 14 `fail_p=0.92`; 14.3–38.5s each).
+  - **axe-core: 2/5 caught** (`positive_tabindex` via `tabindex`, `label_mismatch` via `label-content-name-mismatch`), **3/5 missed** by design (`hide_focus`, `keyboard_trap`, `covering_banner`), plus baseline `landmark-one-main` and `region` violations.
+
 ## Next
 
-Phase 4 (1:00 to 1:30 in `docs/PLAN.md`): `blindspot/injector.py` (five bugs + seeded manifest + `tests/test_injector.py` on `clean.html`) and `blindspot/axe_runner.py` (axe-core baseline + `axe` SSE event), wired into `run_audit`.
+Phase 5 (1:30 to 2:00 in `docs/PLAN.md`): `baseline_single_call` (Argon) and `code_only` in `eval/harness.py`, dev-set run & fixes logged in `failure_log.md`, then 2:00 threshold freeze and `eval/heldout_manifest.json` + SHA-256 from `eval/submissions.jsonl`.
