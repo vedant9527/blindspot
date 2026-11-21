@@ -2,6 +2,25 @@
 
 Read AGENTS.md first. This file says where the build stands.
 
+**Status at handoff from Claude Code to Google Antigravity (Nov 21, ~11:50):** Phases 0, 1 and 2 done and pushed; Prompt B done. Next: Prompt 3 (Phase 3). The background app was stopped at handoff; restart it (below) so the QR form keeps taking stranger URLs.
+
+## Setup and run (exact commands)
+
+```bash
+cd ~/blindspot
+source .venv/bin/activate              # Python 3.12; create with: python3 -m venv .venv
+pip install -r requirements.txt
+playwright install ffmpeg              # screen recordings (already installed on this laptop)
+pytest -q                              # 12 tests, ~65 s, headless Chrome
+uvicorn app.main:app --host 0.0.0.0 --port 8000     # app + stranger form at http://<laptop IP>:8000/submit
+ipconfig getifaddr en0                 # laptop IP; regenerate eval/submit_qr.png if it changed
+python -m blindspot.runner --url https://www.healthcare.gov/   # full keyboard run + code checks
+```
+
+Keys in `.env` (never commit it; `.env.example` stays blank): `GEMINI_API_KEY` (required, used by every model and the Managed Agent) and `GEMINI_API_KEY_BACKUP` (optional; `blindspot/gemini.py` falls back to it on any error). Suggested: event credits key as primary, the free AI Studio key as backup.
+
+API quirks found so far: the first Decisions API call is ~3 s (cold), later ones ~0.4 s and they parallelise well; responses carry a top-level `usage` block not in the launch docs; the Managed Agent sandbox runs Python 3.12.3 and took 16 s for hello-world.
+
 ## Done and verified
 
 - **Phase 0:** repo layout, FastAPI app (`app/main.py`) serving `/` (placeholder) and `/submit` (stranger URL form that appends to `eval/submissions.jsonl`), `requirements.txt`, `.env.example`, `.gitignore`, MIT license, `blindspot/config.py` with all thresholds and model IDs, axe-core 4.14.1 in `vendor/axe.min.js`. `pytest -q` passes.
