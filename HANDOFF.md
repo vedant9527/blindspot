@@ -73,6 +73,27 @@ API quirks found so far: the first Decisions API call is ~3 s (cold), later ones
 - indicator_contrast is noisy (many suspects under dimming layers). It is suspect-only, so it cannot confirm anything without the scorer, but consider not sending it to the scorer when the element is under an overlay.
 - Phase 3 should parallelise scoring (see the latency notes above): the run takes ~0.6 s per step without Gemini.
 
+## Step 2 (Antigravity + Claude Code review, ~12:20)
+
+- `fixtures/popup.html` + `test_late_popup_is_closed_and_page_is_tested`: a `role="dialog"` popup appears after 1 s; the runner closes it ("close"), logs it in `run["popups"]`, restarts and tests the 12 page elements with no proven findings. Test made timing-proof (ignores every step inside the popup). `pytest -q`: 13 passed.
+- Headless batch over `eval/pages_ok.txt` (one run each, all at once):
+
+| Page | Proven | Suspects | Steps | Notes |
+| --- | --- | --- | --- | --- |
+| mountsinai.org/find-a-doctor | 28 | 39 | 40 | **Real:** an accessibility overlay widget sets `aria-label` on links to its own instruction ("To make this website accessible to screen reader, press combination of alt and 1 keys..."), so 25 links lose their visible name (2.5.3). Verified with a separate CDP probe. 3 focus_not_visible. |
+| my.clevelandclinic.org | 1 | 20 | 40 | "Closures & Updates" is announced as "Open notification banner" (2.5.3) |
+| cdc.gov | 1 | 30 | 40 | 3 elements with positive tabindex, e.g. tabindex=1 on "Skip to site content" (F44) |
+| nyulangone.org/doctors | 0 | 3 | 40 | Quiet page: good base for Break it injections |
+| medlineplus.gov | 0 | 20 | 40 | |
+| cms.gov | 0 | 38 | 40 | |
+| va.gov/find-locations | 0 | 16 | 40 | |
+| healthcare.gov, medicare.gov | 0 | 7-8 | 9-16 | No popup this time (they are random) |
+| nih.gov, nyc.gov, nychealthandhospitals.org, hopkinsmedicine.org, mayoclinic.org, plannedparenthood.org, kp.org, oscarhealth.com | - | - | - | No result: headless preflight blocked (nih.gov returns HTTP 403 headless, though it passed 3/3 headed) or the batch was cut off |
+| w3.org BAD before | - | - | - | Started, cut off mid-run (no steps.json) |
+
+- **Demo pages (recommended, each run once so far; run each twice headed before relying on it):** mountsinai.org/find-a-doctor (real overlay finding), cdc.gov (real positive tabindex), nyulangone.org/doctors (quiet base for injected bugs).
+- Open: `python -m blindspot.runner` writes nothing when preflight blocks; it should save a `preflight.json` with the reason so batch runs show why. Run batches headed and one at a time.
+
 ## Next
 
 Phase 3 (Prompt 3 in PROMPTS.md): Gemini reading and scoring, the decision rule, SSE events. The Decisions API parser can be written from `docs/decisions_response_example.json`. Read `failure_log.md` first.

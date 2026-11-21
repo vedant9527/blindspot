@@ -11,6 +11,7 @@ from playwright.sync_api import sync_playwright
 
 from blindspot.browser import launch_browser
 from blindspot.checks import contrast_ratio, normalize_label, pixel_stats, run_checks
+from blindspot.preflight import dismiss_banner
 from blindspot.runner import run_keyboard
 
 FIXTURES = Path(__file__).resolve().parent.parent / "fixtures"
@@ -97,3 +98,19 @@ def test_helpers():
     assert normalize_label("  Log in! ") == normalize_label("Login")
     assert normalize_label("Cambiar a español") == "cambiaraespañol"
     assert round(contrast_ratio((0, 0, 0), (255, 255, 255)), 1) == 21.0
+
+
+def test_late_popup_is_closed_and_page_is_tested(browser, tmp_path):
+    context = browser.new_context(viewport={"width": 1280, "height": 800})
+    page = context.new_page()
+    page.goto((FIXTURES / "popup.html").as_uri())
+    run = run_keyboard(page, tmp_path, dismiss_popup=dismiss_banner)
+    context.close()
+
+    assert len(run["popups"]) == 1, run["popups"]
+    assert run["popups"][0]["action"] == "close"
+    assert run["stop_reason"] == "cycle"
+    page_selectors = {s["selector"] for s in run["steps"] if s["selector"] and not s.get("in_overlay")}
+    assert len(page_selectors) == 12
+    proven = [r for r in run_checks(run) if r["proven"]]
+    assert proven == [], proven
