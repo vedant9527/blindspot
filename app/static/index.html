@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Blindspot</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; max-width: 900px; margin: 0 auto; padding: 32px; line-height: 1.5; }
+    h1 { font-size: 2.4rem; margin-bottom: 0; }
+    .tag { font-size: 1.2rem; opacity: 0.8; }
+    .card { border: 2px solid #ccc; border-radius: 12px; padding: 20px; margin-top: 24px; }
+    a:focus-visible { outline: 3px solid #1a73e8; outline-offset: 2px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Blindspot</h1>
+    <p class="tag">Uses a website the way a keyboard or screen-reader user does, and proves where they get stuck.</p>
+    <div class="card">
+      <p><strong>Status:</strong> setup complete. The live run screen arrives in Phase 6.</p>
+      <p>Websites submitted for testing: <strong id="count">0</strong> &middot; <a href="/submit">Submit a website</a></p>
+    </div>
+  </main>
+  <script>
+    fetch('/api/submissions/count').then(r => r.json()).then(d => {
+      document.getElementById('count').textContent = d.count;
+    }).catch(() => {});
+  </script>
+</body>
+</html>

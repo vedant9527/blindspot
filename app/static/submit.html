@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Blindspot: submit a website</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: system-ui, -apple-system, sans-serif; max-width: 520px; margin: 0 auto; padding: 24px; line-height: 1.5; }
+    h1 { font-size: 1.6rem; margin-bottom: 0.25rem; }
+    p { margin-top: 0.25rem; }
+    label { display: block; font-weight: 600; margin-top: 1rem; }
+    input { width: 100%; box-sizing: border-box; font-size: 1.1rem; padding: 12px; margin-top: 6px; border: 2px solid #888; border-radius: 8px; }
+    input:focus-visible, button:focus-visible { outline: 3px solid #1a73e8; outline-offset: 2px; }
+    button { margin-top: 1.25rem; width: 100%; font-size: 1.1rem; padding: 14px; border: 0; border-radius: 8px; background: #1a73e8; color: #fff; font-weight: 600; cursor: pointer; }
+    #status { margin-top: 1rem; font-weight: 600; min-height: 1.5em; }
+    .small { font-size: 0.9rem; opacity: 0.8; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Help test Blindspot</h1>
+    <p>Blindspot uses websites the way keyboard and screen-reader users do. Give us any public website and we'll test it today, including a bug we plant at random.</p>
+    <form id="form" novalidate>
+      <label for="url">Website address</label>
+      <input id="url" name="url" type="url" inputmode="url" placeholder="https://example.com" required autocomplete="url">
+      <label for="note">Anything we should know? (optional)</label>
+      <input id="note" name="note" type="text" maxlength="200" autocomplete="off">
+      <button type="submit">Submit website</button>
+    </form>
+    <p id="status" role="status" aria-live="polite"></p>
+    <p class="small">Public pages only, please: no logins, no personal information.</p>
+  </main>
+  <script>
+    const form = document.getElementById('form');
+    const status = document.getElementById('status');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      status.textContent = 'Sending...';
+      try {
+        const res = await fetch('/api/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: form.url.value, note: form.note.value })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Something went wrong');
+        status.textContent = 'Thanks! Websites submitted so far: ' + data.count;
+        form.reset();
+        form.url.focus();
+      } catch (err) {
+        status.textContent = err.message;
+      }
+    });
+  </script>
+</body>
+</html>
