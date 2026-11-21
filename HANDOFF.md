@@ -2,7 +2,10 @@
 
 Read AGENTS.md first. This file says where the build stands.
 
-**Status (Nov 21, ~14:36, Google Antigravity):** Phases 0–6 AND the 2:30 Managed Agent Replay Gate (5/5 consecutive passes!) are done and wired in. Ready for the ~2:40 PM `"freeze"` signal (do not edit `config.py` or `eval/submissions.jsonl`). Note: restart `uvicorn` when convenient so the live `:8000` server picks up the new `run_replay` background hook (per instructions, port 8000 was not restarted during the gate).
+**Status (Nov 21, ~14:55, Google Antigravity):** **THRESHOLDS FROZEN (`blindspot/config.py` locked — do not modify).** `eval/heldout_manifest.json` built from `eval/submissions.jsonl` (16 stranger URLs, 14 loadable, 2 blocked honestly in preflight).
+- **Held-out manifest SHA-256:** `816e4bb137338731ce06adaf5d2c76a90c9f2ed9c985b7907332226e606f2492`
+
+Note: restart `uvicorn` when convenient so the live `:8000` server picks up the new `run_replay` background hook (per instructions, port 8000 was not restarted).
 
 ## Setup and run (exact commands)
 
@@ -169,6 +172,12 @@ API quirks found so far: the first Decisions API call is ~3 s (cold), later ones
 - `blindspot/managed_agent.py`: sends `replay.py` + manifest to Google's Managed Agent sandbox (`antigravity-preview-05-2026`). **5/5 consecutive passes** on `https://medlineplus.gov/` (`hide_focus`, step 9, `changed_px=0 changed_elsewhere=0`): Attempt 1 `118.1s`, Attempt 2 `108.2s`, Attempt 3 `100.2s`, Attempt 4 `104.8s`, Attempt 5 `82.3s`.
 - Wired in via `start_background_replays` in `blindspot/runner.py` (`run_replay=req.use_gemini` in `app/main.py`): spawns a daemon thread **after** `done` is emitted so it adds 0 ms to the live demo, updates `runs/<id>/findings.json` and `replays.json`, and `app/static/index.html` polls `/api/run/{run_id}` to display **`Replayed ✓`** badges on confirmed cards.
 
+## Freeze & Held-out Manifest (done, Antigravity, ~14:55)
+
+- `blindspot/config.py` is **FROZEN** — do not change any thresholds from now on.
+- `eval/heldout_manifest.json` built from `eval/submissions.jsonl` (16 stranger URLs: 14 loadable, 2 blocked honestly in preflight — `carbonhealth.com` and `ticketmaster.com`, bot check challenge widget) via `python eval/harness.py --build-heldout-manifest --headed`.
+- **Held-out manifest SHA-256:** `816e4bb137338731ce06adaf5d2c76a90c9f2ed9c985b7907332226e606f2492`
+
 ## Next
 
-At ~2:40 PM `"freeze"`: freeze `blindspot/config.py`, build `eval/heldout_manifest.json` + SHA-256 from `eval/submissions.jsonl`, then Phase 8 held-out evaluation run (`--set heldout --set govuk --set w3c_clean`) and Phase 9 HAR snapshots & demo rehearsal.
+Phase 8 (3:30 to 4:00 in `docs/PLAN.md`): run `python eval/harness.py --set heldout --set govuk --set w3c_clean` once for all four systems, save `eval/results/results.json` and `eval/results/results.md`, and verify the Proof tab; then Phase 9 (HAR snapshots + 3 demo rehearsals) and Phase 10 (1-min video + submit by 4:50 PM).

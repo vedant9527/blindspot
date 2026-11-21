@@ -1,0 +1,144 @@
+[
+  {
+    "bug_type": "hide_focus",
+    "expected_check": "focus_not_visible",
+    "seed": 2001,
+    "target_selector": "#block-primary-navigation > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > button",
+    "target_text": "Menu toggle",
+    "timestamp": "2026-11-21T19:53:40.537053+00:00",
+    "url": "https://www.uclahealth.org/"
+  },
+  {
+    "bug_type": "keyboard_trap",
+    "expected_check": "keyboard_trap",
+    "seed": 2002,
+    "target_selector": "#container-5bd3147e2a > div > div:nth-of-type(5) > div > ul > li:nth-of-type(2) > a",
+    "target_text": "",
+    "timestamp": "2026-11-21T19:53:43.821737+00:00",
+    "url": "https://www.medtronic.com/en-us/index.html"
+  },
+  {
+    "bug_type": "covering_banner",
+    "reason": "bot check (challenge widget)",
+    "seed": 2003,
+    "status": "blocked_in_preflight",
+    "timestamp": "2026-11-21T19:53:47.499166+00:00",
+    "url": "https://carbonhealth.com/"
+  },
+  {
+    "bug_type": "positive_tabindex",
+    "expected_check": "focus_order",
+    "seed": 2004,
+    "target_selector": "#main-content > footer > div:nth-of-type(3) > div:nth-of-type(2) > ul > li:nth-of-type(4) > a",
+    "target_text": "Notice of Privacy Practices",
+    "timestamp": "2026-11-21T19:53:50.742798+00:00",
+    "url": "https://www.cityblock.com/"
+  },
+  {
+    "bug_type": "label_mismatch",
+    "expected_check": "label_in_name",
+    "seed": 2005,
+    "target_selector": "#comp-mvh4ir8g_r_comp-mvh4iiv67-menu-content > nav > ul > li:nth-of-type(4) > div > div > a",
+    "target_text": "Careers",
+    "timestamp": "2026-11-21T19:53:53.885423+00:00",
+    "url": "https://www.khealth.com/"
+  },
+  {
+    "bug_type": "hide_focus",
+    "expected_check": "focus_not_visible",
+    "seed": 2006,
+    "target_selector": "body > div:nth-of-type(1) > main > div > div:nth-of-type(2) > div > div:nth-of-type(1) > div:nth-of-type(1) > div > div:nth-of-type(2) > a",
+    "target_text": "Find your therapist",
+    "timestamp": "2026-11-21T19:53:56.962281+00:00",
+    "url": "https://www.springhealth.com/"
+  },
+  {
+    "bug_type": "keyboard_trap",
+    "expected_check": "keyboard_trap",
+    "seed": 2007,
+    "target_selector": "#w-dropdown-toggle-1",
+    "target_text": "Why Maven",
+    "timestamp": "2026-11-21T19:54:01.613268+00:00",
+    "url": "https://www.mavenclinic.com/"
+  },
+  {
+    "bug_type": "covering_banner",
+    "expected_check": "focus_obscured",
+    "seed": 2008,
+    "target_selector": "#main-content > div > div:nth-of-type(2) > section > div:nth-of-type(1) > div:nth-of-type(2) > div > div > div > div:nth-of-type(2) > div > div > div:nth-of-type(1) > div > div:nth-of-type(1) > a",
+    "target_text": "",
+    "timestamp": "2026-11-21T19:54:05.125685+00:00",
+    "url": "https://headway.co/"
+  },
+  {
+    "bug_type": "positive_tabindex",
+    "expected_check": "focus_order",
+    "seed": 2009,
+    "target_selector": "body > div:nth-of-type(2) > div > footer > div > div:nth-of-type(4) > p > a:nth-of-type(1)",
+    "target_text": "Digital Privacy Policy",
+    "timestamp": "2026-11-21T19:54:09.664085+00:00",
+    "url": "https://www.citymd.com/"
+  },
+  {
+    "bug_type": "label_mismatch",
+    "expected_check": "label_in_name",
+    "seed": 2010,
+    "target_selector": "#header > div > div:nth-of-type(1) > a",
+    "target_text": "Nurx\u2122",
+    "timestamp": "2026-11-21T19:54:14.232483+00:00",
+    "url": "https://www.nurx.com/"
+  },
+  {
+    "bug_type": "hide_focus",
+    "expected_check": "focus_not_visible",
+    "seed": 2011,
+    "target_selector": "#papa-global-nav-pals",
+    "target_text": "Be a Papa Pal",
+    "timestamp": "2026-11-21T19:54:19.308009+00:00",
+    "url": "https://www.papa.com/"
+  },
+  {
+    "bug_type": "keyboard_trap",
+    "expected_check": "keyboard_trap",
+    "seed": 2012,
+    "target_selector": "body > div > div:nth-of-type(1) > div > header > div:nth-of-type(2) > div > nav > a:nth-of-type(1)",
+    "target_text": "What we do",
+    "timestamp": "2026-11-21T19:54:23.147774+00:00",
+    "url": "https://www.baba.com/"
+  },
+  {
+    "bug_type": "covering_banner",
+    "expected_check": "focus_obscured",
+    "seed": 2013,
+    "target_selector": "#desktop-pharmacy-logo",
+    "target_text": "",
+    "timestamp": "2026-11-21T19:54:26.610597+00:00",
+    "url": "https://pharmacy.amazon.com/"
+  },
+  {
+    "bug_type": "positive_tabindex",
+    "expected_check": "focus_order",
+    "seed": 2014,
+    "target_selector": "#gatsby-focus-wrapper > div > footer > div > div:nth-of-type(1) > nav > div:nth-of-type(3) > div > a:nth-of-type(3)",
+    "target_text": "Careers",
+    "timestamp": "2026-11-21T19:54:29.467137+00:00",
+    "url": "https://asktia.com/"
+  },
+  {
+    "bug_type": "label_mismatch",
+    "expected_check": "label_in_name",
+    "seed": 2015,
+    "target_selector": "#compass-auth-buttons > a:nth-of-type(1)",
+    "target_text": "SIGN IN",
+    "timestamp": "2026-11-21T19:54:32.985390+00:00",
+    "url": "https://www.nerdwallet.com/"
+  },
+  {
+    "bug_type": "hide_focus",
+    "reason": "bot check (challenge widget)",
+    "seed": 2016,
+    "status": "blocked_in_preflight",
+    "timestamp": "2026-11-21T19:54:35.727687+00:00",
+    "url": "https://www.ticketmaster.com/"
+  }
+]
