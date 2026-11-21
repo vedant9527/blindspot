@@ -47,6 +47,8 @@ Filled in after the held-out run (see `eval/results/results.md`).
 
 - Phase 0: FastAPI app with the URL submission form (`/submit`), repo layout, config, axe-core vendored from npm (`vendor/axe.min.js`, MPL-2.0, license in `vendor/AXE-LICENSE`), tests.
 - Phase 1: browser helpers (focused element, computed accessible name and role via the Chrome DevTools Protocol), preflight with honest block detection and cookie-banner handling, page check script, and spike scripts for the runner, models, Decisions API and Managed Agents.
+- Page check run: 18 of 20 candidate healthcare pages load cleanly three times in a visible browser (`eval/pages_ok.txt`); two returned HTTP 403 and were dropped, with no bot-protection workarounds.
+- QR code for the stranger URL form (`eval/submit_qr.png`).
 
 ## License
 

@@ -1,0 +1,562 @@
+[
+  {
+    "url": "https://www.medicare.gov/",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 63,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 63,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 69,
+        "banner": "none"
+      }
+    ]
+  },
+  {
+    "url": "https://www.healthcare.gov/",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 67,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 67,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 67,
+        "banner": "none"
+      }
+    ]
+  },
+  {
+    "url": "https://www.cms.gov/",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 65,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 65,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 64,
+        "banner": "none"
+      }
+    ]
+  },
+  {
+    "url": "https://www.va.gov/find-locations/",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 57,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 57,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 57,
+        "banner": "none"
+      }
+    ]
+  },
+  {
+    "url": "https://www.cdc.gov/",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 49,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 49,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 49,
+        "banner": "none"
+      }
+    ]
+  },
+  {
+    "url": "https://www.nih.gov/",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 59,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 59,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 59,
+        "banner": "none"
+      }
+    ]
+  },
+  {
+    "url": "https://medlineplus.gov/",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 48,
+        "banner": "close"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 48,
+        "banner": "close"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 48,
+        "banner": "close"
+      }
+    ]
+  },
+  {
+    "url": "https://www.nyc.gov/site/doh/index.page",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 69,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 69,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 69,
+        "banner": "none"
+      }
+    ]
+  },
+  {
+    "url": "https://www.nychealthandhospitals.org/",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 171,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 171,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 171,
+        "banner": "none"
+      }
+    ]
+  },
+  {
+    "url": "https://nyulangone.org/doctors",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 231,
+        "banner": "close"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 231,
+        "banner": "close"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 231,
+        "banner": "close"
+      }
+    ]
+  },
+  {
+    "url": "https://www.mountsinai.org/find-a-doctor",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 77,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 77,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 77,
+        "banner": "none"
+      }
+    ]
+  },
+  {
+    "url": "https://www.hopkinsmedicine.org/",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 83,
+        "banner": "accept (#onetrust-accept-btn-handler)"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 83,
+        "banner": "accept (#onetrust-accept-btn-handler)"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 83,
+        "banner": "accept (#onetrust-accept-btn-handler)"
+      }
+    ]
+  },
+  {
+    "url": "https://my.clevelandclinic.org/",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 107,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 107,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 107,
+        "banner": "none"
+      }
+    ]
+  },
+  {
+    "url": "https://www.mayoclinic.org/",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 116,
+        "banner": "reject"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 116,
+        "banner": "reject"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 116,
+        "banner": "reject"
+      }
+    ]
+  },
+  {
+    "url": "https://www.plannedparenthood.org/health-center",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 55,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 55,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 55,
+        "banner": "none"
+      }
+    ]
+  },
+  {
+    "url": "https://www.kp.org/",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 87,
+        "banner": "close"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 87,
+        "banner": "close"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 87,
+        "banner": "close"
+      }
+    ]
+  },
+  {
+    "url": "https://www.oscarhealth.com/",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 58,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 58,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 58,
+        "banner": "none"
+      }
+    ]
+  },
+  {
+    "url": "https://www.zocdoc.com/",
+    "passed": false,
+    "reason": "HTTP 403",
+    "tries": [
+      {
+        "status": "blocked",
+        "reason": "HTTP 403",
+        "http": 403,
+        "tabbable": 0,
+        "banner": "none"
+      },
+      {
+        "status": "blocked",
+        "reason": "HTTP 403",
+        "http": 403,
+        "tabbable": 0,
+        "banner": "none"
+      },
+      {
+        "status": "blocked",
+        "reason": "HTTP 403",
+        "http": 403,
+        "tabbable": 0,
+        "banner": "none"
+      }
+    ]
+  },
+  {
+    "url": "https://www.goodrx.com/",
+    "passed": false,
+    "reason": "HTTP 403",
+    "tries": [
+      {
+        "status": "blocked",
+        "reason": "HTTP 403",
+        "http": 403,
+        "tabbable": 0,
+        "banner": "none"
+      },
+      {
+        "status": "blocked",
+        "reason": "HTTP 403",
+        "http": 403,
+        "tabbable": 0,
+        "banner": "none"
+      },
+      {
+        "status": "blocked",
+        "reason": "HTTP 403",
+        "http": 403,
+        "tabbable": 0,
+        "banner": "none"
+      }
+    ]
+  },
+  {
+    "url": "https://www.w3.org/WAI/demos/bad/before/home.html",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 56,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 56,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 56,
+        "banner": "none"
+      }
+    ]
+  }
+]
