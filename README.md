@@ -31,6 +31,7 @@ uvicorn app.main:app --reload      # http://localhost:8000 and /submit
 | `python scripts/check_pages.py` | Loads each page in `eval/pages_vetted.txt` three times; writes `eval/pages_ok.txt` | No |
 | `python scripts/spike_runner.py --url URL` | Tabs through a page and prints the focused element, role and accessible name | No |
 | `python -m blindspot.runner --url URL` | Preflight, full keyboard run and code checks; saves evidence to `runs/<id>/` | No |
+| `python -m blindspot.runner --url URL --score` | Full run plus Hydrogen step reader, Decisions API scorer and `decide.py` | Yes |
 | `python scripts/spike_models.py` | Lists the Gemini 4 and decision models your key can use | Yes |
 | `python scripts/spike_decisions.py --url URL` | One Decisions API call on a screenshot; saves the raw response | Yes |
 | `python scripts/spike_agent.py` | A Managed Agent runs one command in Google's sandbox | Yes |
@@ -51,7 +52,8 @@ Filled in after the held-out run (see `eval/results/results.md`).
 - Page check run: 18 of 20 candidate healthcare pages load cleanly three times in a visible browser (`eval/pages_ok.txt`); two returned HTTP 403 and were dropped, with no bot-protection workarounds.
 - QR code for the stranger URL form (`eval/submit_qr.png`).
 - API checks: all four Gemini models confirmed; one Decisions API call on a real page (`docs/decisions_response_example.json`, cold call ~3 s, warm calls ~0.4 s); Managed Agent hello-world ran in Google's sandbox in 16 s.
-- Phase 2: keyboard runner (screenshots, focused and unfocused crops, accessible names, coverage sampling, screen recording), code checks for keyboard traps, invisible focus, covered focus, positive tabindex and label-in-name mismatch, six fixture pages with known bugs and tests. First real finding: on healthcare.gov, a sign-up popup hides the footer links a keyboard user is Tabbing through.
+- Phase 2: keyboard runner (screenshots, focused and unfocused crops, accessible names, coverage sampling, screen recording), code checks for keyboard traps, invisible focus, covered focus, positive tabindex and label-in-name mismatch, seven fixture pages (including late-popup dismissal) with tests, and vetted healthcare page expansion (37 of 40 public healthcare pages passing 3/3 loads in `eval/pages_ok.txt`). First real finding: on healthcare.gov, a sign-up popup hides the footer links a keyboard user is Tabbing through.
+- Phase 3: Gemini 4 Hydrogen step reader (`read_step`), Gemini Decisions API per-step WCAG scorer (`score_step` with outer red-box crops, preflight warm-up call, token/usage logging, and thread-pool concurrency alongside the Tab loop), honest confirmation rule (`decide.py`: code-proven or code-suspect + high-confidence scorer agreement), and FastAPI run + SSE streaming endpoints (`POST /api/run`, `GET /api/run/{id}/events`).
 
 ## License
 

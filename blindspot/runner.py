@@ -337,19 +337,407 @@ def _print_step(step: dict[str, Any]) -> None:
           f"{' -> closed popup (' + step['popup_closed'] + ')' if step.get('popup_closed') else ''}")
 
 
+def _step_has_order_jump(step: dict[str, Any], prev: dict[str, Any] | None) -> bool:
+    """True when focus jumped more than ORDER_JUMP_PX upward within the same landmark."""
+    if not prev or step.get("body") or prev.get("body") or not step.get("rect") or not prev.get("rect"):
+        return False
+    prev_top = prev["rect"]["y"] + prev.get("scroll_y", 0)
+    top = step["rect"]["y"] + step.get("scroll_y", 0)
+    return (prev_top - top > config.ORDER_JUMP_PX) and (step.get("landmark") == prev.get("landmark"))
+
+
+def _score_step_worker(
+    step: dict[str, Any],
+    prev_rect: dict[str, float] | None,
+    include_order: bool,
+    under_overlay: bool,
+    out_dir: Path,
+    viewport_width: int,
+    call_log: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Run Hydrogen `read_step` and Decisions `score_step` concurrently for one step."""
+    from concurrent.futures import ThreadPoolExecutor
+
+    from blindspot.checks import LABEL_ROLES, LABEL_TAGS, NO_LABEL_TAGS
+    from blindspot.gemini import make_boxed_crop, read_step, score_step
+
+    full_bytes = Path(step["full_screenshot"]).read_bytes()
+    raw_crop = Path(step["focused_crop"]).read_bytes() if step.get("focused_crop") else None
+
+    boxed_crop_bytes: bytes | None = None
+    boxed_full_bytes = full_bytes
+    boxed_path_str: str | None = None
+    if not step.get("offscreen") and step.get("rect"):
+        boxed_crop_bytes, boxed_full_bytes = make_boxed_crop(full_bytes, step["rect"], viewport_width=viewport_width)
+        if boxed_crop_bytes:
+            boxed_path = out_dir / "crops" / f"{step['index']:02d}_boxed.png"
+            boxed_path.write_bytes(boxed_crop_bytes)
+            boxed_path_str = str(boxed_path)
+
+    tag, role = step.get("tag"), step.get("role")
+    include_label = bool(
+        step.get("ax_ok")
+        and tag not in NO_LABEL_TAGS
+        and (tag in LABEL_TAGS or role in LABEL_ROLES)
+        and (step.get("label_text") or step.get("accessible_name"))
+    )
+    # Per HANDOFF.md / Phase 3 spec: never send indicator_contrast to the scorer when under an overlay.
+    include_contrast = (not under_overlay) and (not step.get("offscreen")) and (tag != "iframe")
+
+    r = step.get("rect") or {"x": 0, "y": 0, "width": 0, "height": 0}
+    px = step.get("pixels") or {}
+    ob = step.get("obscured") or {}
+    ctx_lines = [
+        "Accessibility check of one keyboard Tab step.",
+        "NOTE: The bright red outer rectangle was drawn by our harness to show which element has keyboard focus — "
+        "it is NOT part of the web page and NOT a focus indicator.",
+        f"Step {step['index']}: <{tag}> role={role!r} selector={step.get('selector')!r}",
+        f"Announced accessible name: {step.get('accessible_name', '')!r}",
+        f"DOM visible label text: {step.get('label_text', '')!r}",
+        f"Bounding rect: ({r['x']:.0f}, {r['y']:.0f}, {r['width']:.0f}x{r['height']:.0f})"
+        + (" [OFFSCREEN]" if step.get("offscreen") else ""),
+        f"Pixels changed on focus inside crop: {px.get('changed_px', 'n/a')}, contrast: {px.get('contrast', 'n/a')}",
+        f"Hit-test coverage: {ob.get('covered', 0)}/{ob.get('sampled', 0)} sample points covered"
+        + (f" by {', '.join(ob.get('covering', []))}" if ob.get("covering") else ""),
+    ]
+    if include_order and prev_rect:
+        ctx_lines.append(
+            f"Previous focused element rect was at ({prev_rect['x']:.0f}, {prev_rect['y']:.0f}); "
+            f"current element is at ({r['x']:.0f}, {r['y']:.0f})."
+        )
+    context_text = "\n".join(ctx_lines)
+
+    out: dict[str, Any] = {"boxed_crop": boxed_path_str, "reader": None, "scores": None, "errors": []}
+    with ThreadPoolExecutor(max_workers=2) as sub:
+        fut_read = sub.submit(read_step, raw_crop, full_bytes, call_log=call_log)
+        fut_score = sub.submit(
+            score_step,
+            boxed_crop_bytes,
+            boxed_full_bytes,
+            context_text,
+            accessible_name=step.get("accessible_name", ""),
+            include_label=include_label,
+            include_contrast=include_contrast,
+            include_order=include_order,
+            call_log=call_log,
+        )
+        try:
+            out["reader"] = fut_read.result()
+        except Exception as exc:
+            out["errors"].append(f"read_step: {exc}")
+        try:
+            out["scores"] = fut_score.result()
+        except Exception as exc:
+            out["errors"].append(f"score_step: {exc}")
+    return out
+
+
+def _rel_path(p: str | None) -> str | None:
+    if not p:
+        return None
+    try:
+        return "/" + str(Path(p).resolve().relative_to(ROOT.resolve())).replace("\\", "/")
+    except Exception:
+        return p
+
+
+def run_audit(
+    url: str,
+    *,
+    run_id: str | None = None,
+    out_dir: Path | None = None,
+    headless: bool = False,
+    max_tabs: int = config.MAX_TABS,
+    inject: str | None = None,
+    seed: int | None = None,
+    use_gemini: bool = True,
+    emit: Callable[[str, dict[str, Any]], None] | None = None,
+) -> dict[str, Any]:
+    """Full Phase 3 run: preflight (+ warm-up), keyboard loop + parallel Gemini scoring, decision rule.
+
+    Streams SSE-ready events via `emit(event_type, payload)` and saves artifacts to `runs/<run_id>/`.
+    """
+    from concurrent.futures import Future, ThreadPoolExecutor
+    from playwright.sync_api import sync_playwright
+
+    from blindspot.browser import launch_browser
+    from blindspot.checks import run_checks
+    from blindspot.decide import decide_findings, filter_checks_for_scoring, is_under_overlay
+    from blindspot.gemini import score_page_state, summarize_calls
+    from blindspot.preflight import dismiss_banner, run_preflight
+
+    host = urlparse(url).netloc.replace("www.", "") or Path(urlparse(url).path).stem or "local"
+    run_id = run_id or f"{datetime.now():%Y%m%d-%H%M%S}-{host}"
+    out_dir = Path(out_dir) if out_dir else (ROOT / "runs" / run_id)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    log_lines: list[str] = []
+    call_log: list[dict[str, Any]] = []
+
+    def _log(msg: str) -> None:
+        line = f"[{datetime.now():%H:%M:%S}] {msg}"
+        log_lines.append(line)
+
+    def _emit(event: str, data: dict[str, Any]) -> None:
+        if emit:
+            emit(event, data)
+
+    _log(f"Starting run {run_id} url={url} headless={headless} use_gemini={use_gemini} inject={inject} seed={seed}")
+    t_run0 = time.perf_counter()
+
+    with sync_playwright() as p:
+        browser = launch_browser(p, headless=headless)
+        try:
+            context = browser.new_context(
+                viewport={"width": 1280, "height": 800},
+                record_video_dir=str(out_dir / "video"),
+            )
+            page = context.new_page()
+        except Exception as exc:
+            _log(f"Video recording off: {str(exc).splitlines()[0][:80]}")
+            context = browser.new_context(viewport={"width": 1280, "height": 800})
+            page = context.new_page()
+
+        pre = run_preflight(page, url)
+        page_state_info: dict[str, Any] | None = None
+        if use_gemini and pre.status == "ok":
+            try:
+                pre_png = page.screenshot()
+                page_state_info = score_page_state(pre_png, call_log=call_log)
+                _log(
+                    f"Preflight warm-up Decisions: page_state={page_state_info['choice']} "
+                    f"({page_state_info['confidence']}) in {page_state_info['latency_s']}s"
+                )
+            except Exception as exc:
+                _log(f"Preflight warm-up failed: {exc}")
+
+        pre_payload = {
+            "run_id": run_id,
+            "status": pre.status,
+            "reason": pre.reason,
+            "http_status": pre.http_status,
+            "tabbable": pre.tabbable,
+            "banner_action": pre.banner_action,
+            "final_url": pre.final_url,
+            "page_state": page_state_info,
+        }
+        _emit("preflight", pre_payload)
+        _log(f"Preflight: {pre.status} {pre.reason} (tabbable={pre.tabbable}, banner={pre.banner_action})")
+
+        if pre.status != "ok":
+            context.close()
+            browser.close()
+            summary = {
+                "run_id": run_id,
+                "status": "blocked",
+                "reason": pre.reason,
+                "preflight": pre_payload,
+                "vetted_hint": "Pick a vetted public healthcare page from eval/pages_ok.txt (/api/vetted).",
+                "duration_s": round(time.perf_counter() - t_run0, 2),
+            }
+            (out_dir / "steps.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+            (out_dir / "findings.json").write_text(
+                json.dumps({"confirmed": [], "needs_human": [], "dropped": [], "findings": []}, indent=2),
+                encoding="utf-8",
+            )
+            (out_dir / "run.log").write_text("\n".join(log_lines) + "\n", encoding="utf-8")
+            _emit("done", summary)
+            return summary
+
+        late = dismiss_banner(page)
+        if late != "none":
+            _log(f"Late popup dismissed before run: {late}")
+            page.wait_for_timeout(500)
+
+        vw = page.viewport_size["width"] if page.viewport_size else 1280
+        step_futures: dict[int, Future[dict[str, Any]]] = {}
+        prev_step_holder: list[dict[str, Any] | None] = [None]
+        pool = ThreadPoolExecutor(max_workers=config.SCORER_WORKERS) if use_gemini else None
+
+        def _on_step(step: dict[str, Any]) -> None:
+            _emit(
+                "step",
+                {
+                    "run_id": run_id,
+                    "index": step["index"],
+                    "body": bool(step.get("body")),
+                    "selector": step.get("selector"),
+                    "tag": step.get("tag"),
+                    "role": step.get("role"),
+                    "accessible_name": step.get("accessible_name", ""),
+                    "label_text": step.get("label_text", ""),
+                    "rect": step.get("rect"),
+                    "offscreen": bool(step.get("offscreen")),
+                    "popup_closed": step.get("popup_closed"),
+                    "full_screenshot": _rel_path(step.get("full_screenshot")),
+                    "focused_crop": _rel_path(step.get("focused_crop")),
+                },
+            )
+            if step.get("body"):
+                return
+            prev_s = prev_step_holder[0]
+            include_order = _step_has_order_jump(step, prev_s)
+            under_ov = is_under_overlay(step)
+            prev_rect = dict(prev_s["rect"]) if (prev_s and prev_s.get("rect")) else None
+            prev_step_holder[0] = step
+            if pool is not None:
+                step_futures[step["index"]] = pool.submit(
+                    _score_step_worker,
+                    step,
+                    prev_rect,
+                    include_order,
+                    under_ov,
+                    out_dir,
+                    vw,
+                    call_log,
+                )
+
+        try:
+            run = run_keyboard(
+                page,
+                out_dir,
+                max_tabs=max_tabs,
+                on_step=_on_step,
+                dismiss_popup=dismiss_banner,
+            )
+        finally:
+            context.close()
+            browser.close()
+
+        # Wait for in-flight parallel Gemini step tasks to finish
+        if pool is not None:
+            steps_by_idx = {s["index"]: s for s in run["steps"]}
+            for idx, fut in step_futures.items():
+                try:
+                    res = fut.result(timeout=config.GEMINI_TIMEOUT_S * 3)
+                    st = steps_by_idx[idx]
+                    if res.get("boxed_crop"):
+                        st["boxed_crop"] = res["boxed_crop"]
+                    if res.get("reader") is not None:
+                        st["reader"] = res["reader"]
+                    if res.get("scores") is not None:
+                        st["scores"] = res["scores"]
+                    if res.get("errors"):
+                        st["gemini_errors"] = res["errors"]
+                        for err in res["errors"]:
+                            _log(f"Step {idx} {err}")
+                except Exception as exc:
+                    _log(f"Step {idx} worker failed: {exc}")
+            pool.shutdown(wait=False)
+
+    run["run_id"] = run_id
+    run["late_banner_action"] = late
+    run["preflight"] = pre_payload
+    raw_checks = run_checks(run)
+    steps_map = {s["index"]: s for s in run["steps"]}
+    filtered_checks = filter_checks_for_scoring(raw_checks, steps_map)
+    decisions = decide_findings(run, filtered_checks)
+    gemini_summary = summarize_calls(call_log)
+    total_duration = round(time.perf_counter() - t_run0, 2)
+
+    run["gemini_usage"] = gemini_summary
+    run["total_duration_s"] = total_duration
+
+    # Stream findings over SSE (with web-accessible crop paths attached)
+    for finding in decisions["findings"]:
+        ev = finding.get("evidence") or {}
+        sse_finding = {
+            **finding,
+            "run_id": run_id,
+            "crop_url": _rel_path(ev.get("boxed_crop") or ev.get("focused_crop")),
+            "screenshot_url": _rel_path(ev.get("full_screenshot")),
+        }
+        _emit("finding", sse_finding)
+
+    for c in call_log:
+        _log(
+            f"GEMINI op={c['op']} model={c['model']} ok={c['ok']} "
+            f"latency={c['latency_s']}s in={c.get('input_tokens', 0)} "
+            f"out={c.get('output_tokens', 0)} total={c.get('total_tokens', 0)}"
+            + (f" err={c['error']}" if c.get("error") else "")
+        )
+    _log(
+        f"Done in {total_duration}s: steps={len(run['steps'])} "
+        f"confirmed={len(decisions['confirmed'])} needs_human={len(decisions['needs_human'])} "
+        f"dropped={len(decisions['dropped'])} gemini_calls={gemini_summary['calls']} "
+        f"tokens={gemini_summary['total_tokens']}"
+    )
+
+    findings_payload = {
+        "run_id": run_id,
+        "url": url,
+        "confirmed": decisions["confirmed"],
+        "needs_human": decisions["needs_human"],
+        "dropped": decisions["dropped"],
+        "findings": decisions["findings"],
+        "gemini_usage": gemini_summary,
+        "duration_s": total_duration,
+    }
+    (out_dir / "steps.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
+    (out_dir / "checks.json").write_text(json.dumps(raw_checks, indent=2), encoding="utf-8")
+    (out_dir / "findings.json").write_text(json.dumps(findings_payload, indent=2), encoding="utf-8")
+    (out_dir / "run.log").write_text("\n".join(log_lines) + "\n", encoding="utf-8")
+
+    done_payload = {
+        "run_id": run_id,
+        "status": "ok",
+        "stop_reason": run["stop_reason"],
+        "steps": len(run["steps"]),
+        "confirmed": len(decisions["confirmed"]),
+        "needs_human": len(decisions["needs_human"]),
+        "dropped": len(decisions["dropped"]),
+        "duration_s": total_duration,
+        "gemini_usage": gemini_summary,
+    }
+    _emit("done", done_payload)
+    return {
+        "run_id": run_id,
+        "out_dir": str(out_dir),
+        "run": run,
+        "checks": raw_checks,
+        "decisions": decisions,
+        "gemini_usage": gemini_summary,
+        "duration_s": total_duration,
+    }
+
+
 def main() -> None:
-    """Preflight, keyboard run and code checks on one URL; saves to runs/<run_id>/."""
+    """Preflight, keyboard run, code checks, and optional Phase 3 Gemini scoring."""
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--url", required=True)
+    ap.add_argument("--tabs", type=int, default=config.MAX_TABS)
+    ap.add_argument("--headless", action="store_true")
+    ap.add_argument("--score", action="store_true", help="Run Hydrogen reader + Decisions API scorer + decide.py")
+    args = ap.parse_args()
+
+    if args.score:
+        res = run_audit(args.url, headless=args.headless, max_tabs=args.tabs, use_gemini=True)
+        if res.get("status") == "blocked":
+            print(f"Preflight: blocked — {res['reason']}")
+            return
+        run = res["run"]
+        dec = res["decisions"]
+        gu = res["gemini_usage"]
+        print(
+            f"\nFinished in {res['duration_s']}s ({len(run['steps'])} steps, stop={run['stop_reason']}, "
+            f"gemini_calls={gu['calls']}, tokens={gu['total_tokens']})"
+        )
+        for label, group in (("CONFIRMED", dec["confirmed"]), ("NEEDS_HUMAN", dec["needs_human"])):
+            for f in group:
+                fp = f["scorer_fail_p"]
+                fp_s = f"fail_p={fp:.2f}" if fp is not None else "code-only"
+                print(
+                    f"  {label:<11} {f['check']:<18} WCAG {f['wcag']:<6} "
+                    f"step {f['evidence'].get('step', '-')} ({fp_s}): {f['detail']}"
+                )
+        print(f"  Dropped scorer evaluations: {len(dec['dropped'])}")
+        print(f"Saved to {res['out_dir']}")
+        return
+
     from playwright.sync_api import sync_playwright
 
     from blindspot.browser import launch_browser
     from blindspot.checks import run_checks
     from blindspot.preflight import dismiss_banner, run_preflight
-
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--url", required=True)
-    ap.add_argument("--tabs", type=int, default=config.MAX_TABS)
-    ap.add_argument("--headless", action="store_true")
-    args = ap.parse_args()
 
     host = urlparse(args.url).netloc.replace("www.", "") or "local"
     run_id = f"{datetime.now():%Y%m%d-%H%M%S}-{host}"

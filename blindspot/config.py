@@ -24,6 +24,13 @@ MAX_POPUP_CLOSES = 2      # popups closed per run (logged); more than that and w
 CONFIRM_P = 0.80          # Decisions API probability to confirm (with code agreement)
 HUMAN_LOW = 0.40          # below this and no code flag = dropped
 
+GEMINI_TIMEOUT_S = 8.0    # per-call timeout (converted to ms for google-genai HttpOptions)
+GEMINI_RETRIES = 2        # attempts per key before falling back or failing
+SCORER_WORKERS = 12       # thread-pool workers for parallel Hydrogen + Decisions calls
+RED_BOX_WIDTH_PX = 3      # red marker box stroke width on scorer/evidence crops
+BOX_OUTSET_PX = 8         # CSS-pixel gap outside element rect so red box never hides focus rings
+SCORER_CONTEXT_PAD_PX = 48  # CSS-pixel context padding around element rect for scorer crops
+
 DECISION_MODEL = "gemini-decision-1"
 READER_MODEL = "gemini-4-hydrogen"
 HARD_CALL_MODEL = "gemini-4-argon"

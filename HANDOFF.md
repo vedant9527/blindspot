@@ -2,7 +2,7 @@
 
 Read AGENTS.md first. This file says where the build stands.
 
-**Status at handoff from Claude Code to Google Antigravity (Nov 21, ~11:50):** Phases 0, 1 and 2 done and pushed; Prompt B done. Next: Prompt 3 (Phase 3). The background app was stopped at handoff; restart it (below) so the QR form keeps taking stranger URLs.
+**Status (Nov 21, ~12:45, Google Antigravity):** Phases 0, 1, 2 and 3 done and verified. Next: Phase 4 (injector + axe-core).
 
 ## Setup and run (exact commands)
 
@@ -11,10 +11,10 @@ cd ~/blindspot
 source .venv/bin/activate              # Python 3.12; create with: python3 -m venv .venv
 pip install -r requirements.txt
 playwright install ffmpeg              # screen recordings (already installed on this laptop)
-pytest -q                              # 13 tests, ~85 s, headless Chrome
-uvicorn app.main:app --host 0.0.0.0 --port 8000     # app + stranger form at http://<laptop IP>:8000/submit
+pytest -q                              # 20 tests, ~90 s, headless Chrome
+uvicorn app.main:app --host 0.0.0.0 --port 8000     # app + run API + SSE + stranger form at /submit
 ipconfig getifaddr en0                 # laptop IP; regenerate eval/submit_qr.png if it changed
-python -m blindspot.runner --url https://www.healthcare.gov/   # full keyboard run + code checks
+python -m blindspot.runner --url https://nyulangone.org/doctors --score   # full Phase 3 run + Gemini scoring
 ```
 
 Keys in `.env` (never commit it; `.env.example` stays blank): `GEMINI_API_KEY` (required, used by every model and the Managed Agent) and `GEMINI_API_KEY_BACKUP` (optional; `blindspot/gemini.py` falls back to it on any error). Suggested: event credits key as primary, the free AI Studio key as backup.
@@ -99,6 +99,33 @@ API quirks found so far: the first Decisions API call is ~3 s (cold), later ones
 - **Demo pages (recommended, each run once so far; run each twice headed before relying on it):** mountsinai.org/find-a-doctor (real overlay finding), cdc.gov (real positive tabindex), nyulangone.org/doctors (quiet base for injected bugs).
 - Open: `python -m blindspot.runner` writes nothing when preflight blocks; it should save a `preflight.json` with the reason so batch runs show why. Run batches headed and one at a time.
 
+## Phase 3: Gemini reading, Decisions API scoring, decision rule & SSE (done, Antigravity, ~12:45)
+
+- `blindspot/config.py`: added `GEMINI_TIMEOUT_S` (8.0s, converted to `8000` ms for `google-genai` `HttpOptions`), `GEMINI_RETRIES` (2), `SCORER_WORKERS` (12), `RED_BOX_WIDTH_PX` (3), `BOX_OUTSET_PX` (8px gap so the red marker box never hides CSS focus outlines), and `SCORER_CONTEXT_PAD_PX` (48px). Existing thresholds untouched.
+- `blindspot/gemini.py`:
+  - `parse_decisions_response(resp)` written from `docs/decisions_response_example.json`: parses `noul` (`noul` = P(true), `p_false` = 1 - `noul`, `confidence`), `choice`, `score`, and `usage` (`text_input_tokens`, `image_input_tokens`, `total_input_tokens`, `total_output_tokens`, `total_tokens`).
+  - Thread-local `genai.Client` cache, 8s timeout, retries, `GEMINI_API_KEY_BACKUP` fallback, and structured per-call logging (`summarize_calls`).
+  - `make_boxed_crop`: draws an outer 3px red marker rectangle around `rect + 8px` on the full screenshot and produces `crops/NN_boxed.png`.
+  - `score_page_state`: preflight warm-up Decisions API call (`page_state` choice) so step-scoring calls hit a warm endpoint.
+  - `read_step` (`gemini-4-hydrogen` JSON `{visible_label, indicator_visible, notes}`) and `score_step` (`gemini-decision-1` `noul` questions with explicit criteria; omits `indicator_faint` when the element is under an overlay; includes `order_logical` only when code flags an upward-jump suspect).
+- `blindspot/decide.py`:
+  - Implements SPEC section 6: `confirmed` (`proven` or `suspect` + `fail_p >= CONFIRM_P`), `needs_human` (`HUMAN_LOW <= fail_p < CONFIRM_P`, scorer >= `CONFIRM_P` without code support, or unconfirmed code suspect), `dropped` (`fail_p < HUMAN_LOW` with no code flag, or `replayed is False`).
+  - Suppresses `indicator_contrast` suspects on steps under an overlay (`is_under_overlay`).
+  - Deduplicates active findings to one per `(check, selector)`, keeping the highest-evidence step.
+- `blindspot/runner.py` & `app/main.py`:
+  - `run_audit(...)` runs preflight (+ warm-up), the Tab loop with a 12-worker `ThreadPoolExecutor` scoring steps concurrently alongside Playwright, `decide_findings`, and writes `steps.json`, `checks.json`, `findings.json`, `crops/NN_boxed.png`, and `run.log`. CLI flag: `--score`.
+  - `POST /api/run` (`{url, inject, seed}` -> `{run_id}`), `GET /api/run/{run_id}/events` (SSE streaming `preflight`, `step`, `finding`, `done`, `error`), `GET /api/run/{run_id}`, `GET /api/vetted`, and `/runs` static mount.
+- Verified on all 7 fixtures with live `gemini-4-hydrogen` + `gemini-decision-1` (~8.4–11.0s each, ~40k tokens/fixture):
+  - `clean.html`: **0 confirmed**, 0 needs_human, 52 dropped.
+  - `popup.html`: **0 confirmed**, 0 needs_human, 52 dropped.
+  - `trap.html`: **1 confirmed** (`keyboard_trap` 2.1.2), 0 needs_human, 48 dropped.
+  - `hidden_focus.html`: **1 confirmed** (`focus_not_visible` 2.4.7, scorer `fail_p=0.93`), 0 needs_human, 51 dropped.
+  - `covered.html`: **1 confirmed** (`focus_obscured` 2.4.11, scorer `fail_p=0.77`), 2 needs_human (scorer-only flags on the covered element), 48 dropped.
+  - `tabindex.html`: **1 confirmed** (`focus_order` 2.4.3), 0 needs_human, 52 dropped.
+  - `label_mismatch.html`: **1 confirmed** (`label_in_name` 2.5.3, scorer `fail_p=0.95`), 0 needs_human, 51 dropped.
+- Verified 40-step real-page latency on `https://nyulangone.org/doctors` (`--headless --score`): **52.76s** total (preflight warm-up + 40 Tab steps + 40 Hydrogen calls + 40 Decisions calls = 81 Gemini calls, 121,810 tokens; **0 confirmed**, 13 needs_human, 144 dropped) — inside the 60s hard cap.
+- Tests: `tests/test_decide.py` added (parser, `decide_one`, deduplication, overlay gating, end-to-end `/api/run` + SSE). `pytest -q`: **20 passed**.
+
 ## Next
 
-Phase 3 (Prompt 3 in PROMPTS.md): Gemini reading and scoring, the decision rule, SSE events. The Decisions API parser can be written from `docs/decisions_response_example.json`. Read `failure_log.md` first.
+Phase 4 (1:00 to 1:30 in `docs/PLAN.md`): `blindspot/injector.py` (five bugs + seeded manifest + `tests/test_injector.py` on `clean.html`) and `blindspot/axe_runner.py` (axe-core baseline + `axe` SSE event), wired into `run_audit`.
