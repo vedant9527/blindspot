@@ -6,7 +6,9 @@ See docs/SPEC.md section 1.
 from __future__ import annotations
 
 import asyncio
+import ipaddress
 import json
+import socket
 import threading
 import uuid
 from dataclasses import dataclass, field
@@ -76,9 +78,50 @@ class RunRequest(BaseModel):
     use_gemini: bool = True
 
 
+def _is_blocked_ip(ip_str: str) -> bool:
+    """True for loopback, private, link-local, unspecified, reserved, or multicast IPs."""
+    clean = ip_str.split("%", 1)[0]  # strip IPv6 zone ID if present
+    ip = ipaddress.ip_address(clean)
+    if isinstance(ip, ipaddress.IPv6Address) and ip.ipv4_mapped is not None:
+        ip = ip.ipv4_mapped
+    return (
+        ip.is_private
+        or ip.is_loopback
+        or ip.is_link_local
+        or ip.is_unspecified
+        or ip.is_reserved
+        or ip.is_multicast
+    )
+
+
 def _valid_url(url: str) -> bool:
+    """Allow only public http(s) URLs; reject file://, localhost, .local, and private/loopback IPs."""
     parsed = urlparse(url.strip())
-    return parsed.scheme in ("http", "https") and bool(parsed.netloc)
+    if parsed.scheme not in ("http", "https"):
+        return False
+    host = (parsed.hostname or "").strip().lower().rstrip(".")
+    if not host:
+        return False
+    if host == "localhost" or host.endswith(".localhost") or host.endswith(".local"):
+        return False
+    try:
+        return not _is_blocked_ip(host)
+    except ValueError:
+        pass
+    try:
+        infos = socket.getaddrinfo(host, None)
+    except OSError:
+        return False
+    ips = {info[4][0] for info in infos if info and info[4]}
+    if not ips:
+        return False
+    for ip_str in ips:
+        try:
+            if _is_blocked_ip(ip_str):
+                return False
+        except ValueError:
+            return False
+    return True
 
 
 @app.get("/")
@@ -133,12 +176,14 @@ def start_run(req: RunRequest) -> dict[str, str]:
     """Start an accessibility run in a background worker and return its `run_id`."""
     url = req.url.strip()
     if not _valid_url(url):
-        raise HTTPException(status_code=400, detail="Please enter a full URL starting with http:// or https://")
+        raise HTTPException(status_code=400, detail="Please enter a valid public URL starting with http:// or https://")
     host = urlparse(url).netloc.replace("www.", "") or "page"
     short = uuid.uuid4().hex[:6]
     run_id = f"{datetime.now():%Y%m%d-%H%M%S}-{host}-{short}"
     state = RunStreamState(run_id=run_id, url=url)
     with _RUNS_LOCK:
+        if any(not s.finished for s in _ACTIVE_RUNS.values()):
+            raise HTTPException(status_code=409, detail="A run is already in progress")
         _ACTIVE_RUNS[run_id] = state
 
     def _worker() -> None:
@@ -155,6 +200,9 @@ def start_run(req: RunRequest) -> dict[str, str]:
             )
         except Exception as exc:
             state.push("error", {"run_id": run_id, "message": str(exc)})
+        finally:
+            with state.lock:
+                state.finished = True
 
     threading.Thread(target=_worker, name=f"blindspot-{run_id}", daemon=True).start()
     return {"run_id": run_id}
