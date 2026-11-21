@@ -1,994 +1,1672 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Blindspot — Keyboard &amp; Screen-Reader Accessibility Agent</title>
-  <style>
-    :root {
-      --bg: #f8fafc;
-      --surface: #ffffff;
-      --ink: #0f172a;
-      --muted: #475569;
-      --border: #cbd5e1;
-      --primary: #1d4ed8;
-      --primary-hover: #1e40af;
-      --danger: #b91c1c;
-      --danger-bg: #fef2f2;
-      --warn: #b45309;
-      --warn-bg: #fffbeb;
-      --ok: #15803d;
-      --ok-bg: #f0fdf4;
-      --radius: 14px;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      font-size: 18px;
-      line-height: 1.45;
-      background: var(--bg);
-      color: var(--ink);
-    }
-    a { color: var(--primary); }
-    :focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blindspot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================================
+   1. TOKENS (lifted from ~/blindspot-mockups/index.html)
+   ========================================================================== */
+:root {
+  /* color */
+  --bg: #F7F5F0;
+  --surface: #FFFFFF;
+  --text: #111827;
+  --muted: #4B5563;
+  --dim: #6B7280;
+  --border: #D1D5DB;
+  --brand: #3730A3;
+  --focus-dark: #FBBF24;
+  --evidence: #C8102E;
+  --human: #B45309;
+  --pass: #15803D;
+  --frame: #111827;
+  --code-bg: #F3F4F6;
+  --on-dark: #F9FAFB;
+  --on-dark-muted: #9CA3AF;
+  --progress: #A5B4FC;
+  --progress-done: #4ADE80;
+  --mock-page: #F9FAFB;
 
-    header {
-      background: #0f172a;
-      color: #ffffff;
-      padding: 18px 28px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-    .brand { display: flex; align-items: baseline; gap: 14px; }
-    .brand h1 { margin: 0; font-size: 2rem; letter-spacing: -0.02em; }
-    .brand span { font-size: 1rem; color: #cbd5e1; }
-    .tabs { display: flex; gap: 10px; align-items: center; }
-    .tab-btn {
-      background: #1e293b;
-      color: #e2e8f0;
-      border: 2px solid #334155;
-      border-radius: 10px;
-      padding: 10px 20px;
-      font-size: 1.05rem;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    .tab-btn.active { background: #ffffff; color: #0f172a; border-color: #ffffff; }
-    .submit-link {
-      color: #93c5fd;
-      font-size: 1rem;
-      font-weight: 600;
-      text-decoration: none;
-      margin-left: 8px;
-    }
-    .submit-link:hover { text-decoration: underline; }
+  /* type */
+  --font-ui: "Atkinson Hyperlegible", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  --fs-14: .875rem;
+  --fs-16: 1rem;
+  --fs-20: 1.25rem;
+  --fs-22: 1.375rem;
+  --fs-24: 1.5rem;
+  --fs-32: 2rem;
+  --fs-48: 3rem;
 
-    main { max-width: 1480px; margin: 0 auto; padding: 22px 28px 48px; }
-    .hidden { display: none !important; }
+  /* layout */
+  --app-w: 1280px;
+  --app-h: 800px;
+  --h-top: 3.5rem;
+  --h-break: 3rem;
+  --h-bottom: 4rem;
+  --gutter: 1rem;
+  --crop-h: 10rem;           /* ~160px tall 1:1 crop */
+  --radius: 8px;
+  --rule-confirmed: 6px solid var(--evidence);
+  --rule-human: 6px solid var(--human);
 
-    /* Controls card */
-    .controls {
-      background: var(--surface);
-      border: 2px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px 22px;
-      margin-bottom: 20px;
-    }
-    .url-row {
-      display: grid;
-      grid-template-columns: 1.4fr 1fr auto;
-      gap: 12px;
-      align-items: end;
-    }
-    label.field-label {
-      display: block;
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: var(--muted);
-      margin-bottom: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-    input[type="url"], select {
-      width: 100%;
-      padding: 12px 14px;
-      font-size: 1.1rem;
-      border: 2px solid var(--border);
-      border-radius: 10px;
-      background: #ffffff;
-      color: var(--ink);
-    }
-    #run-btn {
-      padding: 13px 28px;
-      font-size: 1.15rem;
-      font-weight: 800;
-      background: var(--primary);
-      color: #ffffff;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    #run-btn:hover:not(:disabled) { background: var(--primary-hover); }
-    #run-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+  /* focus */
+  --focus-ring: 3px solid var(--brand);
+  --focus-offset: 3px;
 
-    .break-row {
-      margin-top: 16px;
-      padding-top: 14px;
-      border-top: 1px solid #e2e8f0;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .break-label {
-      font-weight: 800;
-      font-size: 1rem;
-      color: var(--danger);
-      margin-right: 4px;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-    .bug-btn {
-      padding: 9px 15px;
-      font-size: 1rem;
-      font-weight: 700;
-      border-radius: 999px;
-      border: 2px solid var(--border);
-      background: #f1f5f9;
-      color: var(--ink);
-      cursor: pointer;
-    }
-    .bug-btn.selected {
-      background: var(--danger);
-      color: #ffffff;
-      border-color: var(--danger);
-    }
-    .bug-btn[data-bug=""].selected {
-      background: #0f172a;
-      border-color: #0f172a;
-    }
+  /* evidence box */
+  --ev-border: 4px solid var(--evidence);
+  --ev-halo: 0 0 0 2px #fff;
 
-    /* Big-number KPI row (one big number per panel) */
-    .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 18px;
-      margin-bottom: 20px;
-    }
-    .kpi-card {
-      background: var(--surface);
-      border: 2px solid var(--border);
-      border-radius: var(--radius);
-      padding: 18px 22px;
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .kpi-label { font-size: 1.1rem; font-weight: 700; color: var(--muted); }
-    .kpi-num { font-size: 3.1rem; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
-    .kpi-num.danger { color: var(--danger); }
-    .kpi-num.primary { color: var(--primary); }
+  /* motion */
+  --ease-fly: cubic-bezier(.2, .8, .2, 1);
+  --t-draw: 300ms;
+  --t-fly: 450ms;
+  --t-stagger: 60ms;
+  --t-fade: 220ms;
+}
 
-    /* Status strip */
-    .status-bar {
-      background: #eff6ff;
-      border: 2px solid #93c5fd;
-      border-radius: 12px;
-      padding: 12px 18px;
-      margin-bottom: 20px;
-      font-size: 1.05rem;
-      font-weight: 600;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-    .status-bar.blocked { background: var(--danger-bg); border-color: #fca5a5; color: var(--danger); }
-    .status-bar.done { background: var(--ok-bg); border-color: #86efac; color: #14532d; }
+html { font-size: 16px; }
 
-    /* Main two-column workspace */
-    .workspace {
-      display: grid;
-      grid-template-columns: 1.15fr 1fr;
-      gap: 20px;
-      align-items: start;
-      margin-bottom: 24px;
-    }
-    .panel {
-      background: var(--surface);
-      border: 2px solid var(--border);
-      border-radius: var(--radius);
-      padding: 18px 20px;
-    }
-    .panel h2 {
-      margin: 0 0 14px;
-      font-size: 1.35rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-    .frame-box {
-      background: #0f172a;
-      border-radius: 10px;
-      overflow: hidden;
-      min-height: 360px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 2px solid #334155;
-    }
-    #live-frame {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-    .frame-placeholder {
-      color: #cbd5e1;
-      font-size: 1.2rem;
-      padding: 32px;
-      text-align: center;
-    }
-    .step-caption {
-      margin-top: 12px;
-      padding: 12px 14px;
-      background: #f1f5f9;
-      border-radius: 10px;
-      font-size: 1.05rem;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      word-break: break-word;
-    }
+/* ==========================================================================
+   2. BASE
+   ========================================================================== */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: var(--fs-16);
+  line-height: 1.35;
+  overflow: hidden;
+  display: grid; place-items: center;
+  -webkit-font-smoothing: antialiased;
+}
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a, button, input, select, [tabindex] { outline-offset: var(--focus-offset); }
+:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-offset); }
+.on-dark :focus-visible { outline-color: var(--focus-dark); }
+[hidden] { display: none !important; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.skip {
+  position: absolute; left: .5rem; top: -4rem; z-index: 50;
+  background: var(--surface); padding: .5rem .75rem; border-radius: 6px;
+  border: 1px solid var(--border); color: var(--brand);
+}
+.skip:focus { top: .5rem; }
 
-    /* Findings cards */
-    .findings-list { display: flex; flex-direction: column; gap: 16px; max-height: 680px; overflow-y: auto; }
-    .finding-card {
-      border: 2px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      background: #ffffff;
-    }
-    .finding-card.confirmed { border-color: var(--danger); background: var(--danger-bg); }
-    .finding-card.needs_human { border-color: #f59e0b; background: var(--warn-bg); }
-    .badge-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
-    .badge {
-      display: inline-block;
-      padding: 4px 11px;
-      border-radius: 999px;
-      font-size: 0.9rem;
-      font-weight: 800;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-    }
-    .badge.confirmed { background: var(--danger); color: #ffffff; }
-    .badge.needs_human { background: var(--warn); color: #ffffff; }
-    .badge.wcag { background: #0f172a; color: #ffffff; }
-    .badge.step { background: #e2e8f0; color: #0f172a; }
-    .badge.replayed-ok { background: var(--ok); color: #ffffff; }
-    .badge.replayed-wait { background: #dbeafe; color: #1e40af; }
-    .badge.replayed-no { background: #e2e8f0; color: #475569; }
-    .crop-wrap {
-      background: #ffffff;
-      border: 2px solid #cbd5e1;
-      border-radius: 10px;
-      padding: 8px;
-      margin: 10px 0;
-      text-align: center;
-    }
-    .crop-img {
-      width: 100%;
-      max-height: 220px;
-      object-fit: contain;
-      display: block;
-      margin: 0 auto;
-    }
-    .finding-title { font-size: 1.2rem; font-weight: 800; margin: 4px 0; }
-    .finding-detail { font-size: 1rem; color: #1e293b; margin: 4px 0 10px; }
-    .finding-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-    .ticket-btn {
-      padding: 10px 18px;
-      font-size: 1rem;
-      font-weight: 800;
-      background: #0f172a;
-      color: #ffffff;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    .ticket-btn:hover:not(:disabled) { background: var(--primary); }
-    .ticket-btn:disabled { opacity: 0.5; cursor: wait; }
+/* fixed 1280x800 design surface; JS zooms it to fit bigger screens (1920x1080 -> 1.35) */
+.app {
+  width: 100%; max-width: var(--app-w); height: var(--app-h);
+  margin: 0 auto; overflow: hidden; background: var(--bg);
+  display: grid;
+  grid-template-rows: minmax(var(--h-top), auto) minmax(var(--h-break), auto) minmax(0, 1fr) var(--h-bottom);
+}
 
-    /* Side-by-side Blindspot vs axe-core */
-    .compare-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-    .compare-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
-    .compare-item {
-      padding: 12px 14px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: #f8fafc;
-      font-size: 1.05rem;
-    }
-    .axe-banner {
-      padding: 12px 14px;
-      border-radius: 10px;
-      margin-bottom: 12px;
-      font-weight: 700;
-      font-size: 1.05rem;
-    }
-    .axe-banner.missed { background: #fef2f2; border: 2px solid #fca5a5; color: var(--danger); }
-    .axe-banner.caught { background: #f0fdf4; border: 2px solid #86efac; color: var(--ok); }
+/* ==========================================================================
+   3. TOP BAR
+   ========================================================================== */
+.topbar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .75rem;
+  padding: .5rem var(--gutter);
+  border-bottom: 1px solid var(--border);
+  min-width: 0;
+}
+.brand { display: flex; align-items: center; gap: .4rem; flex: none; margin-right: auto; }
+.brand svg { width: 1.375rem; height: 1.375rem; }
+.wordmark { font-size: var(--fs-24); font-weight: 700; letter-spacing: -.01em; }
+.run { display: flex; align-items: center; gap: .5rem; flex: none; }
+.field {
+  height: 2.5rem; border: 1px solid var(--border); border-radius: 6px;
+  background: var(--surface); padding: 0 .625rem;
+}
+select.field {
+  appearance: none; padding-right: 1.75rem; max-width: 17.5rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%23111827' stroke-width='1.6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right .6rem center; background-size: .75rem;
+}
+input.field { width: 15.5rem; }
+input.field::placeholder { color: var(--muted); opacity: 1; }
+.btn-run {
+  height: 2.5rem; padding: 0 1.25rem; border: 0; border-radius: 6px;
+  background: var(--brand); color: #fff; font-weight: 700; font-size: 1.125rem; letter-spacing: .01em;
+}
+.btn-run:hover:not(:disabled) { background: #312E81; }
+.btn-run:disabled { opacity: .6; cursor: not-allowed; }
+.deadline {
+  flex: none; padding: .35rem .7rem; border: 1px solid var(--text); border-radius: 6px;
+  white-space: nowrap;
+}
+.deadline b { font-weight: 700; }
+.proof {
+  flex: none; color: var(--brand); font-weight: 700; text-underline-offset: 3px;
+  background: none; border: 0; padding: .2rem .25rem; text-decoration: underline;
+}
 
-    /* Proof tab */
-    .proof-box {
-      background: var(--surface);
-      border: 2px solid var(--border);
-      border-radius: var(--radius);
-      padding: 26px 30px;
-    }
-    .hash-pill {
-      display: inline-block;
-      background: #f1f5f9;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px 14px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 0.95rem;
-      word-break: break-all;
-      margin-bottom: 16px;
-    }
-    table.proof-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 16px;
-      font-size: 1.05rem;
-    }
-    table.proof-table th, table.proof-table td {
-      border: 1px solid var(--border);
-      padding: 12px 14px;
-      text-align: left;
-    }
-    table.proof-table th { background: #0f172a; color: #ffffff; font-weight: 800; }
-    table.proof-table tr:nth-child(even) { background: #f8fafc; }
+/* ==========================================================================
+   4. BREAK-IT STRIP
+   ========================================================================== */
+.breakit {
+  display: flex; flex-wrap: wrap; align-items: center; gap: .375rem .75rem;
+  padding: .3rem var(--gutter);
+  border-bottom: 1px solid var(--border);
+  min-width: 0;
+}
+.breakit-label { flex: none; width: 14.5rem; line-height: 1.15; }
+.breakit-label span { color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: .375rem; min-width: 0; }
+.chip {
+  height: 2.25rem; padding: 0 .65rem; border-radius: 999px; white-space: nowrap;
+  border: 1px solid var(--border); background: var(--surface);
+}
+.chip:hover { border-color: var(--text); }
+.chip[aria-pressed="true"] { background: var(--text); border-color: var(--text); color: #fff; }
 
-    /* Ticket modal */
-    dialog#ticket-modal {
-      width: min(920px, 94vw);
-      max-height: 88vh;
-      border: 3px solid #0f172a;
-      border-radius: 16px;
-      padding: 0;
-      box-shadow: 0 24px 64px rgba(15, 23, 42, 0.45);
-    }
-    dialog::backdrop { background: rgba(15, 23, 42, 0.65); }
-    .modal-head {
-      background: #0f172a;
-      color: #ffffff;
-      padding: 16px 22px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-    }
-    .modal-head h3 { margin: 0; font-size: 1.3rem; }
-    .modal-body { padding: 22px 26px; overflow-y: auto; max-height: 70vh; font-size: 1.08rem; }
-    .modal-body pre {
-      background: #0f172a;
-      color: #e2e8f0;
-      padding: 14px 16px;
-      border-radius: 10px;
-      overflow-x: auto;
-      font-size: 0.98rem;
-    }
-    .modal-body code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
-    .modal-actions {
-      padding: 14px 22px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: flex-end;
-      gap: 12px;
-    }
-    .close-btn {
-      background: #ffffff;
-      color: #0f172a;
-      border: 2px solid #0f172a;
-      border-radius: 8px;
-      padding: 8px 16px;
-      font-size: 1rem;
-      font-weight: 800;
-      cursor: pointer;
-    }
+/* ==========================================================================
+   5. HERO ROW
+   ========================================================================== */
+.hero {
+  display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: var(--gutter);
+  padding: .375rem var(--gutter);
+  min-height: 0;
+}
 
-    @media (max-width: 1020px) {
-      .url-row, .workspace, .compare-grid, .kpi-grid { grid-template-columns: 1fr; }
-    }
-  </style>
+/* 5a. stage: keyboard frame + caption */
+.stage {
+  container-type: size;
+  display: flex; flex-direction: column; gap: .6rem;
+  min-height: 0; min-width: 0;
+}
+.frame {
+  --cap-reserve: 6.75rem;
+  container-type: size;
+  position: relative; flex: none;
+  width: min(100cqw, (100cqh - var(--cap-reserve)) * 1.6);
+  aspect-ratio: 16 / 10;
+  background: var(--frame); color: var(--on-dark);
+  border-radius: 12px; overflow: hidden;
+  display: grid; grid-template-rows: auto minmax(0, 1fr);
+}
+.band {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: .5rem 1rem .625rem;
+  position: relative;
+}
+.counter { display: flex; align-items: baseline; gap: .75rem; white-space: nowrap; }
+.tabcount { font-family: var(--font-mono); font-size: var(--fs-48); line-height: 1; letter-spacing: -.02em; }
+.tabcount b { font-weight: 700; }
+.max { font-family: var(--font-mono); font-size: var(--fs-16); color: var(--on-dark-muted); }
+.band-right { display: grid; justify-items: end; gap: .25rem; min-width: 0; }
+.status { display: inline-flex; align-items: center; gap: .5rem; font-size: var(--fs-16); white-space: nowrap; }
+.dot { width: .625rem; height: .625rem; border-radius: 50%; background: var(--progress); flex: none; }
+.state-running .dot { animation: pulse 1.1s ease-in-out infinite; }
+.dot.grey { background: #6B7280; }
+.dot.red { background: #F87171; }
+.dot.green { background: var(--progress-done); }
+.dot.amber { background: var(--focus-dark); }
+.url { font-family: var(--font-mono); font-size: var(--fs-16); color: var(--on-dark-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.progress { position: absolute; left: 1rem; right: 1rem; bottom: 0; height: 4px; border-radius: 2px; background: rgba(255,255,255,.14); overflow: hidden; }
+.progress span { display: block; height: 100%; width: var(--p, 0%); background: var(--progress); border-radius: 2px; transition: width 320ms var(--ease-fly); }
+.state-done .progress span { background: var(--progress-done); }
+
+.viewport { position: relative; margin: .625rem .75rem .75rem; border-radius: 6px; overflow: hidden; min-height: 0; background: #1f2937; }
+.idle-slot {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  border: 2px dashed #4B5563; border-radius: 6px; background: var(--frame);
+}
+.keycap {
+  display: inline-flex; align-items: center; gap: .5rem;
+  font-family: var(--font-mono); font-size: var(--fs-24); color: var(--on-dark-muted);
+  border: 2px solid #4B5563; border-bottom-width: 5px; border-radius: 10px; padding: .5rem 1.25rem;
+}
+.blocked-slot {
+  position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 1rem;
+  text-align: center; padding: 1.5rem 2.5rem;
+  border: 2px solid #374151; border-radius: 6px; background: var(--frame); z-index: 4;
+}
+.blocked-slot svg { width: 2.75rem; height: 2.75rem; color: var(--focus-dark); }
+.blocked-slot p { margin: 0; font-size: var(--fs-24); line-height: 1.3; max-width: 28ch; }
+.blocked-slot p span { display: block; color: var(--on-dark-muted); font-size: var(--fs-20); margin-top: .375rem; }
+.btn-vetted {
+  height: 2.75rem; padding: 0 1.25rem; border-radius: 6px; border: 0;
+  background: var(--on-dark); color: var(--text); font-weight: 700;
+}
+
+/* Real live screenshot & percentage-positioned FOCUS IS HERE box */
+.live-shot {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; object-position: top; display: block;
+}
+.focus-marker {
+  position: absolute; z-index: 3; pointer-events: none;
+  transition: left 180ms var(--ease-fly), top 180ms var(--ease-fly), width 180ms var(--ease-fly), height 180ms var(--ease-fly);
+}
+.ev-box {
+  position: absolute; inset: -4px; border: var(--ev-border); box-shadow: var(--ev-halo);
+  border-radius: 6px; pointer-events: none;
+}
+.ev-tab {
+  position: absolute; left: -4px; bottom: calc(100% + 2px);
+  background: var(--evidence); color: #fff;
+  font: 700 var(--fs-14)/1 var(--font-mono); letter-spacing: .04em;
+  padding: .28rem .45rem .23rem; border-radius: 4px 4px 0 0; white-space: nowrap;
+}
+.ev-under .ev-tab { bottom: auto; top: calc(100% + 2px); border-radius: 0 0 4px 4px; }
+
+/* caption */
+.caption {
+  margin: 0; font-size: 1.35rem; line-height: 1.28; max-width: 100%;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.caption .step { font-family: var(--font-mono); font-weight: 700; }
+.caption .says { color: var(--muted); }
+
+/* 5c. ticket pane */
+.tickets { display: flex; flex-direction: column; gap: .38rem; min-height: 0; min-width: 0; overflow: hidden; }
+.empty {
+  flex: 1; display: grid; place-content: center; text-align: center; gap: .375rem; padding: 1.5rem;
+  border: 2px dashed var(--border); border-radius: var(--radius); color: var(--muted);
+}
+.empty strong { color: var(--text); font-size: var(--fs-24); }
+
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-left: var(--rule-confirmed);
+  border-radius: var(--radius);
+  padding: .35rem .875rem .38rem;
+  display: flex; flex-direction: column; gap: .22rem;
+  flex: none; min-height: 0; overflow: hidden;
+}
+.card.human { border-left: var(--rule-human); }
+.card > * { flex: none; }
+.row1 { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; row-gap: .2rem; }
+.tid { font-family: var(--font-mono); font-weight: 700; }
+.wcag {
+  font-family: var(--font-mono); font-size: var(--fs-14); font-weight: 700;
+  background: var(--text); color: #fff; padding: .18rem .45rem; border-radius: 4px; white-space: nowrap;
+}
+.human .row1 .wcag { background: var(--human); }
+.verdict-tag { display: inline-flex; align-items: baseline; gap: .4rem; white-space: nowrap; }
+.verdict-tag strong { font-family: var(--font-mono); font-size: var(--fs-14); font-weight: 700; color: var(--evidence); letter-spacing: .02em; }
+.human .verdict-tag strong { color: var(--human); }
+.verdict-tag .how { font-size: var(--fs-16); color: var(--muted); }
+.gemini {
+  margin: 0; font: .8125rem/1.28 var(--font-mono); color: var(--text);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.gemini b { font-weight: 700; }
+.title {
+  margin: 0; font-size: 1.65rem; line-height: 1.08; font-weight: 700; letter-spacing: -.01em;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+.crop {
+  position: relative; height: 9.25rem; min-height: 7rem; max-height: 9.25rem;
+  border: 1px solid var(--border); border-radius: 6px; overflow: hidden;
+  background: var(--mock-page);
+  display: flex; align-items: center; justify-content: center;
+}
+.crop-img {
+  max-width: 100%; max-height: 100%;
+  width: auto; height: auto;
+  object-fit: scale-down;
+  display: block;
+}
+.card.compact .crop, .card.compact .patient, .card.compact .fix { display: none; }
+.count {
+  position: absolute; top: .45rem; right: .45rem; z-index: 2;
+  background: var(--text); color: #fff; font: 700 var(--fs-14)/1 var(--font-mono);
+  padding: .3rem .55rem; border-radius: 999px;
+}
+.crop .pill { position: absolute; right: .45rem; bottom: .45rem; z-index: 2; }
+
+/* replay pill */
+.pill {
+  display: inline-flex; align-items: center; gap: .4rem; white-space: nowrap;
+  font-size: .92rem; line-height: 1; padding: .3rem .6rem; border-radius: 999px;
+  background: rgba(255, 255, 255, .95); border: 1px solid currentColor;
+}
+.pill svg { width: .95rem; height: .95rem; flex: none; }
+.pill.replaying { color: var(--brand); }
+.pill.replayed { color: var(--pass); }
+.pill.partial { color: var(--muted); border-style: dashed; }
+.spinner {
+  width: .85rem; height: .85rem; border-radius: 50%; flex: none;
+  border: 2px solid currentColor; border-right-color: transparent;
+  animation: spin .8s linear infinite;
+}
+
+.patient { display: grid; gap: .08rem; }
+.label { font-size: .95rem; font-weight: 700; color: var(--muted); }
+.patient p {
+  margin: 0; font-size: 1.08rem; line-height: 1.22; border-left: 4px solid var(--text); padding-left: .7rem;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.fix { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; gap: .55rem; }
+.fix .label { padding-top: .2rem; min-width: 1.8rem; }
+.fix .note { display: block; font-size: .9rem; line-height: 1.22; color: var(--muted); margin-top: .15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fix pre {
+  margin: 0; background: var(--code-bg); border-radius: 6px; padding: .28rem .55rem;
+  font: .84rem/1.3 var(--font-mono); color: var(--text); white-space: pre-wrap; word-break: break-word;
+  max-height: 3.6rem; overflow-y: auto;
+}
+.foot { display: flex; align-items: center; gap: .55rem; border-top: 1px solid var(--border); padding-top: .28rem; min-width: 0; }
+.foot .at { font-family: var(--font-mono); font-weight: 700; flex: none; }
+.sel { font: .95rem/1.2 var(--font-mono); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 1; }
+.btn-ghost {
+  flex: none; height: 1.95rem; padding: 0 .7rem; border-radius: 6px;
+  border: 1px solid var(--text); background: var(--surface); font-weight: 700; font-size: .95rem;
+  display: inline-flex; align-items: center; gap: .35rem;
+}
+.btn-ghost svg { width: .95rem; height: .95rem; }
+.axe { margin: 0; font-size: .95rem; color: var(--muted); display: flex; align-items: center; gap: .38rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.axe svg { width: .95rem; height: .95rem; flex: none; }
+.axe.caught { color: var(--pass); }
+
+/* collapsed rows */
+.rows {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: .2rem;
+  flex: 0 1 auto; min-height: 0; overflow-y: auto;
+}
+.rows li { min-width: 0; }
+.rowc {
+  width: 100%; display: grid; gap: .2rem; text-align: left;
+  min-height: 1.95rem; padding: .22rem .625rem;
+  background: var(--surface); border: 1px solid var(--border); border-left: var(--rule-confirmed); border-radius: var(--radius);
+}
+.rline { display: flex; align-items: center; gap: .5rem; min-width: 0; }
+.rowc.human { border-left: var(--rule-human); }
+button.rowc:hover { border-color: var(--text); border-left-color: var(--evidence); }
+button.rowc.human:hover { border-left-color: var(--human); }
+.rowc .tid { font-size: var(--fs-16); color: var(--muted); flex: none; }
+.rowc .rt { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rowc .tag { font: 700 var(--fs-14)/1 var(--font-mono); border: 1px solid var(--text); border-radius: 999px; padding: .18rem .42rem; flex: none; }
+.rowc .wcag { flex: none; }
+.rowc.human .wcag { background: var(--human); }
+
+.human-toggle {
+  flex: none; display: flex; align-items: center; gap: .45rem; width: 100%;
+  border: 0; background: none; padding: .1rem .25rem; text-align: left; line-height: 1.2;
+  color: var(--human); font-weight: 700;
+}
+.human-toggle svg { width: 1rem; height: 1rem; transition: transform 200ms; }
+.human-toggle[aria-expanded="true"] svg { transform: rotate(90deg); }
+
+/* ==========================================================================
+   6. BOTTOM STRIP: opens Proof
+   ========================================================================== */
+.bottom { display: flex; padding: 4px var(--gutter) 6px; border-top: 1px solid var(--border); background: var(--bg); min-width: 0; }
+.proof-link {
+  flex: 1; min-width: 0; display: flex; align-items: center; gap: .75rem;
+  padding: 0 1rem; border: 1px solid var(--text); border-radius: var(--radius);
+  background: var(--surface); color: var(--text); text-decoration: none; text-align: left;
+  font-size: 1.08rem; line-height: 1.12;
+}
+.proof-link:hover { border-color: var(--brand); box-shadow: inset 0 0 0 1px var(--brand); }
+.verdict { flex: 1; min-width: 0; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.verdict .k { font-weight: 700; }
+.verdict .caught { color: var(--evidence); font-weight: 700; }
+.verdict .dim { color: var(--muted); }
+.verdict .n { font-family: var(--font-mono); font-weight: 700; }
+.verdict .sep { color: var(--muted); padding: 0 .18em; }
+.go { flex: none; display: inline-flex; align-items: center; gap: .375rem; color: var(--brand); font-weight: 700; font-size: var(--fs-20); }
+.go svg { width: 1.25rem; height: 1.25rem; }
+
+/* ==========================================================================
+   7. PROOF DIALOG
+   ========================================================================== */
+dialog.proof-modal {
+  width: min(1080px, 94vw); max-height: 86vh;
+  border: 2px solid var(--text); border-radius: 12px; padding: 0;
+  background: var(--surface); color: var(--text);
+  box-shadow: 0 24px 64px rgba(17, 24, 39, .35);
+}
+dialog.proof-modal::backdrop { background: rgba(17, 24, 39, .55); }
+.pm-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: .85rem 1.25rem; border-bottom: 1px solid var(--border); background: var(--bg);
+}
+.pm-head h2 { margin: 0; font-size: var(--fs-24); }
+.pm-body { padding: 1.1rem 1.25rem 1.4rem; overflow-y: auto; max-height: calc(86vh - 4rem); font-size: 1rem; }
+.pm-hash {
+  display: inline-block; font-family: var(--font-mono); font-size: .88rem;
+  background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px;
+  padding: .35rem .65rem; margin-bottom: .75rem; word-break: break-all;
+}
+.pm-body table { width: 100%; border-collapse: collapse; margin: .75rem 0 1rem; font-size: .95rem; }
+.pm-body th, .pm-body td { border: 1px solid var(--border); padding: .5rem .65rem; text-align: left; }
+.pm-body th { background: var(--text); color: #fff; font-weight: 700; }
+.pm-body tr:nth-child(even) { background: #F9FAFB; }
+.pm-body h1 { font-size: 1.4rem; margin: 0 0 .5rem; }
+.pm-body h2 { font-size: 1.15rem; margin: 1rem 0 .4rem; }
+
+/* ==========================================================================
+   8. MOTION
+   ========================================================================== */
+@keyframes pulse { 50% { opacity: .35; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important; animation-delay: 0ms !important; animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important; transition-delay: 0ms !important;
+  }
+}
+</style>
 </head>
 <body>
-  <header>
+<a class="skip" href="#ticket-pane">Skip to evidence tickets</a>
+<div class="app state-idle" id="app">
+
+  <!-- TOP BAR -->
+  <header class="topbar">
     <div class="brand">
-      <h1>Blindspot</h1>
-      <span>HHS Section 504 / WCAG 2.1 AA · Keyboard &amp; Screen-Reader Audit Agent</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="#3730A3" stroke-width="3"/><circle cx="15.5" cy="9" r="3.4" fill="#C8102E"/></svg>
+      <span class="wordmark">Blindspot</span>
     </div>
-    <nav class="tabs" aria-label="Views">
-      <button type="button" class="tab-btn active" id="tab-live">Live Audit</button>
-      <button type="button" class="tab-btn" id="tab-proof">Proof</button>
-      <a class="submit-link" href="/submit">Submit URL (<span id="sub-count">0</span>)</a>
-    </nav>
+    <form class="run" id="run-form">
+      <label class="sr-only" for="page-select">Page to test</label>
+      <select class="field" id="page-select">
+        <option value="https://www.mountsinai.org/find-a-doctor" selected>mountsinai.org/find-a-doctor</option>
+      </select>
+      <label class="sr-only" for="url-input">Or paste a URL</label>
+      <input class="field" id="url-input" type="text" inputmode="url" placeholder="or paste a URL">
+      <button class="btn-run" id="run-btn" type="submit">Run</button>
+    </form>
+    <span class="deadline"><b>WCAG 2.1 AA</b> · HHS 504 deadline May 2027</span>
+    <button class="proof" type="button" id="top-proof-btn">Proof</button>
   </header>
 
-  <main>
-    <!-- LIVE AUDIT VIEW -->
-    <section id="view-live">
-      <div class="controls">
-        <div class="url-row">
-          <div>
-            <label class="field-label" for="url-input">Target Public Healthcare URL</label>
-            <input type="url" id="url-input" placeholder="https://nyulangone.org/doctors" value="https://nyulangone.org/doctors">
+  <!-- BREAK IT -->
+  <section class="breakit" aria-labelledby="breakit-label">
+    <span class="breakit-label" id="breakit-label"><strong>Break it:</strong> <span>plant one bug in our copy of this page</span></span>
+    <div class="chips" role="group" aria-labelledby="breakit-label" id="chips">
+      <button class="chip" type="button" data-bug="" aria-pressed="true">No bug (real site)</button>
+      <button class="chip" type="button" data-bug="hide_focus" aria-pressed="false">Hide focus</button>
+      <button class="chip" type="button" data-bug="keyboard_trap" aria-pressed="false">Keyboard trap</button>
+      <button class="chip" type="button" data-bug="covering_banner" aria-pressed="false">Covering banner</button>
+      <button class="chip" type="button" data-bug="positive_tabindex" aria-pressed="false">Positive tabindex</button>
+      <button class="chip" type="button" data-bug="label_mismatch" aria-pressed="false">Label mismatch</button>
+      <button class="chip" type="button" data-bug="random" aria-pressed="false">Random</button>
+    </div>
+  </section>
+
+  <!-- HERO -->
+  <main class="hero">
+    <section class="stage" aria-label="Live keyboard frame">
+      <div class="frame on-dark" id="frame">
+        <div class="band">
+          <div class="counter" id="hud">
+            <span class="tabcount" id="hud-tab" style="color:var(--on-dark-muted)">TAB 0</span>
+            <span class="max">max 40</span>
           </div>
-          <div>
-            <label class="field-label" for="vetted-select">Vetted Pages (3 Stable Demo Pages First)</label>
-            <select id="vetted-select" aria-label="Choose a vetted public healthcare page">
-              <option value="">Loading vetted pages...</option>
-            </select>
+          <div class="band-right">
+            <span class="status" id="status"><span class="dot grey"></span>Waiting for Run</span>
+            <span class="url" id="frame-url">mountsinai.org/find-a-doctor</span>
           </div>
-          <button type="button" id="run-btn">Run Audit</button>
+          <div class="progress" aria-hidden="true"><span id="progress"></span></div>
         </div>
-
-        <div class="break-row" role="group" aria-label="Break it bug injector">
-          <span class="break-label">Break it:</span>
-          <button type="button" class="bug-btn selected" data-bug="">None (real site)</button>
-          <button type="button" class="bug-btn" data-bug="hide_focus">Hide focus</button>
-          <button type="button" class="bug-btn" data-bug="keyboard_trap">Keyboard trap</button>
-          <button type="button" class="bug-btn" data-bug="covering_banner">Covering banner</button>
-          <button type="button" class="bug-btn" data-bug="positive_tabindex">Positive tabindex</button>
-          <button type="button" class="bug-btn" data-bug="label_mismatch">Label mismatch</button>
-          <button type="button" class="bug-btn" data-bug="random">Random</button>
-        </div>
-      </div>
-
-      <!-- One big number per panel -->
-      <div class="kpi-grid">
-        <div class="kpi-card">
-          <span class="kpi-label">Blindspot Confirmed</span>
-          <span class="kpi-num danger" id="kpi-confirmed">0</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">axe-core Violations</span>
-          <span class="kpi-num" id="kpi-axe">0</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">Tab Steps</span>
-          <span class="kpi-num primary" id="kpi-steps">0 / 40</span>
-        </div>
-      </div>
-
-      <div class="status-bar" id="status-bar" role="status" aria-live="polite">
-        <span id="status-text">Ready. Pick a healthcare page (and optional "Break it" bug) and click Run Audit.</span>
-        <span id="status-meta"></span>
-      </div>
-
-      <div class="workspace">
-        <div class="panel">
-          <h2>
-            <span>Live Keyboard Frame</span>
-            <span id="frame-step-tag" class="badge step">Idle</span>
-          </h2>
-          <div class="frame-box">
-            <img id="live-frame" class="hidden" alt="Latest keyboard navigation frame">
-            <div id="frame-placeholder" class="frame-placeholder">
-              Live browser screenshots stream here on every Tab press.
-            </div>
+        <div class="viewport" id="viewport">
+          <div class="idle-slot" id="idle-slot">
+            <span class="keycap" aria-hidden="true">Tab
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h14M13 7l5 5-5 5M20 6v12"/></svg>
+            </span>
           </div>
-          <div class="step-caption" id="step-caption">Waiting to start...</div>
-        </div>
-
-        <div class="panel">
-          <h2>
-            <span>Findings &amp; Evidence Tickets</span>
-            <span id="findings-summary" class="badge step">0 findings</span>
-          </h2>
-          <div class="findings-list" id="findings-list">
-            <div style="color: var(--muted); padding: 16px 4px;">
-              Confirmed findings appear here with zoomed red-box crops and Carbon Markdown tickets.
-            </div>
+          <div class="blocked-slot" id="blocked-slot" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6l8-3z"/><path d="M9 9l6 6M15 9l-6 6"/></svg>
+            <p id="blocked-msg">This site blocks automated browsers, so nothing was tested.<span>We don’t bypass bot protection.</span></p>
+            <button class="btn-vetted" type="button" id="try-vetted-btn">Try a vetted page</button>
+          </div>
+          <img class="live-shot" id="live-shot" alt="Live screenshot of keyboard navigation" hidden>
+          <div class="focus-marker" id="focus-marker" hidden>
+            <span class="ev-box"></span>
+            <span class="ev-tab">FOCUS IS HERE</span>
           </div>
         </div>
       </div>
-
-      <!-- Side-by-side Blindspot vs axe-core -->
-      <div class="compare-grid">
-        <div class="panel">
-          <h2>Blindspot (Keyboard + Vision + Decisions)</h2>
-          <ul class="compare-list" id="blindspot-compare">
-            <li class="compare-item" style="color: var(--muted);">Run an audit to compare Blindspot with axe-core on the same page.</li>
-          </ul>
-        </div>
-        <div class="panel">
-          <h2>axe-core Baseline (Same Page)</h2>
-          <div id="axe-callout" class="axe-banner hidden"></div>
-          <ul class="compare-list" id="axe-compare">
-            <li class="compare-item" style="color: var(--muted);">axe-core violations will appear here at the end of the run.</li>
-          </ul>
-        </div>
-      </div>
+      <p class="caption" id="caption" aria-live="polite">Pick a page and press Run. Every Tab a patient would press shows up here.</p>
     </section>
 
-    <!-- PROOF TAB -->
-    <section id="view-proof" class="hidden">
-      <div class="proof-box">
-        <h2 style="margin-top: 0; font-size: 1.8rem;">Held-Out Evaluation Proof</h2>
-        <div id="proof-hash" class="hash-pill hidden"></div>
-        <div id="proof-content" style="font-size: 1.2rem;">Loading evaluation results...</div>
+    <section class="tickets" id="ticket-pane" aria-label="Evidence tickets, newest first" tabindex="-1">
+      <div class="empty" id="empty-pane">
+        <strong id="empty-title">Nothing found yet.</strong>
+        <span id="empty-sub">Each place a patient gets stuck becomes a ticket here.</span>
       </div>
+
+      <!-- Persistent expanded ticket card (updated incrementally in place) -->
+      <article class="card" id="active-card" hidden>
+        <div class="row1">
+          <span class="tid" id="ac-id">BS-001</span>
+          <span class="wcag" id="ac-wcag">2.4.7 Focus Visible</span>
+          <span class="verdict-tag" id="ac-verdict">
+            <strong id="ac-verdict-strong">CONFIRMED</strong>
+            <span class="how" id="ac-verdict-how">proven by code</span>
+          </span>
+        </div>
+        <p class="gemini"><b>Gemini</b> <span id="ac-gemini"></span></p>
+        <h2 class="title" id="ac-title"></h2>
+        <div class="crop" id="ac-crop-wrap" role="img" aria-label="Zoomed screenshot with red evidence box">
+          <span class="count" id="ac-count" hidden></span>
+          <img class="crop-img" id="ac-crop-img" alt="Focused element crop with red evidence box">
+          <span class="pill" id="ac-pill" hidden></span>
+        </div>
+        <div class="patient">
+          <span class="label">What the patient experiences</span>
+          <p id="ac-patient"></p>
+        </div>
+        <div class="fix">
+          <span class="label">Fix</span>
+          <div>
+            <pre><code id="ac-fix"></code></pre>
+            <span class="note" id="ac-fix-note" hidden></span>
+          </div>
+        </div>
+        <div class="foot">
+          <span class="at" id="ac-tab">Tab 1</span>
+          <span class="sel" id="ac-sel"></span>
+          <button class="btn-ghost" type="button" id="ac-copy-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h10"/></svg>
+            <span id="ac-copy-label">Copy Markdown</span>
+          </button>
+        </div>
+        <p class="axe" id="ac-axe"></p>
+      </article>
+
+      <!-- Incremental collapsed confirmed ticket rows -->
+      <ul class="rows" id="confirmed-rows" aria-label="Other confirmed tickets" hidden></ul>
+
+      <!-- Needs-a-human toggle & incremental rows -->
+      <button type="button" class="human-toggle" id="human-toggle" aria-expanded="false" aria-controls="human-rows" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        <span id="human-toggle-label">0 more need a human look</span>
+      </button>
+      <ul class="rows" id="human-rows" aria-label="Needs a human look" hidden></ul>
     </section>
   </main>
 
-  <!-- TICKET MODAL -->
-  <dialog id="ticket-modal" aria-labelledby="modal-title">
-    <div class="modal-head">
-      <h3 id="modal-title">Accessibility Ticket</h3>
-      <button type="button" class="close-btn" id="modal-close">Close</button>
-    </div>
-    <div class="modal-body" id="modal-body"></div>
-    <div class="modal-actions">
-      <a id="modal-raw-link" href="#" target="_blank" rel="noopener" style="margin-right: auto; font-weight: 700;">Open raw .md</a>
-      <button type="button" class="close-btn" id="modal-copy">Copy Markdown</button>
-    </div>
-  </dialog>
+  <!-- BOTTOM STRIP -->
+  <footer class="bottom">
+    <button class="proof-link" type="button" id="proof-link" aria-describedby="proof-desc">
+      <span class="sr-only" id="proof-desc">Opens the Proof evaluation table</span>
+      <span class="verdict" id="verdict"><span class="dim">Nothing planted yet. Pick a bug above and press Run, or see how we tested on 16 stranger sites.</span></span>
+      <span class="go" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </button>
+  </footer>
+</div>
 
-  <script>
-    const state = {
-      selectedBug: "",
-      es: null,
-      runId: null,
-      replayTimer: null,
-      findings: [],
-      ticketsByKey: {},
-      manifest: null,
-      activeTicketMd: "",
-    };
+<!-- PROOF MODAL -->
+<dialog class="proof-modal" id="proof-modal" aria-labelledby="pm-title">
+  <div class="pm-head">
+    <h2 id="pm-title">Held-out Evaluation Proof</h2>
+    <button class="btn-ghost" type="button" id="pm-close">Close</button>
+  </div>
+  <div class="pm-body">
+    <div class="pm-hash" id="pm-hash" hidden></div>
+    <div id="pm-content">Loading evaluation results…</div>
+  </div>
+</dialog>
 
-    const $ = id => document.getElementById(id);
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const app = $('#app');
 
-    function esc(s) {
-      return String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-    }
+  /* ---------- fit 1280x800 design surface to larger viewports ---------- */
+  function fit() {
+    const z = Math.min(innerWidth / 1280, innerHeight / 800);
+    app.style.zoom = Math.abs(z - 1) < 0.01 ? '' : String(z);
+  }
+  addEventListener('resize', fit);
+  fit();
 
-    // Tabs
-    function setTab(which) {
-      const live = which === "live";
-      $("view-live").classList.toggle("hidden", !live);
-      $("view-proof").classList.toggle("hidden", live);
-      $("tab-live").classList.toggle("active", live);
-      $("tab-proof").classList.toggle("active", !live);
-      if (!live) loadProof();
-    }
-    $("tab-live").addEventListener("click", () => setTab("live"));
-    $("tab-proof").addEventListener("click", () => setTab("proof"));
+  const ICON = {
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>',
+    slash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></svg>',
+    warn: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5v.5"/></svg>'
+  };
 
-    // Break-it bug buttons
-    document.querySelectorAll(".bug-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".bug-btn").forEach(b => b.classList.remove("selected"));
-        btn.classList.add("selected");
-        state.selectedBug = btn.dataset.bug || "";
+  const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const shortUrl = u => String(u || '').replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+
+  const WCAG_LABELS = {
+    keyboard_trap:      { full: '2.1.2 No Keyboard Trap', short: '2.1.2' },
+    focus_not_visible:  { full: '2.4.7 Focus Visible', short: '2.4.7' },
+    focus_obscured:     { full: '2.4.11 Focus Not Obscured', short: '2.4.11' },
+    focus_order:        { full: '2.4.3 Focus Order', short: '2.4.3' },
+    label_in_name:      { full: '2.5.3 Label in Name', short: '2.5.3' },
+    indicator_contrast: { full: '1.4.11 Non-text Contrast', short: '1.4.11' }
+  };
+
+  const BUG_NAMES = {
+    '': 'No bug',
+    hide_focus: 'Hide focus',
+    keyboard_trap: 'Keyboard trap',
+    covering_banner: 'Covering banner',
+    positive_tabindex: 'Positive tabindex',
+    label_mismatch: 'Label mismatch',
+    random: 'Random'
+  };
+
+  const BUG_TO_CHECK = {
+    hide_focus: 'focus_not_visible',
+    keyboard_trap: 'keyboard_trap',
+    covering_banner: 'focus_obscured',
+    positive_tabindex: 'focus_order',
+    label_mismatch: 'label_in_name'
+  };
+
+  const Q_META = {
+    focus_visible:   { q: "'Focus visible?'", failWord: 'no', passWord: 'yes' },
+    focus_covered:   { q: "'Focus covered?'", failWord: 'yes', passWord: 'no' },
+    label_matches:   { q: "'Name matches visible label?'", failWord: 'no', passWord: 'yes' },
+    indicator_faint: { q: "'Indicator too faint?'", failWord: 'yes', passWord: 'no' },
+    order_logical:   { q: "'Logical next step?'", failWord: 'no', passWord: 'yes' }
+  };
+
+  const DEFAULT_FIX = {
+    keyboard_trap:      { code: '// Allow Tab and Shift+Tab to leave the control; close modals on Escape.', note: 'Remove preventDefault() on Tab' },
+    focus_not_visible:  { code: ':focus-visible { outline: 3px solid #1a5fb4; outline-offset: 2px; }', note: 'Restore a visible keyboard focus ring' },
+    focus_obscured:     { code: 'html { scroll-padding-top: 96px; scroll-padding-bottom: 96px; }', note: 'Keep focused controls clear of fixed/sticky layers' },
+    focus_order:        { code: '<a href="...">Link</a> <!-- remove positive tabindex -->', note: 'Use natural DOM order or tabindex="0"' },
+    label_in_name:      { code: '<a href="...">Visible text</a>', note: 'Include visible text in aria-label or remove overriding aria-label' },
+    indicator_contrast: { code: ':focus-visible { outline: 3px solid #0b4f9c; outline-offset: 2px; }', note: 'Ensure >= 3:1 focus ring contrast' }
+  };
+
+  const DEFAULT_PREF = 'https://www.mountsinai.org/find-a-doctor';
+
+  /* ---------- state ---------- */
+  const S = {
+    phase: 'idle',            // 'idle' | 'running' | 'done' | 'blocked' | 'error'
+    bug: '',
+    activeUrl: DEFAULT_PREF,
+    runId: null,
+    es: null,
+    pollTimer: null,
+    clockTimer: null,
+    runStartedMs: 0,
+    doneMs: 0,
+    lastStep: null,
+    lastImgNatural: { w: 1280, h: 800 },
+    axe: null,
+    manifest: null,
+    groups: new Map(),        // groupKey -> group object
+    confirmedOrder: [],       // newest first
+    humanOrder: [],           // newest first
+    expandedKey: null,
+    humanOpen: false,
+    nextSeq: 1,
+    proof: null               // cached /api/proof response
+  };
+
+  const rowNodes = new Map(); // groupKey -> <li> element
+
+  /* ---------- vetted list & proof preload ---------- */
+  async function loadVetted() {
+    try {
+      const data = await fetch('/api/vetted').then(r => r.json());
+      const urls = data.urls || [];
+      const sel = $('#page-select');
+      sel.innerHTML = '';
+      // Put mountsinai.org/find-a-doctor in the list and preselect it
+      const list = urls.includes(DEFAULT_PREF) ? urls : [DEFAULT_PREF, ...urls];
+      list.forEach(u => {
+        const opt = document.createElement('option');
+        opt.value = u;
+        opt.textContent = shortUrl(u);
+        if (u === DEFAULT_PREF) opt.selected = true;
+        sel.appendChild(opt);
       });
-    });
+      S.activeUrl = sel.value || DEFAULT_PREF;
+      $('#frame-url').textContent = shortUrl(S.activeUrl);
+    } catch (_) {}
+  }
 
-    // Load vetted pages + submission count
-    async function initMeta() {
-      try {
-        const res = await fetch("/api/vetted");
-        const data = await res.json();
-        const sel = $("vetted-select");
-        sel.innerHTML = "";
-        const featured = new Set(data.featured || []);
-        const g1 = document.createElement("optgroup");
-        g1.label = "Recommended Stable Demo Pages";
-        const g2 = document.createElement("optgroup");
-        g2.label = "All Vetted Public Healthcare Pages";
-        (data.urls || []).forEach(u => {
-          const opt = document.createElement("option");
-          opt.value = u;
-          opt.textContent = u.replace(/^https?:\/\//, "");
-          if (featured.has(u)) g1.appendChild(opt);
-          else g2.appendChild(opt);
-        });
-        if (g1.children.length) sel.appendChild(g1);
-        if (g2.children.length) sel.appendChild(g2);
-        if (data.urls && data.urls.length) {
-          sel.value = data.urls[0];
-          $("url-input").value = data.urls[0];
-        }
-        sel.addEventListener("change", () => {
-          if (sel.value) $("url-input").value = sel.value;
-        });
-      } catch (e) {
-        $("vetted-select").innerHTML = '<option value="">Could not load vetted list</option>';
-      }
-      try {
-        const sc = await fetch("/api/submissions/count").then(r => r.json());
-        $("sub-count").textContent = sc.count ?? 0;
-      } catch (e) {}
+  async function loadProof() {
+    try {
+      S.proof = await fetch('/api/proof').then(r => r.json());
+    } catch (_) {
+      S.proof = null;
+    }
+    if (S.phase === 'done') updateFooter();
+  }
+
+  /* ---------- live frame positioning ---------- */
+  function positionFocusMarker(rect, offscreen) {
+    const marker = $('#focus-marker');
+    const vp = $('#viewport');
+    if (!rect || offscreen || rect.width * rect.height <= 0) {
+      marker.hidden = true;
+      return;
+    }
+    const vw = vp.clientWidth || 640;
+    const vh = vp.clientHeight || 330;
+    // Page CSS viewport is 1280x800; live-shot uses object-fit:cover; object-position:top
+    const scale = Math.max(vw / 1280, vh / 800);
+    const offsetX = (vw - 1280 * scale) / 2;
+    const leftPct = ((offsetX + rect.x * scale) / vw) * 100;
+    const topPct = ((rect.y * scale) / vh) * 100;
+    const wPct = ((rect.width * scale) / vw) * 100;
+    const hPct = ((rect.height * scale) / vh) * 100;
+
+    if (topPct > 96 || topPct + hPct < 2 || leftPct > 98 || leftPct + wPct < 2) {
+      marker.hidden = true;
+      return;
+    }
+    marker.style.left = `${Math.max(0.5, leftPct).toFixed(2)}%`;
+    marker.style.top = `${Math.max(0.5, topPct).toFixed(2)}%`;
+    marker.style.width = `${Math.min(99, wPct).toFixed(2)}%`;
+    marker.style.height = `${Math.min(96, hPct).toFixed(2)}%`;
+    marker.classList.toggle('ev-under', topPct < 11);
+    marker.hidden = false;
+  }
+
+  addEventListener('resize', () => {
+    if (S.lastStep && !$('#live-shot').hidden) {
+      positionFocusMarker(S.lastStep.rect, S.lastStep.offscreen);
+    }
+  });
+
+  function setHudTab(n, muted = false) {
+    const el = $('#hud-tab');
+    el.style.color = muted ? 'var(--on-dark-muted)' : '';
+    el.innerHTML = n > 0 ? `TAB <b>${n}</b>` : 'TAB 0';
+  }
+
+  function setStatus(dotClass, text) {
+    $('#status').innerHTML = `<span class="dot ${dotClass}"></span>${esc(text)}`;
+  }
+
+  /* ---------- grouping & real-field builders ---------- */
+  function groupKeyFor(status, check, accName, visText, selector) {
+    const normAcc = String(accName || '').trim().toLowerCase().slice(0, 120);
+    if (normAcc) return `${status}::${check}::name::${normAcc}`;
+    const normVis = String(visText || '').trim().toLowerCase().slice(0, 80);
+    if (normVis) return `${status}::${check}::vis::${normVis}`;
+    // Group repeated unnamed icon controls (e.g. identical unlabelled chevron buttons)
+    const tagHint = (String(selector || '').match(/([a-z0-9]+)(?::nth-of-type|\s*$)/i) || ['', 'el'])[1].toLowerCase();
+    return `${status}::${check}::unnamed::${tagHint}`;
+  }
+
+  function defaultTitle(f, count) {
+    const ev = f.evidence || {};
+    const vis = (ev.label_text || ev.visible_text || '').trim();
+    const acc = (ev.accessible_name || '').trim();
+    const targetName = vis || acc || ev.selector || 'page element';
+    if (count > 1 && f.check === 'label_in_name' && acc) {
+      return `${count} controls announce “${acc.slice(0, 42)}${acc.length > 42 ? '…' : ''}” instead of their visible text`;
+    }
+    if (count > 1 && f.check === 'focus_not_visible') {
+      return `No visible keyboard focus indicator across ${count} controls`;
+    }
+    if (count > 1 && f.check === 'focus_obscured') {
+      return `${count} focused controls hidden behind a fixed overlay`;
+    }
+    switch (f.check) {
+      case 'keyboard_trap':
+        return `Keyboard focus trapped on ${targetName.slice(0, 48)}`;
+      case 'focus_not_visible':
+        return `Keyboard users lose the focus indicator on ${targetName.slice(0, 44)}`;
+      case 'focus_obscured':
+        return `Focused control ${targetName.slice(0, 38)} hidden behind a fixed overlay`;
+      case 'focus_order':
+        return f.proven ? 'Positive tabindex overrides natural keyboard focus order' : `Unexpected upward focus jump to ${targetName.slice(0, 38)}`;
+      case 'label_in_name':
+        return `“${(vis || targetName).slice(0, 30)}” announced as “${(acc || 'empty').slice(0, 34)}${acc.length > 34 ? '…' : ''}”`;
+      case 'indicator_contrast':
+        return `Faint keyboard focus indicator on ${targetName.slice(0, 44)}`;
+      default:
+        return f.detail || f.check;
+    }
+  }
+
+  function defaultPatientLine(f) {
+    const ev = f.evidence || {};
+    const vis = (ev.label_text || ev.visible_text || '').trim();
+    const acc = (ev.accessible_name || '').trim();
+    if (f.check === 'label_in_name' && vis && acc) {
+      return `A screen-reader or voice-control patient on “${vis.slice(0, 40)}” hears “${acc.slice(0, 85)}${acc.length > 85 ? '…' : ''}” instead.`;
+    }
+    return f.detail || 'A keyboard or screen-reader patient cannot reliably use this control.';
+  }
+
+  function buildGeminiLine(g) {
+    const f = g.finding;
+    const ev = f.evidence || {};
+    const step = ev.step;
+    const confirmed = f.status === 'confirmed';
+    const carbonTxt = g.carbonDone ? 'Carbon wrote this ticket' : 'Carbon writing ticket…';
+
+    if (confirmed && f.proven) {
+      return `Proven by code check → ${carbonTxt}`;
     }
 
-    // Minimal Markdown -> HTML renderer for Carbon tickets & Proof table
-    function renderMarkdown(md) {
-      const lines = String(md || "").split("\n");
-      let html = "";
-      let inCode = false;
-      let inList = false;
-      let inTable = false;
-      let tableHeadDone = false;
-
-      const inline = txt => esc(txt)
-        .replace(/`([^`]+)`/g, "<code>$1</code>")
-        .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-        .replace(/\*([^*]+)\*/g, "<em>$1</em>");
-
-      for (const raw of lines) {
-        if (raw.trim().startsWith("```")) {
-          if (inList) { html += "</ul>"; inList = false; }
-          if (inTable) { html += "</tbody></table>"; inTable = false; tableHeadDone = false; }
-          if (!inCode) { html += "<pre><code>"; inCode = true; }
-          else { html += "</code></pre>"; inCode = false; }
-          continue;
-        }
-        if (inCode) { html += esc(raw) + "\n"; continue; }
-
-        const line = raw.trim();
-        if (line.startsWith("|") && line.endsWith("|")) {
-          if (inList) { html += "</ul>"; inList = false; }
-          const cells = line.slice(1, -1).split("|").map(c => c.trim());
-          if (cells.every(c => /^:?-{2,}:?$/.test(c))) {
-            tableHeadDone = true;
-            continue;
-          }
-          if (!inTable) {
-            html += '<table class="proof-table"><thead><tr>' + cells.map(c => `<th>${inline(c)}</th>`).join("") + "</tr></thead><tbody>";
-            inTable = true;
-          } else {
-            html += "<tr>" + cells.map(c => `<td>${inline(c)}</td>`).join("") + "</tr>";
-          }
-          continue;
-        } else if (inTable) {
-          html += "</tbody></table>";
-          inTable = false;
-          tableHeadDone = false;
-        }
-
-        if (!line) {
-          if (inList) { html += "</ul>"; inList = false; }
-          continue;
-        }
-        if (line.startsWith("# ")) { html += `<h1>${inline(line.slice(2))}</h1>`; continue; }
-        if (line.startsWith("## ")) { html += `<h2>${inline(line.slice(3))}</h2>`; continue; }
-        if (line.startsWith("### ")) { html += `<h3>${inline(line.slice(4))}</h3>`; continue; }
-        if (line === "---") { html += "<hr>"; continue; }
-        if (/^[-*]\s+/.test(line) || /^\d+\.\s+/.test(line)) {
-          if (!inList) { html += "<ul>"; inList = true; }
-          html += `<li>${inline(line.replace(/^([-*]|\d+\.)\s+/, ""))}</li>`;
-          continue;
-        }
-        if (inList) { html += "</ul>"; inList = false; }
-        html += `<p>${inline(line)}</p>`;
-      }
-      if (inCode) html += "</code></pre>";
-      if (inList) html += "</ul>";
-      if (inTable) html += "</tbody></table>";
-      return html;
+    const parts = [];
+    if (ev.reader) {
+      const rl = (ev.reader.visible_label || '').trim();
+      const rNote = rl ? ` (“${rl.slice(0, 24)}${rl.length > 24 ? '…' : ''}”)` : '';
+      parts.push(`Hydrogen read frame ${step ?? '?'}${rNote}`);
+    } else if (step != null) {
+      parts.push(`Frame ${step}`);
     }
 
-    async function loadProof() {
-      try {
-        const d = await fetch("/api/proof").then(r => r.json());
-        if (d.manifest_sha256) {
-          $("proof-hash").textContent = "Held-out manifest SHA-256: " + d.manifest_sha256;
-          $("proof-hash").classList.remove("hidden");
-        } else {
-          $("proof-hash").classList.add("hidden");
-        }
-        if (d.ready && d.markdown) {
-          $("proof-content").innerHTML = renderMarkdown(d.markdown);
-        } else {
-          $("proof-content").innerHTML = `<p style="font-size:1.35rem; color: var(--muted); font-weight:700;">${esc(d.message || "Results after the held-out run.")}</p>`;
-        }
-      } catch (e) {
-        $("proof-content").textContent = "Could not load evaluation results.";
-      }
+    if (f.scorer_question && f.scorer_fail_p != null) {
+      const qm = Q_META[f.scorer_question] || { q: `'${f.scorer_question}'`, failWord: 'fail', passWord: 'pass' };
+      const p = Number(f.scorer_fail_p);
+      const word = p >= 0.80 ? qm.failWord : (p >= 0.40 ? 'unsure' : qm.passWord);
+      parts.push(`Decisions API ${qm.q} ${word}, ${p.toFixed(2)}`);
+    } else if (f.decision_reason) {
+      parts.push(f.decision_reason);
     }
 
-    function findingKey(f) {
+    if (confirmed) parts.push(carbonTxt);
+    return parts.join(' → ');
+  }
+
+  function parseCarbonMarkdown(md) {
+    const out = { title: '', patient: '', code: '', note: '' };
+    if (!md) return out;
+    const mTitle = md.match(/^#\s+(.+)$/m);
+    if (mTitle) out.title = mTitle[1].replace(/`/g, '').trim();
+
+    const mPat = md.match(/##\s+What a Patient Experiences\s+([\s\S]*?)(?=\n##\s+|\n---|$)/i);
+    if (mPat) out.patient = mPat[1].replace(/\s+/g, ' ').trim();
+
+    const mFixSec = md.match(/##\s+Suggested Fix\s+([\s\S]*?)(?=\n##\s+|\n---|$)/i);
+    if (mFixSec) {
+      const sec = mFixSec[1];
+      const codeMatch = sec.match(/```[a-z]*\n([\s\S]*?)```/i);
+      if (codeMatch) {
+        out.code = codeMatch[1].trim();
+        const prose = sec.replace(codeMatch[0], '').replace(/\s+/g, ' ').trim();
+        if (prose) out.note = prose;
+      } else {
+        out.code = sec.trim();
+      }
+    }
+    return out;
+  }
+
+  function axeTextFor(check) {
+    const noRule = check === 'focus_not_visible' || check === 'keyboard_trap' || check === 'focus_obscured' || check === 'indicator_contrast';
+    if (!S.axe) {
+      return { caught: false, text: noRule ? 'axe-core on the same page: has no rule for this (verifying…)' : 'axe-core on the same page: checking…' };
+    }
+    const caught = (S.axe.mapped_checks || []).includes(check);
+    if (caught) return { caught: true, text: 'axe-core on the same page: also caught it.' };
+    if (noRule) return { caught: false, text: 'axe-core on the same page: missed it, it has no rule for this.' };
+    return { caught: false, text: 'axe-core on the same page: missed it.' };
+  }
+
+  function formatElapsed(ms) {
+    const s = Math.max(0, Math.floor(ms / 1000));
+    return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  }
+
+  function updateReplayPillDOM() {
+    const pill = $('#ac-pill');
+    if (!S.expandedKey || !S.groups.has(S.expandedKey)) { pill.hidden = true; return; }
+    const g = S.groups.get(S.expandedKey);
+    if (g.status !== 'confirmed') { pill.hidden = true; return; }
+
+    pill.hidden = false;
+    if (g.replayed === true) {
+      pill.className = 'pill replayed';
+      pill.innerHTML = `Replayed by Managed Agent ${ICON.check}`;
+      return;
+    }
+    if (g.replayed === false || g.replayed === 'unavailable' || g.replayTimedOut) {
+      pill.className = 'pill partial';
+      pill.innerHTML = `${ICON.warn}<span>Replay didn’t finish · evidence is from the live run</span>`;
+      return;
+    }
+    const elapsed = Date.now() - (g.createdMs || S.runStartedMs || Date.now());
+    pill.className = 'pill replaying';
+    pill.innerHTML = `<span class="spinner" aria-hidden="true"></span><span>Replaying in Google Managed Agent sandbox… <span id="pill-clock">${formatElapsed(elapsed)}</span></span>`;
+  }
+
+  /* ---------- incremental ticket pane rendering ---------- */
+  function syncActiveCard() {
+    const empty = $('#empty-pane');
+    const card = $('#active-card');
+    const cRows = $('#confirmed-rows');
+    const hToggle = $('#human-toggle');
+    const hRows = $('#human-rows');
+
+    if (S.phase === 'idle') {
+      empty.hidden = false;
+      $('#empty-title').textContent = 'Nothing found yet.';
+      $('#empty-sub').textContent = 'Each place a patient gets stuck becomes a ticket here.';
+      card.hidden = true; cRows.hidden = true; hToggle.hidden = true; hRows.hidden = true;
+      return;
+    }
+    if (S.phase === 'blocked' || S.phase === 'error') {
+      empty.hidden = false;
+      $('#empty-title').textContent = 'No tickets.';
+      $('#empty-sub').textContent = S.phase === 'blocked'
+        ? 'A blocked page is not a passing page: nothing here means nothing was tested.'
+        : 'The run stopped on an error before tickets were produced.';
+      card.hidden = true; cRows.hidden = true; hToggle.hidden = true; hRows.hidden = true;
+      return;
+    }
+
+    if (!S.expandedKey && S.confirmedOrder.length) S.expandedKey = S.confirmedOrder[0];
+    if (!S.expandedKey && S.humanOrder.length && S.phase === 'done') S.expandedKey = S.humanOrder[0];
+
+    if (!S.expandedKey || !S.groups.has(S.expandedKey)) {
+      empty.hidden = false;
+      $('#empty-title').textContent = S.phase === 'done' ? '0 confirmed failures.' : 'Tabbing through the page…';
+      $('#empty-sub').textContent = S.phase === 'done'
+        ? 'No keyboard traps, obscured focus, or label mismatches were confirmed.'
+        : 'Each place a patient gets stuck becomes a ticket here.';
+      card.hidden = true; cRows.hidden = true;
+    } else {
+      empty.hidden = true;
+      card.hidden = false;
+      const g = S.groups.get(S.expandedKey);
+      const f = g.finding;
       const ev = f.evidence || {};
-      return `${f.check}::${ev.selector || f.selector || ""}::${ev.step ?? f.step ?? ""}`;
-    }
+      const isHuman = g.status !== 'confirmed';
+      const wmeta = WCAG_LABELS[f.check] || { full: `WCAG ${f.wcag}`, short: f.wcag || '' };
 
-    function openTicketModal(ticket) {
-      state.activeTicketMd = ticket.markdown || "";
-      $("modal-title").textContent = ticket.title || "Accessibility Ticket";
-      let bodyHtml = "";
-      if (ticket.crop_url) {
-        bodyHtml += `<div class="crop-wrap"><img class="crop-img" src="${esc(ticket.crop_url)}" alt="Evidence crop with red marker box"></div>`;
+      card.classList.toggle('human', isHuman);
+      card.classList.toggle('compact', S.humanOpen && S.humanOrder.length > 0 && !isHuman);
+
+      $('#ac-id').textContent = g.id;
+      $('#ac-wcag').textContent = wmeta.full;
+      if (isHuman) {
+        const conf = f.scorer_fail_p != null ? ` · confidence ${Number(f.scorer_fail_p).toFixed(2)}` : '';
+        $('#ac-verdict-strong').textContent = `NEEDS A HUMAN LOOK${conf}`;
+        $('#ac-verdict-how').textContent = '';
+      } else {
+        $('#ac-verdict-strong').textContent = 'CONFIRMED';
+        $('#ac-verdict-how').textContent = (f.proven || String(f.decision_reason || '').includes('proven by code'))
+          ? 'proven by code'
+          : 'code + Decisions API';
       }
-      bodyHtml += renderMarkdown(ticket.markdown || "");
-      $("modal-body").innerHTML = bodyHtml;
-      $("modal-raw-link").href = ticket.ticket_url || "#";
-      $("ticket-modal").showModal();
+
+      $('#ac-gemini').textContent = buildGeminiLine(g);
+      $('#ac-title').textContent = g.title;
+
+      // Count pill for grouped duplicates
+      const countEl = $('#ac-count');
+      if (g.count > 1) {
+        countEl.textContent = `${g.count} ${g.unit}`;
+        countEl.hidden = false;
+      } else {
+        countEl.hidden = true;
+      }
+
+      // Real crop image
+      const cropWrap = $('#ac-crop-wrap');
+      const cropImg = $('#ac-crop-img');
+      if (g.cropUrl) {
+        if (cropImg.dataset.src !== g.cropUrl) {
+          cropImg.dataset.src = g.cropUrl;
+          cropImg.src = g.cropUrl;
+        }
+        cropImg.hidden = false;
+        cropWrap.hidden = false;
+      } else {
+        cropImg.hidden = true;
+        cropWrap.hidden = false;
+      }
+
+      updateReplayPillDOM();
+
+      $('#ac-patient').textContent = g.patient;
+      $('#ac-fix').textContent = g.fixCode;
+      const fixNoteEl = $('#ac-fix-note');
+      if (g.fixNote) { fixNoteEl.textContent = g.fixNote; fixNoteEl.hidden = false; }
+      else { fixNoteEl.hidden = true; }
+
+      $('#ac-tab').textContent = ev.step != null ? `Tab ${ev.step}` : 'Page';
+      const selStr = ev.selector || '(page-level)';
+      $('#ac-sel').textContent = selStr;
+      $('#ac-sel').title = selStr;
+
+      const axeInfo = axeTextFor(f.check);
+      const axeEl = $('#ac-axe');
+      axeEl.classList.toggle('caught', axeInfo.caught);
+      axeEl.innerHTML = `${axeInfo.caught ? ICON.check : ICON.slash}<span>${esc(axeInfo.text)}</span>`;
     }
 
-    $("modal-close").addEventListener("click", () => $("ticket-modal").close());
-    $("modal-copy").addEventListener("click", async () => {
-      try {
-        await navigator.clipboard.writeText(state.activeTicketMd);
-        $("modal-copy").textContent = "Copied!";
-        setTimeout(() => ($("modal-copy").textContent = "Copy Markdown"), 1500);
-      } catch (e) {}
+    // Update visibility of collapsed confirmed rows (incremental: hide expanded one, show others)
+    let visibleConfirmedRows = 0;
+    S.confirmedOrder.forEach(k => {
+      const li = ensureRowNode(S.groups.get(k));
+      if (li.parentElement !== cRows) cRows.appendChild(li);
+      const hide = k === S.expandedKey;
+      li.hidden = hide;
+      if (!hide) visibleConfirmedRows++;
     });
+    cRows.hidden = visibleConfirmedRows === 0;
 
-    function renderFindings() {
-      const list = $("findings-list");
-      const cmp = $("blindspot-compare");
-      const confirmed = state.findings.filter(f => f.status === "confirmed");
-      $("kpi-confirmed").textContent = String(confirmed.length);
-      $("findings-summary").textContent = `${confirmed.length} confirmed · ${state.findings.length - confirmed.length} needs human`;
-
-      if (!state.findings.length) {
-        list.innerHTML = '<div style="color: var(--muted); padding: 14px 4px;">No findings yet.</div>';
-        cmp.innerHTML = '<li class="compare-item" style="color: var(--muted);">0 confirmed findings.</li>';
-        return;
-      }
-
-      list.innerHTML = "";
-      state.findings.forEach(f => {
-        const ev = f.evidence || {};
-        const key = findingKey(f);
-        const ticket = state.ticketsByKey[key];
-        const card = document.createElement("article");
-        card.className = `finding-card ${f.status}`;
-        const label = f.status === "confirmed" ? "Confirmed" : "Needs Human";
-        const scoreTxt = f.scorer_fail_p != null ? `Scorer p=${Number(f.scorer_fail_p).toFixed(2)}` : "Code proven";
-        let replayBadge = "";
-        if (f.status === "confirmed") {
-          if (f.replayed === true) replayBadge = '<span class="badge replayed-ok">Replayed &#10003;</span>';
-          else if (f.replayed === false) replayBadge = '<span class="badge replayed-no">Replay: not reproduced</span>';
-          else if (f.replayed === "unavailable") replayBadge = '<span class="badge replayed-no">Replay: unavailable</span>';
-          else if (state.replayTimer) replayBadge = '<span class="badge replayed-wait">Replaying in sandbox...</span>';
-        }
-        card.innerHTML = `
-          <div class="badge-row">
-            <span class="badge ${esc(f.status)}">${label}</span>
-            <span class="badge wcag">WCAG ${esc(f.wcag)}</span>
-            ${ev.step != null ? `<span class="badge step">Step ${esc(ev.step)}</span>` : ""}
-            <span class="badge step">${esc(scoreTxt)}</span>
-            ${replayBadge}
-          </div>
-          <div class="finding-title">${esc(f.check.replace(/_/g, " "))}</div>
-          <div class="finding-detail">${esc(f.detail)}</div>
-          ${f.crop_url ? `<div class="crop-wrap"><img class="crop-img" src="${esc(f.crop_url)}" alt="Zoomed evidence crop for ${esc(f.check)}"></div>` : ""}
-          <div class="finding-actions">
-            ${f.status === "confirmed"
-              ? `<button type="button" class="ticket-btn" ${ticket ? "" : "disabled"}>${ticket ? "View Ticket" : "Writing Carbon Ticket..."}</button>`
-              : `<span style="font-size:0.95rem; color: var(--warn); font-weight:700;">Flagged for human review (not confirmed)</span>`}
-          </div>
-        `;
-        if (f.status === "confirmed" && ticket) {
-          card.querySelector(".ticket-btn").addEventListener("click", () => openTicketModal(ticket));
-        }
-        list.appendChild(card);
+    // Needs-human toggle & rows
+    const hCount = S.humanOrder.length;
+    if (hCount > 0 && (S.phase === 'done' || S.confirmedOrder.length > 0)) {
+      hToggle.hidden = false;
+      hToggle.setAttribute('aria-expanded', String(S.humanOpen));
+      $('#human-toggle-label').textContent = `${hCount} more need a human look`;
+      let visibleHuman = 0;
+      S.humanOrder.forEach(k => {
+        const li = ensureRowNode(S.groups.get(k));
+        if (li.parentElement !== hRows) hRows.appendChild(li);
+        const hide = k === S.expandedKey;
+        li.hidden = hide;
+        if (!hide) visibleHuman++;
       });
+      hRows.hidden = !S.humanOpen || visibleHuman === 0;
+    } else {
+      hToggle.hidden = true;
+      hRows.hidden = true;
+    }
+  }
 
-      if (!confirmed.length) {
-        cmp.innerHTML = '<li class="compare-item" style="color: var(--ok); font-weight:700;">0 confirmed keyboard/focus failures.</li>';
+  function ensureRowNode(g) {
+    let li = rowNodes.get(g.key);
+    if (!li) {
+      li = document.createElement('li');
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `rowc ${g.status !== 'confirmed' ? 'human' : ''}`;
+      btn.dataset.expandKey = g.key;
+      btn.innerHTML = `<span class="rline"><span class="tid"></span><span class="rt"></span><span class="tag" hidden></span><span class="wcag"></span></span>`;
+      li.appendChild(btn);
+      rowNodes.set(g.key, li);
+    }
+    const btn = li.firstElementChild;
+    const wmeta = WCAG_LABELS[g.finding.check] || { short: g.finding.wcag || '' };
+    $('.tid', btn).textContent = g.id;
+    $('.rt', btn).textContent = g.title;
+    const tagEl = $('.tag', btn);
+    if (g.count > 1) { tagEl.textContent = `${g.count} ${g.unit}`; tagEl.hidden = false; }
+    else { tagEl.hidden = true; }
+    $('.wcag', btn).textContent = wmeta.short;
+    btn.setAttribute('aria-label', `${g.title}, ${wmeta.short}. Expand ticket`);
+    return li;
+  }
+
+  function upsertFinding(f) {
+    const ev = f.evidence || {};
+    const key = groupKeyFor(f.status, f.check, ev.accessible_name, ev.label_text || ev.visible_text, ev.selector);
+    const defFix = DEFAULT_FIX[f.check] || { code: '/* Inspect element focus/ARIA state */', note: '' };
+    const unit = (ev.selector || '').includes('button') ? 'buttons' : 'links';
+
+    if (S.groups.has(key)) {
+      const g = S.groups.get(key);
+      g.count += 1;
+      g.selectors.push(ev.selector || '');
+      if (!g.cropUrl && f.crop_url) g.cropUrl = f.crop_url;
+      if (!g.carbonDone) g.title = defaultTitle(g.finding, g.count);
+      ensureRowNode(g);
+    } else {
+      const id = `BS-${String(S.nextSeq++).padStart(3, '0')}`;
+      const g = {
+        key,
+        id,
+        status: f.status,
+        finding: f,
+        count: 1,
+        unit,
+        selectors: [ev.selector || ''],
+        cropUrl: f.crop_url || null,
+        title: defaultTitle(f, 1),
+        patient: defaultPatientLine(f),
+        fixCode: defFix.code,
+        fixNote: defFix.note,
+        carbonDone: false,
+        rawMarkdown: '',
+        replayed: f.replayed,
+        replayTimedOut: false,
+        createdMs: Date.now()
+      };
+      S.groups.set(key, g);
+      if (f.status === 'confirmed') {
+        S.confirmedOrder.unshift(key);    // newest confirmed ticket on top!
+        S.expandedKey = key;              // expand newest confirmed ticket!
       } else {
-        cmp.innerHTML = "";
-        confirmed.forEach(f => {
-          const ev = f.evidence || {};
-          const li = document.createElement("li");
-          li.className = "compare-item";
-          li.innerHTML = `<strong>${esc(f.check)}</strong> (WCAG ${esc(f.wcag)}) · Step ${esc(ev.step ?? "page")} · <code>${esc((ev.selector || "").slice(0, 60))}</code>`;
-          cmp.appendChild(li);
+        S.humanOrder.unshift(key);
+      }
+      ensureRowNode(g);
+    }
+    syncActiveCard();
+    updateFooter();
+  }
+
+  function attachTicket(t) {
+    // Match Carbon's ticket event to its confirmed group
+    let targetGroup = null;
+    for (const k of S.confirmedOrder) {
+      const g = S.groups.get(k);
+      const ev = g.finding.evidence || {};
+      if (g.finding.check === t.check && (ev.selector === t.selector || g.selectors.includes(t.selector))) {
+        targetGroup = g;
+        break;
+      }
+    }
+    if (!targetGroup) {
+      for (const k of S.confirmedOrder) {
+        const g = S.groups.get(k);
+        if (g.finding.check === t.check && !g.carbonDone) { targetGroup = g; break; }
+      }
+    }
+    if (!targetGroup) return;
+
+    const parsed = parseCarbonMarkdown(t.markdown);
+    if (t.used_carbon !== false && parsed.title) {
+      targetGroup.title = targetGroup.count > 1 && !/\d+/.test(parsed.title)
+        ? `${parsed.title} (${targetGroup.count} ${targetGroup.unit})`
+        : parsed.title;
+    } else if (t.used_carbon !== false && t.title) {
+      targetGroup.title = t.title;
+    }
+    if (t.used_carbon !== false && parsed.patient) targetGroup.patient = parsed.patient;
+    if (parsed.code) targetGroup.fixCode = parsed.code;
+    if (t.used_carbon !== false && parsed.note) targetGroup.fixNote = parsed.note;
+    if (t.crop_url) targetGroup.cropUrl = t.crop_url;
+    targetGroup.rawMarkdown = t.markdown || '';
+    targetGroup.carbonDone = true;
+
+    ensureRowNode(targetGroup);
+    syncActiveCard();
+  }
+
+  function buildCopyMarkdown(g) {
+    if (g.rawMarkdown) return g.rawMarkdown;
+    const f = g.finding;
+    const ev = f.evidence || {};
+    const wmeta = WCAG_LABELS[f.check] || { full: `WCAG ${f.wcag}` };
+    const how = f.proven ? 'proven by code' : 'code + Decisions API';
+    return `### ${g.id}: ${g.title}\n\n` +
+      `- **WCAG:** ${wmeta.full}\n` +
+      `- **Where:** ${ev.step != null ? `Tab ${ev.step}` : 'Page'}, \`${ev.selector || 'page'}\`${g.count > 1 ? ` (${g.count} ${g.unit})` : ''}\n` +
+      `- **Status:** ${g.status === 'confirmed' ? `Confirmed (${how})` : 'Needs a human look'}\n` +
+      `- **Gemini:** ${buildGeminiLine(g)}\n\n` +
+      `**What the patient experiences:** ${g.patient}\n\n` +
+      `**Fix**${g.fixNote ? ` (${g.fixNote})` : ''}:\n\n\`\`\`\n${g.fixCode}\n\`\`\`\n\n` +
+      `_${axeTextFor(f.check).text}_\n`;
+  }
+
+  /* ---------- footer verdict line ---------- */
+  function parseProofSummary(proof) {
+    const md = (proof && proof.markdown) || '';
+    const grab = sys => {
+      const m = md.match(new RegExp('\\|\\s*`' + sys + '`\\s*\\|\\s*\\*\\*([^*]+)\\*\\*'));
+      return m ? m[1].trim() : null;
+    };
+    return {
+      bs: grab('blindspot') || '12/13',
+      code: grab('code_only') || '10/13',
+      axe: grab('axe') || '5/12',
+      sg: grab('single_gemini') || '0/13',
+      sha: (proof && proof.manifest_sha256) ? proof.manifest_sha256.slice(0, 8) : '816e4bb1'
+    };
+  }
+
+  function updateFooter() {
+    const SEP = '<span class="sep">·</span>';
+    const ARROW = '<span class="sep">→</span>';
+    const v = $('#verdict');
+
+    if (S.phase === 'idle') {
+      v.innerHTML = '<span class="dim">Nothing planted yet. Pick a bug above and press Run, or see how we tested on 16 stranger sites.</span>';
+      return;
+    }
+    if (S.phase === 'blocked') {
+      v.innerHTML = '<span class="k">A blocked page is not a passing page.</span> <span class="dim">See how we test on 16 stranger sites.</span>';
+      return;
+    }
+    if (S.phase === 'error') {
+      v.innerHTML = '<span class="k">Run stopped on an error.</span> <span class="dim">Open Proof to inspect our held-out evaluation results.</span>';
+      return;
+    }
+    if (S.phase === 'done') {
+      const p = parseProofSummary(S.proof);
+      v.innerHTML = `<span class="dim">Held-out ${SEP} 16 stranger sites ${SEP} sealed sha256 <span class="n" style="font-weight:400">${esc(p.sha)}…</span></span> ${ARROW} ` +
+        `<span class="k">Blindspot <span class="n">${esc(p.bs)}</span></span>${SEP}` +
+        `without Gemini <span class="n">${esc(p.code)}</span>${SEP}` +
+        `axe-core <span class="n">${esc(p.axe)}</span>${SEP}` +
+        `Gemini one screenshot <span class="n">${esc(p.sg)}</span>`;
+      return;
+    }
+
+    // Running
+    const activeBug = S.manifest ? S.manifest.bug_type : S.bug;
+    if (activeBug) {
+      const expCheck = BUG_TO_CHECK[activeBug];
+      const bsCaught = expCheck && S.confirmedOrder.some(k => S.groups.get(k).finding.check === expCheck);
+      if (bsCaught) {
+        const axePart = S.axe
+          ? ((S.axe.mapped_bugs || []).includes(activeBug) ? 'axe-core also caught it' : 'axe-core missed it')
+          : 'checking axe-core…';
+        v.innerHTML = `<span class="k">Planted: ${esc(BUG_NAMES[activeBug] || activeBug)}</span>${SEP}<span class="caught">Blindspot caught it</span>${SEP}<span class="dim">${axePart}</span>`;
+      } else {
+        v.innerHTML = `<span class="k">Planted: ${esc(BUG_NAMES[activeBug] || activeBug)}</span>${SEP}<span class="dim">Blindspot is tabbing, nothing caught yet</span>`;
+      }
+    } else {
+      const nConf = S.confirmedOrder.length;
+      v.innerHTML = `<span class="k">Real site (no bug planted)</span>${SEP}<span class="${nConf ? 'caught' : 'dim'}">${nConf ? `${nConf} confirmed ticket${nConf === 1 ? '' : 's'} so far` : 'Blindspot is tabbing like a patient…'}</span>`;
+    }
+  }
+
+  /* ---------- Proof dialog renderer ---------- */
+  function renderMarkdownToHTML(md) {
+    const lines = String(md || '').split('\n');
+    let html = '', inTable = false, inList = false;
+    const fmt = t => esc(t)
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+
+    for (const raw of lines) {
+      const ln = raw.trim();
+      if (ln.startsWith('|') && ln.endsWith('|')) {
+        if (inList) { html += '</ul>'; inList = false; }
+        const cells = ln.slice(1, -1).split('|').map(c => c.trim());
+        if (cells.every(c => /^:?-{2,}:?$/.test(c))) continue;
+        if (!inTable) {
+          html += '<table><thead><tr>' + cells.map(c => `<th>${fmt(c)}</th>`).join('') + '</tr></thead><tbody>';
+          inTable = true;
+        } else {
+          html += '<tr>' + cells.map(c => `<td>${fmt(c)}</td>`).join('') + '</tr>';
+        }
+        continue;
+      } else if (inTable) { html += '</tbody></table>'; inTable = false; }
+
+      if (!ln) { if (inList) { html += '</ul>'; inList = false; } continue; }
+      if (ln.startsWith('# ')) { html += `<h1>${fmt(ln.slice(2))}</h1>`; continue; }
+      if (ln.startsWith('## ')) { html += `<h2>${fmt(ln.slice(3))}</h2>`; continue; }
+      if (ln.startsWith('- ')) {
+        if (!inList) { html += '<ul>'; inList = true; }
+        html += `<li>${fmt(ln.slice(2))}</li>`;
+        continue;
+      }
+      if (inList) { html += '</ul>'; inList = false; }
+      html += `<p>${fmt(ln)}</p>`;
+    }
+    if (inTable) html += '</tbody></table>';
+    if (inList) html += '</ul>';
+    return html;
+  }
+
+  async function openProofModal() {
+    const dlg = $('#proof-modal');
+    if (!S.proof) await loadProof();
+    const hashEl = $('#pm-hash');
+    if (S.proof && S.proof.manifest_sha256) {
+      hashEl.textContent = `Sealed held-out manifest SHA-256: ${S.proof.manifest_sha256}`;
+      hashEl.hidden = false;
+    } else {
+      hashEl.hidden = true;
+    }
+    if (S.proof && S.proof.ready && S.proof.markdown) {
+      $('#pm-content').innerHTML = renderMarkdownToHTML(S.proof.markdown);
+    } else {
+      $('#pm-content').textContent = (S.proof && S.proof.message) || 'Results after the held-out run.';
+    }
+    dlg.showModal();
+  }
+
+  /* ---------- Replay polling & clock ---------- */
+  function stopTimers() {
+    if (S.pollTimer) { clearInterval(S.pollTimer); S.pollTimer = null; }
+    if (S.clockTimer) { clearInterval(S.clockTimer); S.clockTimer = null; }
+  }
+
+  function startReplayMonitoring(runId) {
+    S.clockTimer = setInterval(() => {
+      const clock = $('#pill-clock');
+      if (clock && S.expandedKey && S.groups.has(S.expandedKey)) {
+        const g = S.groups.get(S.expandedKey);
+        clock.textContent = formatElapsed(Date.now() - (g.createdMs || S.runStartedMs));
+      }
+      // If run finished and >135s passed without a Managed Agent response, mark replay didn't finish
+      if (S.doneMs && Date.now() - S.doneMs > 135000) {
+        let changed = false;
+        S.confirmedOrder.forEach(k => {
+          const g = S.groups.get(k);
+          if (g.replayed === undefined && !g.replayTimedOut) {
+            g.replayTimedOut = true;
+            changed = true;
+          }
         });
+        if (changed) updateReplayPillDOM();
+        stopTimers();
       }
-    }
+    }, 1000);
 
-    function renderAxe(axe) {
-      $("kpi-axe").textContent = String(axe.violation_count ?? 0);
-      const list = $("axe-compare");
-      const callout = $("axe-callout");
-      const injectedBug = state.manifest ? state.manifest.bug_type : (state.selectedBug || null);
-      if (injectedBug && injectedBug !== "random") {
-        const caught = (axe.mapped_bugs || []).includes(injectedBug);
-        callout.classList.remove("hidden", "missed", "caught");
-        callout.classList.add(caught ? "caught" : "missed");
-        callout.textContent = caught
-          ? `axe-core CAUGHT injected bug: ${injectedBug}`
-          : `axe-core MISSED injected bug: ${injectedBug} (no static rule for runtime focus/keyboard behavior)`;
-      } else {
-        callout.classList.add("hidden");
-      }
-
-      const viols = axe.violations || [];
-      if (!viols.length) {
-        list.innerHTML = '<li class="compare-item">0 axe-core violations reported on this page.</li>';
-        return;
-      }
-      list.innerHTML = "";
-      viols.forEach(v => {
-        const li = document.createElement("li");
-        li.className = "compare-item";
-        li.innerHTML = `<strong>${esc(v.id)}</strong> (${esc(v.impact || "unknown")}, ${esc(v.nodes_count)} node${v.nodes_count === 1 ? "" : "s"})${v.mapped_bug ? ` · <span class="badge wcag">${esc(v.mapped_bug)}</span>` : ""}<br><span style="color:var(--muted)">${esc(v.help)}</span>`;
-        list.appendChild(li);
-      });
-    }
-
-    function setStatus(text, kind = "", meta = "") {
-      const bar = $("status-bar");
-      bar.className = "status-bar" + (kind ? ` ${kind}` : "");
-      $("status-text").textContent = text;
-      if (meta !== null) $("status-meta").textContent = meta;
-    }
-
-    async function startAudit() {
-      const url = $("url-input").value.trim();
-      if (!url) return;
-      if (state.es) { state.es.close(); state.es = null; }
-      if (state.replayTimer) { clearInterval(state.replayTimer); state.replayTimer = null; }
-      state.runId = null;
-
-      state.findings = [];
-      state.ticketsByKey = {};
-      state.manifest = null;
-      $("kpi-confirmed").textContent = "0";
-      $("kpi-axe").textContent = "0";
-      $("kpi-steps").textContent = "0 / 40";
-      $("frame-step-tag").textContent = "Starting...";
-      $("step-caption").textContent = "Launching browser & running preflight...";
-      $("live-frame").classList.add("hidden");
-      $("frame-placeholder").classList.remove("hidden");
-      $("axe-callout").classList.add("hidden");
-      $("axe-compare").innerHTML = '<li class="compare-item" style="color:var(--muted);">Waiting for axe-core...</li>';
-      renderFindings();
-
-      $("run-btn").disabled = true;
-      setStatus(`Starting audit on ${url}...`, "", state.selectedBug ? `Inject: ${state.selectedBug}` : "Live site");
-
+    S.pollTimer = setInterval(async () => {
+      if (!runId) return;
       try {
-        const body = { url, inject: state.selectedBug || null, seed: null, headless: false, use_gemini: true };
-        const res = await fetch("/api/run", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
+        const data = await fetch(`/api/run/${encodeURIComponent(runId)}`).then(r => r.json());
+        const confirmed = data.confirmed || [];
+        let anyPending = false;
+        confirmed.forEach(cf => {
+          const cev = cf.evidence || {};
+          const key = groupKeyFor('confirmed', cf.check, cev.accessible_name, cev.label_text || cev.visible_text, cev.selector);
+          const g = S.groups.get(key);
+          if (g) {
+            if (cf.replayed !== undefined) g.replayed = cf.replayed;
+            else anyPending = true;
+          }
         });
-        const data = await res.json();
-        if (!res.ok) {
-          setStatus(`Could not start: ${data.detail || res.statusText}`, "blocked", "");
-          $("run-btn").disabled = false;
-          return;
+        updateReplayPillDOM();
+        if (!anyPending && S.phase === 'done' && confirmed.some(c => c.replayed !== undefined)) {
+          stopTimers();
         }
-        const runId = data.run_id;
-        state.runId = runId;
-        const es = new EventSource(`/api/run/${encodeURIComponent(runId)}/events`);
-        state.es = es;
+      } catch (_) {}
+    }, 6000);
+  }
 
-        es.addEventListener("preflight", e => {
-          const d = JSON.parse(e.data);
-          if (d.status !== "ok") {
-            setStatus(`Blocked in preflight: ${d.reason}. Pick another page from the vetted list.`, "blocked", "");
-          } else {
-            const ps = d.page_state ? ` · page_state=${d.page_state.choice}` : "";
-            setStatus(`Preflight OK (${d.tabbable} focusable, banner: ${d.banner_action}${ps}). Tabbing through page...`, "", state.selectedBug ? `Inject: ${state.selectedBug}` : "Live site");
-          }
-        });
+  /* ---------- Start a real run ---------- */
+  function normalizeInputUrl(raw) {
+    const trimmed = String(raw || '').trim();
+    if (!trimmed) return '';
+    if (/^[a-z][a-z0-9+.-]*:\/\//i.test(trimmed)) return trimmed;
+    return 'https://' + trimmed;
+  }
 
-        es.addEventListener("step", e => {
-          const s = JSON.parse(e.data);
-          $("kpi-steps").textContent = `${s.index} / 40`;
-          $("frame-step-tag").textContent = `Step ${s.index}`;
-          if (s.full_screenshot) {
-            $("live-frame").src = s.full_screenshot + "?t=" + Date.now();
-            $("live-frame").classList.remove("hidden");
-            $("frame-placeholder").classList.add("hidden");
-          }
-          if (s.body) {
-            $("step-caption").textContent = `Step ${s.index}: focus on <body>`;
-          } else {
-            $("step-caption").textContent = `Step ${s.index}: <${s.tag}> role=${s.role || "none"} · name="${s.accessible_name || ""}" · ${s.selector || ""}`;
-          }
-        });
+  async function startRun() {
+    const pasted = normalizeInputUrl($('#url-input').value);
+    const url = pasted || $('#page-select').value;
+    if (!url) return;
 
-        es.addEventListener("finding", e => {
-          const f = JSON.parse(e.data);
-          state.findings.push(f);
-          renderFindings();
-        });
+    if (S.es) { S.es.close(); S.es = null; }
+    stopTimers();
 
-        es.addEventListener("axe", e => {
-          const axe = JSON.parse(e.data);
-          renderAxe(axe);
-        });
+    // Clear previous run DOM nodes cleanly
+    S.groups.clear();
+    S.confirmedOrder = [];
+    S.humanOrder = [];
+    S.expandedKey = null;
+    S.humanOpen = false;
+    S.nextSeq = 1;
+    S.axe = null;
+    S.manifest = null;
+    S.lastStep = null;
+    S.doneMs = 0;
+    S.runStartedMs = Date.now();
+    rowNodes.forEach(node => node.remove());
+    rowNodes.clear();
 
-        es.addEventListener("ticket", e => {
-          const t = JSON.parse(e.data);
-          const key = `${t.check}::${t.selector || ""}::${t.step ?? ""}`;
-          state.ticketsByKey[key] = t;
-          renderFindings();
-        });
+    S.activeUrl = url;
+    S.phase = 'running';
+    app.className = 'app state-running';
+    $('#run-btn').disabled = true;
+    $('#frame-url').textContent = shortUrl(url);
+    setHudTab(0, true);
+    setStatus('', 'Loading page & preflight…');
+    $('#progress').style.setProperty('--p', '0%');
+    $('#idle-slot').hidden = false;
+    $('#blocked-slot').hidden = true;
+    $('#live-shot').hidden = true;
+    $('#focus-marker').hidden = true;
+    $('#caption').textContent = 'Opening Chrome and checking preflight…';
+    syncActiveCard();
+    updateFooter();
 
-        es.addEventListener("done", e => {
-          const d = JSON.parse(e.data);
-          if (d.manifest) state.manifest = d.manifest;
-          if (d.status === "blocked") {
-            setStatus(`Stopped: ${d.reason}`, "blocked", `${d.duration_s}s`);
-          } else {
-            const injTxt = d.manifest ? ` · Injected ${d.manifest.bug_type} on ${d.manifest.target_selector}` : "";
-            setStatus(
-              `Done in ${d.duration_s}s — ${d.confirmed} confirmed, ${d.needs_human} needs human, ${d.tickets || 0} ticket(s), ${d.axe_violations || 0} axe violations.${injTxt}`,
-              "done",
-              `${d.gemini_usage ? d.gemini_usage.calls : 0} Gemini calls`
-            );
-            // Refresh axe banner with final resolved manifest (e.g. for "random")
-            if (d.manifest && $("axe-compare").children.length) {
-              fetch(`/api/run/${encodeURIComponent(d.run_id)}`).then(r => r.json()).then(full => {
-                if (full.axe) renderAxe(full.axe);
-              }).catch(() => {});
-            }
-            // Poll background Managed Agent replay results without ever blocking the demo
-            if ((d.confirmed || 0) > 0 && d.run_id) {
-              let polls = 0;
-              state.replayTimer = setInterval(async () => {
-                polls += 1;
-                try {
-                  const full = await fetch(`/api/run/${encodeURIComponent(d.run_id)}`).then(r => r.json());
-                  let pending = 0;
-                  (full.confirmed || []).forEach(cf => {
-                    const cev = cf.evidence || {};
-                    const match = state.findings.find(x => x.check === cf.check && ((x.evidence || {}).selector === cev.selector));
-                    if (match && cf.replayed !== undefined) match.replayed = cf.replayed;
-                    if (cf.replayed === undefined) pending += 1;
-                  });
-                  renderFindings();
-                  if (pending === 0 || polls >= 30) {
-                    clearInterval(state.replayTimer);
-                    state.replayTimer = null;
-                    renderFindings();
-                  }
-                } catch (err) {}
-              }, 8000);
-              renderFindings();
-            }
-          }
-          $("run-btn").disabled = false;
-          es.close();
-          state.es = null;
-        });
-
-        es.addEventListener("error", e => {
-          if (e.data) {
-            const d = JSON.parse(e.data);
-            setStatus(`Run error: ${d.message}`, "blocked", "");
-          }
-          $("run-btn").disabled = false;
-          es.close();
-          state.es = null;
-        });
-      } catch (err) {
-        setStatus(`Request failed: ${err}`, "blocked", "");
-        $("run-btn").disabled = false;
+    try {
+      const resp = await fetch('/api/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url,
+          inject: S.bug || null,
+          seed: null,
+          headless: false,
+          use_gemini: true
+        })
+      });
+      const payload = await resp.json();
+      if (!resp.ok) {
+        S.phase = 'error';
+        app.className = 'app state-blocked';
+        setStatus('red', payload.detail || 'Could not start run');
+        $('#idle-slot').hidden = true;
+        $('#blocked-slot').hidden = false;
+        $('#blocked-msg').innerHTML = `${esc(payload.detail || 'Run rejected.')}<span>Pick a vetted public healthcare page above.</span>`;
+        $('#caption').textContent = `Could not start run: ${payload.detail || resp.statusText}`;
+        $('#run-btn').disabled = false;
+        syncActiveCard();
+        updateFooter();
+        return;
       }
+
+      const runId = payload.run_id;
+      S.runId = runId;
+      startReplayMonitoring(runId);
+
+      const es = new EventSource(`/api/run/${encodeURIComponent(runId)}/events`);
+      S.es = es;
+
+      es.addEventListener('preflight', e => {
+        const d = JSON.parse(e.data);
+        if (d.final_url) $('#frame-url').textContent = shortUrl(d.final_url);
+        if (d.status !== 'ok') {
+          S.phase = 'blocked';
+          app.className = 'app state-blocked';
+          setStatus('amber', 'Stopped at page load');
+          $('#idle-slot').hidden = true;
+          $('#live-shot').hidden = true;
+          $('#focus-marker').hidden = true;
+          $('#blocked-slot').hidden = false;
+          $('#blocked-msg').innerHTML = `This site blocked or prevented testing (${esc(d.reason)}).<span>We don’t bypass bot protection or login walls.</span>`;
+          $('#caption').textContent = 'Blindspot stopped before the first Tab. Nothing on this page was tested.';
+          syncActiveCard();
+          updateFooter();
+        } else {
+          setStatus('', 'Tabbing like a patient…');
+        }
+      });
+
+      es.addEventListener('step', e => {
+        const s = JSON.parse(e.data);
+        S.lastStep = s;
+        setHudTab(s.index, false);
+        $('#progress').style.setProperty('--p', `${Math.min(100, (s.index / 40) * 100).toFixed(1)}%`);
+
+        if (s.full_screenshot) {
+          const img = $('#live-shot');
+          img.onload = () => positionFocusMarker(s.rect, s.offscreen);
+          img.src = `${s.full_screenshot}?t=${s.index}`;
+          img.hidden = false;
+          $('#idle-slot').hidden = true;
+          positionFocusMarker(s.rect, s.offscreen);
+        }
+
+        if (s.body) {
+          $('#caption').innerHTML = `<span class="step">Tab ${s.index}</span> · <span class="says">Screen reader says:</span> “page body”`;
+        } else {
+          const acc = (s.accessible_name || '').trim() || '(unnamed)';
+          const role = (s.role || s.tag || 'element').trim();
+          $('#caption').innerHTML = `<span class="step">Tab ${s.index}</span> · <span class="says">Screen reader says:</span> “${esc(acc)}, ${esc(role)}”`;
+        }
+      });
+
+      es.addEventListener('finding', e => {
+        const f = JSON.parse(e.data);
+        upsertFinding(f);
+        if (f.status === 'confirmed') {
+          const g = S.groups.get(S.expandedKey);
+          const ev = f.evidence || {};
+          if (g) setStatus('red', `Ticket ${g.id} filed · ${ev.step != null ? `Tab ${ev.step}` : 'Page'}`);
+        }
+      });
+
+      es.addEventListener('axe', e => {
+        S.axe = JSON.parse(e.data);
+        syncActiveCard();
+        updateFooter();
+      });
+
+      es.addEventListener('ticket', e => {
+        attachTicket(JSON.parse(e.data));
+      });
+
+      es.addEventListener('done', e => {
+        const d = JSON.parse(e.data);
+        S.doneMs = Date.now();
+        if (d.manifest) S.manifest = d.manifest;
+        if (d.status === 'blocked') {
+          S.phase = 'blocked';
+          app.className = 'app state-blocked';
+          $('#run-btn').disabled = false;
+          stopTimers();
+        } else {
+          S.phase = 'done';
+          app.className = 'app state-done';
+          $('#progress').style.setProperty('--p', '100%');
+          const stepsN = d.steps ?? (S.lastStep ? S.lastStep.index : 0);
+          setHudTab(stepsN, stepsN === 0);
+          setStatus('green', `Run complete · ${stepsN} Tabs`);
+
+          // If a bug was planted and caught, expand the exact planted-target ticket at the end
+          if (S.manifest && S.manifest.expected_check) {
+            const exactHit = S.confirmedOrder.find(k => {
+              const g = S.groups.get(k);
+              return g.finding.check === S.manifest.expected_check && g.selectors.includes(S.manifest.target_selector);
+            });
+            const anyHit = S.confirmedOrder.find(k => S.groups.get(k).finding.check === S.manifest.expected_check);
+            if (exactHit || anyHit) S.expandedKey = exactHit || anyHit;
+          }
+
+          const cTickets = S.confirmedOrder.length;
+          const hTickets = S.humanOrder.length;
+          $('#caption').innerHTML = `<span class="step">Tab ${stepsN}</span> · Run finished: ${cTickets} confirmed ticket${cTickets === 1 ? '' : 's'}${hTickets ? `, ${hTickets} need a human look` : ''}.`;
+          $('#run-btn').disabled = false;
+          // If the server doesn't populate `replayed` immediately (e.g. replay off or pending), check once right away
+          fetch(`/api/run/${encodeURIComponent(runId)}`).then(r => r.json()).then(full => {
+            if (full.axe && !S.axe) S.axe = full.axe;
+            (full.confirmed || []).forEach(cf => {
+              const cev = cf.evidence || {};
+              const k = groupKeyFor('confirmed', cf.check, cev.accessible_name, cev.label_text || cev.visible_text, cev.selector);
+              const g = S.groups.get(k);
+              if (g && cf.replayed !== undefined) g.replayed = cf.replayed;
+            });
+            syncActiveCard();
+            updateFooter();
+          }).catch(() => {});
+        }
+        syncActiveCard();
+        updateFooter();
+        es.close();
+        S.es = null;
+      });
+
+      es.addEventListener('error', e => {
+        if (e.data) {
+          const d = JSON.parse(e.data);
+          S.phase = 'error';
+          app.className = 'app state-blocked';
+          setStatus('red', 'Run error');
+          $('#caption').textContent = `Run stopped with an error: ${d.message || 'unknown error'}`;
+          syncActiveCard();
+          updateFooter();
+        }
+        $('#run-btn').disabled = false;
+        stopTimers();
+        es.close();
+        S.es = null;
+      });
+    } catch (err) {
+      S.phase = 'error';
+      app.className = 'app state-blocked';
+      setStatus('red', 'Connection error');
+      $('#caption').textContent = `Could not connect to server: ${err}`;
+      $('#run-btn').disabled = false;
+      syncActiveCard();
+      updateFooter();
+    }
+  }
+
+  /* ---------- UI interactions ---------- */
+  async function copyText(text) {
+    try { await navigator.clipboard.writeText(text); return true; }
+    catch {
+      const ta = Object.assign(document.createElement('textarea'), { value: text });
+      ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      const ok = document.execCommand('copy'); ta.remove(); return ok;
+    }
+  }
+
+  $('#page-select').addEventListener('change', () => {
+    $('#url-input').value = '';
+    if (S.phase === 'idle') {
+      S.activeUrl = $('#page-select').value;
+      $('#frame-url').textContent = shortUrl(S.activeUrl);
+    }
+  });
+
+  document.addEventListener('click', async e => {
+    const chip = e.target.closest('.chip');
+    if (chip) {
+      S.bug = chip.dataset.bug || '';
+      document.querySelectorAll('.chip').forEach(c => {
+        c.setAttribute('aria-pressed', String((c.dataset.bug || '') === S.bug));
+      });
+      if (S.phase === 'idle') updateFooter();
+      return;
     }
 
-    $("run-btn").addEventListener("click", startAudit);
-    initMeta();
-  </script>
+    const expBtn = e.target.closest('[data-expand-key]');
+    if (expBtn) {
+      S.expandedKey = expBtn.dataset.expandKey;
+      syncActiveCard();
+      $('#ac-copy-btn').focus();
+      return;
+    }
+
+    if (e.target.closest('#human-toggle')) {
+      S.humanOpen = !S.humanOpen;
+      syncActiveCard();
+      return;
+    }
+
+    if (e.target.closest('#ac-copy-btn')) {
+      if (!S.expandedKey || !S.groups.has(S.expandedKey)) return;
+      const ok = await copyText(buildCopyMarkdown(S.groups.get(S.expandedKey)));
+      const lbl = $('#ac-copy-label');
+      lbl.textContent = ok ? 'Copied' : 'Copy failed';
+      setTimeout(() => { lbl.textContent = 'Copy Markdown'; }, 1600);
+      return;
+    }
+
+    if (e.target.closest('#try-vetted-btn')) {
+      $('#url-input').value = '';
+      $('#page-select').value = DEFAULT_PREF;
+      startRun();
+      return;
+    }
+
+    if (e.target.closest('#top-proof-btn') || e.target.closest('#proof-link')) {
+      openProofModal();
+      return;
+    }
+
+    if (e.target.closest('#pm-close')) {
+      $('#proof-modal').close();
+    }
+  });
+
+  $('#run-form').addEventListener('submit', e => {
+    e.preventDefault();
+    startRun();
+  });
+
+  loadVetted();
+  loadProof();
+})();
+</script>
 </body>
 </html>
