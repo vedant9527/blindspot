@@ -11,7 +11,7 @@ cd ~/blindspot
 source .venv/bin/activate              # Python 3.12; create with: python3 -m venv .venv
 pip install -r requirements.txt
 playwright install ffmpeg              # screen recordings (already installed on this laptop)
-pytest -q                              # 12 tests, ~65 s, headless Chrome
+pytest -q                              # 13 tests, ~85 s, headless Chrome
 uvicorn app.main:app --host 0.0.0.0 --port 8000     # app + stranger form at http://<laptop IP>:8000/submit
 ipconfig getifaddr en0                 # laptop IP; regenerate eval/submit_qr.png if it changed
 python -m blindspot.runner --url https://www.healthcare.gov/   # full keyboard run + code checks
@@ -61,16 +61,21 @@ API quirks found so far: the first Decisions API call is ~3 s (cold), later ones
 - CLI: `python -m blindspot.runner --url URL [--headless] [--tabs N]` runs preflight, the keyboard run and the checks; saves `runs/<run_id>/steps.json`, `checks.json`, screenshots, crops and a `.webm` screen recording (needs `playwright install ffmpeg`, already installed here; it falls back to no video if missing).
 - `blindspot/checks.py`: `run_checks(run)` returns `{check, wcag, proven, suspect, evidence, detail}` per (check, selector). Proven: keyboard_trap, focus_not_visible (fewer than 8 changed pixels around the element and the screen did not change elsewhere, or focus entirely off screen), focus_obscured (all sample points under a fixed or sticky layer), focus_order (positive tabindex), label_in_name. Suspect only: faint indicators, partial or non-fixed coverage, upward jumps over 300 px in one region, indicator contrast under 3:1.
 - Thresholds added to `blindspot/config.py` (PIXEL_DELTA, FOCUS_CHANGED_PX_MIN, ELSEWHERE_PX_MAX, RING_MAX_FRACTION, TRAP_*, MAX_POPUP_CLOSES).
-- `fixtures/`: clean, trap, hidden_focus, covered, tabindex, label_mismatch (12 focusable elements each). `pytest -q`: 12 passed (~65 s, headless Chrome).
-- Real pages:
-  - medicare.gov: 1 proven on the first runs (focus lands on an off-screen, unnamed div), then a sign-up popup changed the results run to run. Latest run: 1 proven focus_obscured (footer "Next Step" under the popup's fixed iframe) and many suspects.
-  - healthcare.gov: 9 proven focus_obscured, footer links hidden under the opaque "Get covered for 2027" popup (screenshot checked). Suspects: elements under the see-through dimming layer.
-  - Both runs: 40 steps in about 25 s.
+- `fixtures/`: clean, trap, hidden_focus, covered, tabindex, label_mismatch, popup (12 focusable elements each). `pytest -q`: 13 passed (~85 s, headless Chrome), including `test_late_popup_is_closed_and_page_is_tested` proving the runner closes a late `role="dialog"` popup ("Close dialog"), logs it in `run["popups"]`, and then tests all 12 page elements.
+- Real pages (headless sweep of original 18 `eval/pages_ok.txt` pages):
+  - 12 of 18 completed cleanly in `--headless` mode; 6 (`nih.gov`, `nyc.gov`, `nychealthandhospitals.org`, `hopkinsmedicine.org`, `mayoclinic.org`, `plannedparenthood.org`) were blocked in headless mode (all 6 still pass 3/3 loads in headed Chrome).
+  - **Recommended 3 most stable pages for the live demo:**
+    1. `https://nyulangone.org/doctors` (0 proven, 3 suspects, 0 mid-run popups, 32.8s)
+    2. `https://www.va.gov/find-locations/` (0 proven, 16 suspects, 0 mid-run popups, 24.58s)
+    3. `https://medlineplus.gov/` (0 proven, 20 suspects, 0 mid-run popups, 26.5s)
+    (Backup: `https://www.kp.org/` — 0 proven, 7 suspects, 26.7s. Avoid `medicare.gov` and `healthcare.gov` for live demos due to random Qualtrics popups.)
+- Expanded vetted dev/demo list (`eval/pages_vetted.txt` -> `eval/pages_ok.txt`): added 20 public healthcare pages (appointments, find-a-doctor, billing info, telehealth, state Medicaid, public insurers, community health centers, pharmacy locators). `python scripts/check_pages.py` (headed Chrome, 3 loads each): **37 of 40 passed** and are in `eval/pages_ok.txt` (blocked: `zocdoc.com` HTTP 403, `goodrx.com` HTTP 403, `mountsinai.org/patient-care/billing-and-insurance` only 4 focusable elements). **Dev and demo set only — never mix into the held-out set, which comes only from `eval/submissions.jsonl`.**
 
 ### Open issues
 
-- Both .gov pages show Qualtrics sign-up popups at random, so results differ between runs. For the demo, use a page without popups or Phase 9 snapshots. The close-and-restart path (`dismiss_popup`) has not fired on a real page yet; it only runs when focus goes inside the popup.
-- indicator_contrast is noisy (many suspects under dimming layers). It is suspect-only, so it cannot confirm anything without the scorer, but consider not sending it to the scorer when the element is under an overlay.
+- Both `medicare.gov` and `healthcare.gov` show Qualtrics sign-up popups at random, so results differ between runs. Use the 3 stable pages above (or Phase 9 snapshots) for the live demo.
+- `indicator_contrast` is noisy (many suspects under dimming layers). It is suspect-only, so it cannot confirm anything without the scorer, but consider not sending it to the scorer when the element is under an overlay.
+- Disk space on `/` is low (~3.1 GB free). Avoid running multiple parallel video-recording sweeps; prune old `runs/` folders if needed.
 - Phase 3 should parallelise scoring (see the latency notes above): the run takes ~0.6 s per step without Gemini.
 
 ## Step 2 (Antigravity + Claude Code review, ~12:20)

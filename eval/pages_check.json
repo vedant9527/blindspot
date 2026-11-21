@@ -22,7 +22,7 @@
         "status": "ok",
         "reason": "",
         "http": 200,
-        "tabbable": 69,
+        "tabbable": 64,
         "banner": "none"
       }
     ]
@@ -43,7 +43,7 @@
         "status": "ok",
         "reason": "",
         "http": 200,
-        "tabbable": 67,
+        "tabbable": 63,
         "banner": "none"
       },
       {
@@ -64,21 +64,21 @@
         "status": "ok",
         "reason": "",
         "http": 200,
-        "tabbable": 65,
-        "banner": "none"
-      },
-      {
-        "status": "ok",
-        "reason": "",
-        "http": 200,
-        "tabbable": 65,
-        "banner": "none"
-      },
-      {
-        "status": "ok",
-        "reason": "",
-        "http": 200,
         "tabbable": 64,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 65,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 65,
         "banner": "none"
       }
     ]
@@ -93,21 +93,21 @@
         "reason": "",
         "http": 200,
         "tabbable": 57,
-        "banner": "none"
+        "banner": "close"
       },
       {
         "status": "ok",
         "reason": "",
         "http": 200,
         "tabbable": 57,
-        "banner": "none"
+        "banner": "close"
       },
       {
         "status": "ok",
         "reason": "",
         "http": 200,
         "tabbable": 57,
-        "banner": "none"
+        "banner": "close"
       }
     ]
   },
@@ -232,22 +232,22 @@
         "status": "ok",
         "reason": "",
         "http": 200,
-        "tabbable": 171,
-        "banner": "none"
+        "tabbable": 167,
+        "banner": "close"
       },
       {
         "status": "ok",
         "reason": "",
         "http": 200,
-        "tabbable": 171,
-        "banner": "none"
+        "tabbable": 167,
+        "banner": "close"
       },
       {
         "status": "ok",
         "reason": "",
         "http": 200,
-        "tabbable": 171,
-        "banner": "none"
+        "tabbable": 167,
+        "banner": "close"
       }
     ]
   },
@@ -345,21 +345,21 @@
         "reason": "",
         "http": 200,
         "tabbable": 107,
-        "banner": "none"
+        "banner": "close"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 108,
+        "banner": "close"
       },
       {
         "status": "ok",
         "reason": "",
         "http": 200,
         "tabbable": 107,
-        "banner": "none"
-      },
-      {
-        "status": "ok",
-        "reason": "",
-        "http": 200,
-        "tabbable": 107,
-        "banner": "none"
+        "banner": "close"
       }
     ]
   },
@@ -443,7 +443,7 @@
         "reason": "",
         "http": 200,
         "tabbable": 87,
-        "banner": "close"
+        "banner": "accept (#onetrust-accept-btn-handler)"
       }
     ]
   },
@@ -456,22 +456,22 @@
         "status": "ok",
         "reason": "",
         "http": 200,
-        "tabbable": 58,
-        "banner": "none"
+        "tabbable": 57,
+        "banner": "close"
       },
       {
         "status": "ok",
         "reason": "",
         "http": 200,
-        "tabbable": 58,
-        "banner": "none"
+        "tabbable": 57,
+        "banner": "close"
       },
       {
         "status": "ok",
         "reason": "",
         "http": 200,
-        "tabbable": 58,
-        "banner": "none"
+        "tabbable": 57,
+        "banner": "close"
       }
     ]
   },
@@ -555,6 +555,566 @@
         "reason": "",
         "http": 200,
         "tabbable": 56,
+        "banner": "none"
+      }
+    ]
+  },
+  {
+    "url": "https://www.mayoclinic.org/appointments",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 70,
+        "banner": "reject"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 70,
+        "banner": "reject"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 70,
+        "banner": "reject"
+      }
+    ]
+  },
+  {
+    "url": "https://www.massgeneral.org/appointments",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 94,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 94,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 94,
+        "banner": "none"
+      }
+    ]
+  },
+  {
+    "url": "https://www.ucsfhealth.org/find-a-doctor",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 365,
+        "banner": "reject (#onetrust-reject-all-handler)"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 365,
+        "banner": "reject (#onetrust-reject-all-handler)"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 365,
+        "banner": "reject (#onetrust-reject-all-handler)"
+      }
+    ]
+  },
+  {
+    "url": "https://www.massgeneral.org/doctors",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 60,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 60,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 60,
+        "banner": "none"
+      }
+    ]
+  },
+  {
+    "url": "https://www.mountsinai.org/patient-care/billing-and-insurance",
+    "passed": false,
+    "reason": "only 4 focusable elements",
+    "tries": [
+      {
+        "status": "blocked",
+        "reason": "only 4 focusable elements",
+        "http": 404,
+        "tabbable": 4,
+        "banner": "none"
+      },
+      {
+        "status": "blocked",
+        "reason": "only 4 focusable elements",
+        "http": 404,
+        "tabbable": 4,
+        "banner": "none"
+      },
+      {
+        "status": "blocked",
+        "reason": "only 4 focusable elements",
+        "http": 404,
+        "tabbable": 4,
+        "banner": "none"
+      }
+    ]
+  },
+  {
+    "url": "https://www.hopkinsmedicine.org/patient-care/patients-visitors/billing-insurance",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 75,
+        "banner": "accept (#onetrust-accept-btn-handler)"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 75,
+        "banner": "accept (#onetrust-accept-btn-handler)"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 75,
+        "banner": "accept (#onetrust-accept-btn-handler)"
+      }
+    ]
+  },
+  {
+    "url": "https://telehealth.hhs.gov/",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 37,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 37,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 37,
+        "banner": "none"
+      }
+    ]
+  },
+  {
+    "url": "https://connectedcare.va.gov/",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 73,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 73,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 73,
+        "banner": "none"
+      }
+    ]
+  },
+  {
+    "url": "https://www.medicare.gov/coverage/telehealth",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 63,
+        "banner": "close"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 62,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 63,
+        "banner": "close"
+      }
+    ]
+  },
+  {
+    "url": "https://www.medicaid.gov/",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 50,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 50,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 50,
+        "banner": "none"
+      }
+    ]
+  },
+  {
+    "url": "https://www.dhcs.ca.gov/services/medi-cal",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 51,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 51,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 51,
+        "banner": "none"
+      }
+    ]
+  },
+  {
+    "url": "https://www.health.ny.gov/health_care/medicaid/",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 135,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 135,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 135,
+        "banner": "none"
+      }
+    ]
+  },
+  {
+    "url": "https://www.mass.gov/orgs/masshealth",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 51,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 51,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 51,
+        "banner": "none"
+      }
+    ]
+  },
+  {
+    "url": "https://www.coveredca.com/",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 73,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 73,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 73,
+        "banner": "none"
+      }
+    ]
+  },
+  {
+    "url": "https://nystateofhealth.ny.gov/",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 33,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 33,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 33,
+        "banner": "none"
+      }
+    ]
+  },
+  {
+    "url": "https://www.bcbs.com/",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 57,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 57,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 57,
+        "banner": "none"
+      }
+    ]
+  },
+  {
+    "url": "https://findahealthcenter.hrsa.gov/",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 46,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 46,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 46,
+        "banner": "none"
+      }
+    ]
+  },
+  {
+    "url": "https://www.nachc.org/",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 76,
+        "banner": "accept"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 76,
+        "banner": "accept"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 76,
+        "banner": "accept"
+      }
+    ]
+  },
+  {
+    "url": "https://www.cvs.com/store-locator/landing",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 11,
+        "banner": "close"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 11,
+        "banner": "close"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 11,
+        "banner": "close"
+      }
+    ]
+  },
+  {
+    "url": "https://www.walgreens.com/storelocator/find.jsp",
+    "passed": true,
+    "reason": "",
+    "tries": [
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 118,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 118,
+        "banner": "none"
+      },
+      {
+        "status": "ok",
+        "reason": "",
+        "http": 200,
+        "tabbable": 118,
         "banner": "none"
       }
     ]
