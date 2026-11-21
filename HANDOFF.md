@@ -2,7 +2,7 @@
 
 Read AGENTS.md first. This file says where the build stands.
 
-**Status (Nov 21, ~14:15, Google Antigravity):** Phases 0–6 done and verified in a live browser demo (`uvicorn` running on `:8000`, `/submit` verified HTTP 200 with 15 stranger URLs). Ready for the ~2:40 PM `"freeze"` signal (do not edit `config.py` or `eval/submissions.jsonl`).
+**Status (Nov 21, ~14:36, Google Antigravity):** Phases 0–6 AND the 2:30 Managed Agent Replay Gate (5/5 consecutive passes!) are done and wired in. Ready for the ~2:40 PM `"freeze"` signal (do not edit `config.py` or `eval/submissions.jsonl`). Note: restart `uvicorn` when convenient so the live `:8000` server picks up the new `run_replay` background hook (per instructions, port 8000 was not restarted during the gate).
 
 ## Setup and run (exact commands)
 
@@ -163,6 +163,12 @@ API quirks found so far: the first Decisions API call is ~3 s (cold), later ones
 - Verified live in browser against `http://127.0.0.1:8000/` (`medlineplus.gov` + `hide_focus`): completed in **50.87s**, **4 confirmed** (`Missing keyboard focus indicator on "What's New" header navigation link` written by Carbon with red-box crop + CSS fix), **2 axe violations** with explicit `"axe-core MISSED injected bug: hide_focus"` callout, Proof tab shows `"Results after the held-out run."`, `/submit` HTTP 200.
 - Tests: `tests/test_tickets.py` added; `pytest -q`: **49 passed**.
 
+## 2:30 Gate: Managed Agent replay (GO — 5/5 passed, Antigravity, ~14:36)
+
+- `blindspot/replay.py`: self-contained headless Chromium replay script (zero repo imports, stdlib + Playwright only; uses in-browser canvas pixel diff so the sandbox only installs `playwright` + `chromium`). Verified locally on 3 confirmed findings (`hidden_focus.html` `focus_not_visible`, `trap.html` `keyboard_trap`, `covered.html` `focus_obscured` — all 3 `reproduced: true`).
+- `blindspot/managed_agent.py`: sends `replay.py` + manifest to Google's Managed Agent sandbox (`antigravity-preview-05-2026`). **5/5 consecutive passes** on `https://medlineplus.gov/` (`hide_focus`, step 9, `changed_px=0 changed_elsewhere=0`): Attempt 1 `118.1s`, Attempt 2 `108.2s`, Attempt 3 `100.2s`, Attempt 4 `104.8s`, Attempt 5 `82.3s`.
+- Wired in via `start_background_replays` in `blindspot/runner.py` (`run_replay=req.use_gemini` in `app/main.py`): spawns a daemon thread **after** `done` is emitted so it adds 0 ms to the live demo, updates `runs/<id>/findings.json` and `replays.json`, and `app/static/index.html` polls `/api/run/{run_id}` to display **`Replayed ✓`** badges on confirmed cards.
+
 ## Next
 
-At ~2:40 PM `"freeze"`: freeze `blindspot/config.py`, build `eval/heldout_manifest.json` + SHA-256 from `eval/submissions.jsonl`, then Phase 6/7 gate (Managed Agent replay `replay.py` + `managed_agent.py`) and Phase 8 held-out evaluation run.
+At ~2:40 PM `"freeze"`: freeze `blindspot/config.py`, build `eval/heldout_manifest.json` + SHA-256 from `eval/submissions.jsonl`, then Phase 8 held-out evaluation run (`--set heldout --set govuk --set w3c_clean`) and Phase 9 HAR snapshots & demo rehearsal.

@@ -270,6 +270,9 @@
     .badge.needs_human { background: var(--warn); color: #ffffff; }
     .badge.wcag { background: #0f172a; color: #ffffff; }
     .badge.step { background: #e2e8f0; color: #0f172a; }
+    .badge.replayed-ok { background: var(--ok); color: #ffffff; }
+    .badge.replayed-wait { background: #dbeafe; color: #1e40af; }
+    .badge.replayed-no { background: #e2e8f0; color: #475569; }
     .crop-wrap {
       background: #ffffff;
       border: 2px solid #cbd5e1;
@@ -547,6 +550,8 @@
     const state = {
       selectedBug: "",
       es: null,
+      runId: null,
+      replayTimer: null,
       findings: [],
       ticketsByKey: {},
       manifest: null,
@@ -752,12 +757,20 @@
         card.className = `finding-card ${f.status}`;
         const label = f.status === "confirmed" ? "Confirmed" : "Needs Human";
         const scoreTxt = f.scorer_fail_p != null ? `Scorer p=${Number(f.scorer_fail_p).toFixed(2)}` : "Code proven";
+        let replayBadge = "";
+        if (f.status === "confirmed") {
+          if (f.replayed === true) replayBadge = '<span class="badge replayed-ok">Replayed &#10003;</span>';
+          else if (f.replayed === false) replayBadge = '<span class="badge replayed-no">Replay: not reproduced</span>';
+          else if (f.replayed === "unavailable") replayBadge = '<span class="badge replayed-no">Replay: unavailable</span>';
+          else if (state.replayTimer) replayBadge = '<span class="badge replayed-wait">Replaying in sandbox...</span>';
+        }
         card.innerHTML = `
           <div class="badge-row">
             <span class="badge ${esc(f.status)}">${label}</span>
             <span class="badge wcag">WCAG ${esc(f.wcag)}</span>
             ${ev.step != null ? `<span class="badge step">Step ${esc(ev.step)}</span>` : ""}
             <span class="badge step">${esc(scoreTxt)}</span>
+            ${replayBadge}
           </div>
           <div class="finding-title">${esc(f.check.replace(/_/g, " "))}</div>
           <div class="finding-detail">${esc(f.detail)}</div>
@@ -829,6 +842,8 @@
       const url = $("url-input").value.trim();
       if (!url) return;
       if (state.es) { state.es.close(); state.es = null; }
+      if (state.replayTimer) { clearInterval(state.replayTimer); state.replayTimer = null; }
+      state.runId = null;
 
       state.findings = [];
       state.ticketsByKey = {};
@@ -861,6 +876,7 @@
           return;
         }
         const runId = data.run_id;
+        state.runId = runId;
         const es = new EventSource(`/api/run/${encodeURIComponent(runId)}/events`);
         state.es = es;
 
@@ -925,6 +941,30 @@
               fetch(`/api/run/${encodeURIComponent(d.run_id)}`).then(r => r.json()).then(full => {
                 if (full.axe) renderAxe(full.axe);
               }).catch(() => {});
+            }
+            // Poll background Managed Agent replay results without ever blocking the demo
+            if ((d.confirmed || 0) > 0 && d.run_id) {
+              let polls = 0;
+              state.replayTimer = setInterval(async () => {
+                polls += 1;
+                try {
+                  const full = await fetch(`/api/run/${encodeURIComponent(d.run_id)}`).then(r => r.json());
+                  let pending = 0;
+                  (full.confirmed || []).forEach(cf => {
+                    const cev = cf.evidence || {};
+                    const match = state.findings.find(x => x.check === cf.check && ((x.evidence || {}).selector === cev.selector));
+                    if (match && cf.replayed !== undefined) match.replayed = cf.replayed;
+                    if (cf.replayed === undefined) pending += 1;
+                  });
+                  renderFindings();
+                  if (pending === 0 || polls >= 30) {
+                    clearInterval(state.replayTimer);
+                    state.replayTimer = null;
+                    renderFindings();
+                  }
+                } catch (err) {}
+              }, 8000);
+              renderFindings();
             }
           }
           $("run-btn").disabled = false;

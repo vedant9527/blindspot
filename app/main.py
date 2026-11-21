@@ -235,6 +235,7 @@ def start_run(req: RunRequest) -> dict[str, str]:
                 inject=req.inject,
                 seed=req.seed,
                 use_gemini=req.use_gemini,
+                run_replay=req.use_gemini,
                 emit=state.push,
             )
         except Exception as exc:

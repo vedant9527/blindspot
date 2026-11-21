@@ -94,3 +94,13 @@ def test_proof_endpoint_placeholder_and_rendered_md(tmp_path, monkeypatch):
     assert r2.status_code == 200
     assert r2.json()["ready"] is True
     assert "blindspot" in r2.json()["markdown"]
+
+
+def test_replay_is_self_contained_and_agent_parser():
+    from blindspot.managed_agent import _parse_json_line
+
+    src = (Path(__file__).resolve().parent.parent / "blindspot" / "replay.py").read_text(encoding="utf-8")
+    assert "from blindspot" not in src and "import blindspot" not in src
+
+    parsed = _parse_json_line('```json\n{"reproduced": true, "detail": "changed_px=0"}\n```')
+    assert parsed == {"reproduced": True, "detail": "changed_px=0"}

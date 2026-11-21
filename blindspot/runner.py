@@ -463,6 +463,7 @@ def run_audit(
     use_gemini: bool = True,
     record_video: bool = True,
     write_tickets: bool = True,
+    run_replay: bool = False,
     emit: Callable[[str, dict[str, Any]], None] | None = None,
 ) -> dict[str, Any]:
     """Full Phase 3 run: preflight (+ warm-up), keyboard loop + parallel Gemini scoring, decision rule.
@@ -752,6 +753,10 @@ def run_audit(
         "gemini_usage": gemini_summary,
     }
     _emit("done", done_payload)
+    if run_replay and decisions["confirmed"]:
+        from blindspot.managed_agent import start_background_replays
+
+        start_background_replays(run_id, url, decisions["confirmed"], out_dir, manifest=manifest)
     return {
         "run_id": run_id,
         "out_dir": str(out_dir),
