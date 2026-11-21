@@ -2,7 +2,7 @@
 
 Read AGENTS.md first. This file says where the build stands.
 
-**Status (Nov 21, ~13:00, Google Antigravity):** Phases 0, 1, 2, 3 and 4 done and verified (1:30 gate passed ahead of schedule). Next: Phase 5 (baselines, dev-set tuning, 2:00 freeze & held-out manifest).
+**Status (Nov 21, ~13:49, Google Antigravity):** 1:30 Gate passed; Phase 5 dev-set run & fixes done (`blindspot` 10/10 vs `axe` 4/10 and `single_gemini` 0/10). Waiting on the 2:00 PM `"freeze"` signal to freeze `config.py` and build `eval/heldout_manifest.json` + SHA-256.
 
 ## Setup and run (exact commands)
 
@@ -11,10 +11,11 @@ cd ~/blindspot
 source .venv/bin/activate              # Python 3.12; create with: python3 -m venv .venv
 pip install -r requirements.txt
 playwright install ffmpeg              # screen recordings (already installed on this laptop)
-pytest -q                              # 26 tests, ~110 s, headless Chrome
+pytest -q                              # 45 tests, ~118 s, headless Chrome
 uvicorn app.main:app --host 0.0.0.0 --port 8000     # app + run API + SSE + stranger form at /submit
 ipconfig getifaddr en0                 # laptop IP; regenerate eval/submit_qr.png if it changed
 python -m blindspot.runner --url https://medlineplus.gov/ --score --inject hide_focus --seed 101
+python eval/harness.py --set dev --out-prefix dev_results
 ```
 
 Keys in `.env` (never commit it; `.env.example` stays blank): `GEMINI_API_KEY` (required, used by every model and the Managed Agent) and `GEMINI_API_KEY_BACKUP` (optional; `blindspot/gemini.py` falls back to it on any error). Suggested: event credits key as primary, the free AI Studio key as backup.
@@ -136,6 +137,22 @@ API quirks found so far: the first Decisions API call is ~3 s (cold), later ones
   - **Blindspot: 5/5 confirmed** on the exact injected target (`hide_focus` step 11 `fail_p=0.92`, `keyboard_trap` step 4, `covering_banner` step 13 `fail_p=0.82`, `positive_tabindex`, `label_mismatch` step 14 `fail_p=0.92`; 14.3–38.5s each).
   - **axe-core: 2/5 caught** (`positive_tabindex` via `tabindex`, `label_mismatch` via `label-content-name-mismatch`), **3/5 missed** by design (`hide_focus`, `keyboard_trap`, `covering_banner`), plus baseline `landmark-one-main` and `region` violations.
 
+## Phase 5 (pre-freeze): 1:30 gate, baselines, dev-set run & fixes (done, Antigravity, ~13:49)
+
+- **1:30 Gate passed** across all three stable demo pages (`nyulangone.org/doctors` 39.7s, `va.gov/find-locations/` 31.0s, `medlineplus.gov/` 28.1s; all under the 60s cap). Nothing cut.
+- `blindspot/gemini.py`: added `baseline_single_call(full_page_screenshot)` (`gemini-4-argon` single-screenshot baseline) and per-model cost estimation in `summarize_calls`. Raised `GEMINI_TIMEOUT_S = 10.0` (the Gemini API rejects `<10s` deadlines with HTTP 400) and `GEMINI_GEN_TIMEOUT_S = 20.0`.
+- `eval/harness.py`: runs `axe`, `single_gemini`, `code_only`, and `blindspot` over `dev`, `heldout`, `govuk`, and `w3c_clean`; includes `--build-heldout-manifest` (writes `eval/heldout_manifest.json` from `eval/submissions.jsonl` and prints its SHA-256).
+- **Pre-freeze fixes from dev-set inspection (all logged in `failure_log.md`):**
+  1. Pierced open `shadowRoot.activeElement` in `browser.py` and `runner.py` (eliminated all 3 Shadow DOM false flags on `va.gov`).
+  2. Computed per-changed-pixel WCAG contrast (`strong_ring_px`) and disappearing-border suspect detection (`border_vanished`) in `checks.py` (eliminated large-box / mixed text+ring false flags on `medlineplus.gov` and caught disappearing-border focus loss on `nyulangone.org`).
+  3. Locked descendant unfocused borders in `injector.py` `hide_focus`, and swapped `telehealth.hhs.gov` (headless 403) to `kp.org` in `DEFAULT_DEV_PAGES`.
+- **10-case `dev` set results (`eval/results/dev_results.md`):**
+  - `blindspot`: **10/10** injected bugs caught (exact target matched on all 10; 2/2 per bug category) + confirms genuine <3:1 faint focus rings (e.g. `cms.gov` 2.87:1 tan outline) that `code_only` can only mark suspect; 37.0s median, 72.4 Gemini calls/page, \$0.0340/page.
+  - `code_only`: **10/10** injected bugs caught (cannot confirm faint-contrast suspects without the scorer); 29.5s median.
+  - `axe`: **4/10** (`2/2 positive_tabindex`, `2/2 label_mismatch`, `0/6` on `hide_focus`, `keyboard_trap`, `covering_banner`); 8.1s median.
+  - `single_gemini` (`gemini-4-argon` 1 screenshot): **0/10**; 13.1s median, \$0.0020/page.
+- Security fixes in `app/main.py` (`tests/test_app.py`): single-run HTTP 409 guard and SSRF/private-IP/localhost/`.local`/`file://` rejection with DNS resolution. `pytest -q`: **45 passed**.
+
 ## Next
 
-Phase 5 (1:30 to 2:00 in `docs/PLAN.md`): `baseline_single_call` (Argon) and `code_only` in `eval/harness.py`, dev-set run & fixes logged in `failure_log.md`, then 2:00 threshold freeze and `eval/heldout_manifest.json` + SHA-256 from `eval/submissions.jsonl`.
+At 2:00 PM `"freeze"`: freeze `blindspot/config.py`, run `python eval/harness.py --build-heldout-manifest --headed` (from `eval/submissions.jsonl`), record the SHA-256, then proceed to Phase 6 (`tickets.py` with Carbon + `app/static/index.html`).

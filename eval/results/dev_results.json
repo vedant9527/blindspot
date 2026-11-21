@@ -1,0 +1,1368 @@
+{
+  "generated_at": "2026-11-21T18:48:11.511551+00:00",
+  "heldout_manifest_sha256": null,
+  "by_system": {
+    "axe": {
+      "pages_ok": 10,
+      "injected_caught": 4,
+      "injected_total": 10,
+      "by_bug": {
+        "hide_focus": {
+          "caught": 0,
+          "total": 2
+        },
+        "keyboard_trap": {
+          "caught": 0,
+          "total": 2
+        },
+        "covering_banner": {
+          "caught": 0,
+          "total": 2
+        },
+        "positive_tabindex": {
+          "caught": 2,
+          "total": 2
+        },
+        "label_mismatch": {
+          "caught": 2,
+          "total": 2
+        }
+      },
+      "w3c_clean_false_flags": 0,
+      "w3c_clean_pages": 0,
+      "govuk_confirmed": 0,
+      "median_seconds": 8.08,
+      "mean_gemini_calls": 0,
+      "mean_cost_usd": 0.0
+    },
+    "single_gemini": {
+      "pages_ok": 10,
+      "injected_caught": 0,
+      "injected_total": 10,
+      "by_bug": {
+        "hide_focus": {
+          "caught": 0,
+          "total": 2
+        },
+        "keyboard_trap": {
+          "caught": 0,
+          "total": 2
+        },
+        "covering_banner": {
+          "caught": 0,
+          "total": 2
+        },
+        "positive_tabindex": {
+          "caught": 0,
+          "total": 2
+        },
+        "label_mismatch": {
+          "caught": 0,
+          "total": 2
+        }
+      },
+      "w3c_clean_false_flags": 0,
+      "w3c_clean_pages": 0,
+      "govuk_confirmed": 0,
+      "median_seconds": 13.06,
+      "mean_gemini_calls": 1,
+      "mean_cost_usd": 0.002
+    },
+    "code_only": {
+      "pages_ok": 10,
+      "injected_caught": 10,
+      "injected_total": 10,
+      "by_bug": {
+        "hide_focus": {
+          "caught": 2,
+          "total": 2
+        },
+        "keyboard_trap": {
+          "caught": 2,
+          "total": 2
+        },
+        "covering_banner": {
+          "caught": 2,
+          "total": 2
+        },
+        "positive_tabindex": {
+          "caught": 2,
+          "total": 2
+        },
+        "label_mismatch": {
+          "caught": 2,
+          "total": 2
+        }
+      },
+      "w3c_clean_false_flags": 0,
+      "w3c_clean_pages": 0,
+      "govuk_confirmed": 0,
+      "median_seconds": 29.51,
+      "mean_gemini_calls": 0,
+      "mean_cost_usd": 0.0
+    },
+    "blindspot": {
+      "pages_ok": 10,
+      "injected_caught": 10,
+      "injected_total": 10,
+      "by_bug": {
+        "hide_focus": {
+          "caught": 2,
+          "total": 2
+        },
+        "keyboard_trap": {
+          "caught": 2,
+          "total": 2
+        },
+        "covering_banner": {
+          "caught": 2,
+          "total": 2
+        },
+        "positive_tabindex": {
+          "caught": 2,
+          "total": 2
+        },
+        "label_mismatch": {
+          "caught": 2,
+          "total": 2
+        }
+      },
+      "w3c_clean_false_flags": 0,
+      "w3c_clean_pages": 0,
+      "govuk_confirmed": 0,
+      "median_seconds": 36.98,
+      "mean_gemini_calls": 72.4,
+      "mean_cost_usd": 0.034
+    }
+  },
+  "records": [
+    {
+      "system": "axe",
+      "set": "dev",
+      "url": "https://nyulangone.org/doctors",
+      "bug_type": "hide_focus",
+      "seed": 501,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 5,
+      "mapped_bugs": [],
+      "violations": [
+        "aria-hidden-focus",
+        "button-name",
+        "heading-order",
+        "label",
+        "meta-viewport"
+      ],
+      "manifest": {
+        "url": "https://nyulangone.org/doctors",
+        "bug_type": "hide_focus",
+        "expected_check": "focus_not_visible",
+        "seed": 501,
+        "target_selector": "#nyuuninav--header > div > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > a",
+        "target_text": "Ask AI",
+        "timestamp": "2026-11-21T18:33:59.227154+00:00"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 7.87
+    },
+    {
+      "system": "single_gemini",
+      "set": "dev",
+      "url": "https://nyulangone.org/doctors",
+      "bug_type": "hide_focus",
+      "seed": 501,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 0,
+      "categories": [],
+      "findings": [],
+      "manifest": {
+        "url": "https://nyulangone.org/doctors",
+        "bug_type": "hide_focus",
+        "expected_check": "focus_not_visible",
+        "seed": 501,
+        "target_selector": "#nyuuninav--header > div > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > a",
+        "target_text": "Ask AI",
+        "timestamp": "2026-11-21T18:34:04.811236+00:00"
+      },
+      "gemini_calls": 1,
+      "total_tokens": 1450,
+      "cost_usd": 0.00184,
+      "duration_s": 11.45
+    },
+    {
+      "system": "code_only",
+      "set": "dev",
+      "url": "https://nyulangone.org/doctors",
+      "bug_type": "hide_focus",
+      "seed": 501,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 1,
+      "needs_human_count": 0,
+      "confirmed_checks": [
+        "focus_not_visible"
+      ],
+      "manifest": {
+        "url": "https://nyulangone.org/doctors",
+        "bug_type": "hide_focus",
+        "expected_check": "focus_not_visible",
+        "seed": 501,
+        "target_selector": "#nyuuninav--header > div > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > a",
+        "target_text": "Ask AI",
+        "timestamp": "2026-11-21T18:34:16.185274+00:00",
+        "sha256": "2ec9dd61e9d7f6c605772fde625f45f46341187b773d5351e309e1bb31b7dc79"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 32.13,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-133413-nyulangone.org"
+    },
+    {
+      "system": "blindspot",
+      "set": "dev",
+      "url": "https://nyulangone.org/doctors",
+      "bug_type": "hide_focus",
+      "seed": 501,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 1,
+      "needs_human_count": 2,
+      "confirmed_checks": [
+        "focus_not_visible"
+      ],
+      "manifest": {
+        "url": "https://nyulangone.org/doctors",
+        "bug_type": "hide_focus",
+        "expected_check": "focus_not_visible",
+        "seed": 501,
+        "target_selector": "#nyuuninav--header > div > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > a",
+        "target_text": "Ask AI",
+        "timestamp": "2026-11-21T18:34:51.691833+00:00",
+        "sha256": "a02253f0d2552ab06da343b522de04ce1c7d2a60b09eec0a1cf0ed7c7c097e00"
+      },
+      "gemini_calls": 81,
+      "total_tokens": 226700,
+      "cost_usd": 0.03826,
+      "duration_s": 39.59,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-133445-nyulangone.org"
+    },
+    {
+      "system": "axe",
+      "set": "dev",
+      "url": "https://nyulangone.org/doctors",
+      "bug_type": "keyboard_trap",
+      "seed": 502,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 5,
+      "mapped_bugs": [],
+      "violations": [
+        "aria-hidden-focus",
+        "button-name",
+        "heading-order",
+        "label",
+        "meta-viewport"
+      ],
+      "manifest": {
+        "url": "https://nyulangone.org/doctors",
+        "bug_type": "keyboard_trap",
+        "expected_check": "keyboard_trap",
+        "seed": 502,
+        "target_selector": "#nyuuninav--header > div > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > nav > ul > li:nth-of-type(1) > a",
+        "target_text": "Home",
+        "timestamp": "2026-11-21T18:35:30.613598+00:00"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 6.54
+    },
+    {
+      "system": "single_gemini",
+      "set": "dev",
+      "url": "https://nyulangone.org/doctors",
+      "bug_type": "keyboard_trap",
+      "seed": 502,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 0,
+      "categories": [],
+      "findings": [],
+      "manifest": {
+        "url": "https://nyulangone.org/doctors",
+        "bug_type": "keyboard_trap",
+        "expected_check": "keyboard_trap",
+        "seed": 502,
+        "target_selector": "#nyuuninav--header > div > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > nav > ul > li:nth-of-type(1) > a",
+        "target_text": "Home",
+        "timestamp": "2026-11-21T18:35:36.048939+00:00"
+      },
+      "gemini_calls": 1,
+      "total_tokens": 1450,
+      "cost_usd": 0.00184,
+      "duration_s": 14.67
+    },
+    {
+      "system": "code_only",
+      "set": "dev",
+      "url": "https://nyulangone.org/doctors",
+      "bug_type": "keyboard_trap",
+      "seed": 502,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 1,
+      "needs_human_count": 0,
+      "confirmed_checks": [
+        "keyboard_trap"
+      ],
+      "manifest": {
+        "url": "https://nyulangone.org/doctors",
+        "bug_type": "keyboard_trap",
+        "expected_check": "keyboard_trap",
+        "seed": 502,
+        "target_selector": "#nyuuninav--header > div > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > nav > ul > li:nth-of-type(1) > a",
+        "target_text": "Home",
+        "timestamp": "2026-11-21T18:35:51.000570+00:00",
+        "sha256": "0308d0a1cc8679da19ca9e1b1f6af6a7fe4aaf4d83887b90c19f6ac3040dc8b4"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 23.53,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-133546-nyulangone.org"
+    },
+    {
+      "system": "blindspot",
+      "set": "dev",
+      "url": "https://nyulangone.org/doctors",
+      "bug_type": "keyboard_trap",
+      "seed": 502,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 1,
+      "needs_human_count": 3,
+      "confirmed_checks": [
+        "keyboard_trap"
+      ],
+      "manifest": {
+        "url": "https://nyulangone.org/doctors",
+        "bug_type": "keyboard_trap",
+        "expected_check": "keyboard_trap",
+        "seed": 502,
+        "target_selector": "#nyuuninav--header > div > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > nav > ul > li:nth-of-type(1) > a",
+        "target_text": "Home",
+        "timestamp": "2026-11-21T18:36:19.353674+00:00",
+        "sha256": "1a204a055c9cec6db44f715fb771744bcad67d8d818be403ae56165314516fcf"
+      },
+      "gemini_calls": 41,
+      "total_tokens": 113589,
+      "cost_usd": 0.01906,
+      "duration_s": 31.86,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-133609-nyulangone.org"
+    },
+    {
+      "system": "axe",
+      "set": "dev",
+      "url": "https://medlineplus.gov/",
+      "bug_type": "covering_banner",
+      "seed": 503,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 2,
+      "mapped_bugs": [],
+      "violations": [
+        "landmark-one-main",
+        "region"
+      ],
+      "manifest": {
+        "url": "https://medlineplus.gov/",
+        "bug_type": "covering_banner",
+        "expected_check": "focus_obscured",
+        "seed": 503,
+        "target_selector": "#mplus-orgs > a:nth-of-type(2)",
+        "target_text": "National Library of Medicine",
+        "timestamp": "2026-11-21T18:36:45.476736+00:00"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 4.68
+    },
+    {
+      "system": "single_gemini",
+      "set": "dev",
+      "url": "https://medlineplus.gov/",
+      "bug_type": "covering_banner",
+      "seed": 503,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 0,
+      "categories": [],
+      "findings": [],
+      "manifest": {
+        "url": "https://medlineplus.gov/",
+        "bug_type": "covering_banner",
+        "expected_check": "focus_obscured",
+        "seed": 503,
+        "target_selector": "#mplus-orgs > a:nth-of-type(2)",
+        "target_text": "National Library of Medicine",
+        "timestamp": "2026-11-21T18:36:48.893306+00:00"
+      },
+      "gemini_calls": 1,
+      "total_tokens": 1456,
+      "cost_usd": 0.00189,
+      "duration_s": 8.43
+    },
+    {
+      "system": "code_only",
+      "set": "dev",
+      "url": "https://medlineplus.gov/",
+      "bug_type": "covering_banner",
+      "seed": 503,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 1,
+      "needs_human_count": 12,
+      "confirmed_checks": [
+        "focus_obscured"
+      ],
+      "manifest": {
+        "url": "https://medlineplus.gov/",
+        "bug_type": "covering_banner",
+        "expected_check": "focus_obscured",
+        "seed": 503,
+        "target_selector": "#mplus-orgs > a:nth-of-type(2)",
+        "target_text": "National Library of Medicine",
+        "timestamp": "2026-11-21T18:36:57.477048+00:00",
+        "sha256": "914ac7c3b4618cc8874d2af0009ca47ad07db04a9e83a6a1504d5065675308a7"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 28.94,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-133654-medlineplus.gov"
+    },
+    {
+      "system": "blindspot",
+      "set": "dev",
+      "url": "https://medlineplus.gov/",
+      "bug_type": "covering_banner",
+      "seed": 503,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 2,
+      "needs_human_count": 35,
+      "confirmed_checks": [
+        "focus_obscured",
+        "indicator_contrast"
+      ],
+      "manifest": {
+        "url": "https://medlineplus.gov/",
+        "bug_type": "covering_banner",
+        "expected_check": "focus_obscured",
+        "seed": 503,
+        "target_selector": "#mplus-orgs > a:nth-of-type(2)",
+        "target_text": "National Library of Medicine",
+        "timestamp": "2026-11-21T18:37:29.095496+00:00",
+        "sha256": "f26e19fc719164f47eb1afe8a098e1107f6ff2478a51ce4051141ef4a19447ed"
+      },
+      "gemini_calls": 81,
+      "total_tokens": 225391,
+      "cost_usd": 0.03768,
+      "duration_s": 31.61,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-133723-medlineplus.gov"
+    },
+    {
+      "system": "axe",
+      "set": "dev",
+      "url": "https://medlineplus.gov/",
+      "bug_type": "positive_tabindex",
+      "seed": 504,
+      "status": "ok",
+      "caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 3,
+      "mapped_bugs": [
+        "positive_tabindex"
+      ],
+      "violations": [
+        "landmark-one-main",
+        "region",
+        "tabindex"
+      ],
+      "manifest": {
+        "url": "https://medlineplus.gov/",
+        "bug_type": "positive_tabindex",
+        "expected_check": "focus_order",
+        "seed": 504,
+        "target_selector": "#mplus-footer > div:nth-of-type(2) > ul > li:nth-of-type(7) > a",
+        "target_text": "MedlinePlus Connect for EHRs",
+        "timestamp": "2026-11-21T18:37:59.490999+00:00"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 5.03
+    },
+    {
+      "system": "single_gemini",
+      "set": "dev",
+      "url": "https://medlineplus.gov/",
+      "bug_type": "positive_tabindex",
+      "seed": 504,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 2,
+      "categories": [
+        "other"
+      ],
+      "findings": [
+        {
+          "category": "other",
+          "wcag": "2.4.4",
+          "element": "'Learn more' button under 'Diagnostic Imaging' featured topic",
+          "detail": "The 'Learn more' link/button lacks descriptive text on its own, making its destination unclear when read out of context by screen reader users navigating via a links list."
+        },
+        {
+          "category": "other",
+          "wcag": "1.4.3",
+          "element": "Light grey decorative/status icons next to links in the bottom section (e.g., checkmark icon next to 'Easy-to-Read Healt",
+          "detail": "The light grey icons (#CCCCCC/#D0D0D0) on a white background have a contrast ratio below the 3:1 minimum required by WCAG 1.4.11 for non-text graphical objects if they convey meaning."
+        }
+      ],
+      "manifest": {
+        "url": "https://medlineplus.gov/",
+        "bug_type": "positive_tabindex",
+        "expected_check": "focus_order",
+        "seed": 504,
+        "target_selector": "#mplus-footer > div:nth-of-type(2) > ul > li:nth-of-type(7) > a",
+        "target_text": "MedlinePlus Connect for EHRs",
+        "timestamp": "2026-11-21T18:38:03.403889+00:00"
+      },
+      "gemini_calls": 1,
+      "total_tokens": 1634,
+      "cost_usd": 0.00278,
+      "duration_s": 14.43
+    },
+    {
+      "system": "code_only",
+      "set": "dev",
+      "url": "https://medlineplus.gov/",
+      "bug_type": "positive_tabindex",
+      "seed": 504,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 1,
+      "needs_human_count": 12,
+      "confirmed_checks": [
+        "focus_order"
+      ],
+      "manifest": {
+        "url": "https://medlineplus.gov/",
+        "bug_type": "positive_tabindex",
+        "expected_check": "focus_order",
+        "seed": 504,
+        "target_selector": "#mplus-footer > div:nth-of-type(2) > ul > li:nth-of-type(7) > a",
+        "target_text": "MedlinePlus Connect for EHRs",
+        "timestamp": "2026-11-21T18:38:21.637416+00:00",
+        "sha256": "07c5d92f6f335f04852d9b3a7c822b1e621135a41fec7c9f9156ca1726341f6a"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 32.71,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-133814-medlineplus.gov"
+    },
+    {
+      "system": "blindspot",
+      "set": "dev",
+      "url": "https://medlineplus.gov/",
+      "bug_type": "positive_tabindex",
+      "seed": 504,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 3,
+      "needs_human_count": 33,
+      "confirmed_checks": [
+        "focus_order",
+        "indicator_contrast",
+        "indicator_contrast"
+      ],
+      "manifest": {
+        "url": "https://medlineplus.gov/",
+        "bug_type": "positive_tabindex",
+        "expected_check": "focus_order",
+        "seed": 504,
+        "target_selector": "#mplus-footer > div:nth-of-type(2) > ul > li:nth-of-type(7) > a",
+        "target_text": "MedlinePlus Connect for EHRs",
+        "timestamp": "2026-11-21T18:38:55.211978+00:00",
+        "sha256": "f795d311e6b427a326e695b8b3187b9b6614f547f6bde13061e9956b776965b5"
+      },
+      "gemini_calls": 81,
+      "total_tokens": 225891,
+      "cost_usd": 0.03792,
+      "duration_s": 34.85,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-133847-medlineplus.gov"
+    },
+    {
+      "system": "axe",
+      "set": "dev",
+      "url": "https://www.va.gov/find-locations/",
+      "bug_type": "label_mismatch",
+      "seed": 505,
+      "status": "ok",
+      "caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 2,
+      "mapped_bugs": [
+        "label_mismatch"
+      ],
+      "violations": [
+        "label-content-name-mismatch",
+        "region"
+      ],
+      "manifest": {
+        "url": "https://www.va.gov/find-locations/",
+        "bug_type": "label_mismatch",
+        "expected_check": "label_in_name",
+        "seed": 505,
+        "target_selector": "#header-v2 > div > div:nth-of-type(2) > div > div:nth-of-type(1) > div > div > div:nth-of-type(1) > div > button",
+        "target_text": "Here\u2019s how you know",
+        "timestamp": "2026-11-21T18:39:28.786266+00:00"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 8.66
+    },
+    {
+      "system": "single_gemini",
+      "set": "dev",
+      "url": "https://www.va.gov/find-locations/",
+      "bug_type": "label_mismatch",
+      "seed": 505,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 0,
+      "categories": [],
+      "findings": [],
+      "manifest": {
+        "url": "https://www.va.gov/find-locations/",
+        "bug_type": "label_mismatch",
+        "expected_check": "label_in_name",
+        "seed": 505,
+        "target_selector": "#header-v2 > div > div:nth-of-type(2) > div > div:nth-of-type(1) > div > div > div:nth-of-type(1) > div > button",
+        "target_text": "Here\u2019s how you know",
+        "timestamp": "2026-11-21T18:39:36.719964+00:00"
+      },
+      "gemini_calls": 1,
+      "total_tokens": 1450,
+      "cost_usd": 0.00184,
+      "duration_s": 11.69
+    },
+    {
+      "system": "code_only",
+      "set": "dev",
+      "url": "https://www.va.gov/find-locations/",
+      "bug_type": "label_mismatch",
+      "seed": 505,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 1,
+      "needs_human_count": 13,
+      "confirmed_checks": [
+        "label_in_name"
+      ],
+      "manifest": {
+        "url": "https://www.va.gov/find-locations/",
+        "bug_type": "label_mismatch",
+        "expected_check": "label_in_name",
+        "seed": 505,
+        "target_selector": "#header-v2 > div > div:nth-of-type(2) > div > div:nth-of-type(1) > div > div > div:nth-of-type(1) > div > button",
+        "target_text": "Here\u2019s how you know",
+        "timestamp": "2026-11-21T18:39:48.746488+00:00",
+        "sha256": "a21545f8dbf061e94572509b086d7748611ce584e51a74b658a3b0e7502466b2"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 29.57,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-133942-va.gov"
+    },
+    {
+      "system": "blindspot",
+      "set": "dev",
+      "url": "https://www.va.gov/find-locations/",
+      "bug_type": "label_mismatch",
+      "seed": 505,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 1,
+      "needs_human_count": 21,
+      "confirmed_checks": [
+        "label_in_name"
+      ],
+      "manifest": {
+        "url": "https://www.va.gov/find-locations/",
+        "bug_type": "label_mismatch",
+        "expected_check": "label_in_name",
+        "seed": 505,
+        "target_selector": "#header-v2 > div > div:nth-of-type(2) > div > div:nth-of-type(1) > div > div > div:nth-of-type(1) > div > button",
+        "target_text": "Here\u2019s how you know",
+        "timestamp": "2026-11-21T18:40:19.767323+00:00",
+        "sha256": "a17d73e3b6c8b7c7aeaa2cd0e3c61796f9b3f2a6f318bc8c7e71af6903a4ceeb"
+      },
+      "gemini_calls": 81,
+      "total_tokens": 225743,
+      "cost_usd": 0.03821,
+      "duration_s": 45.89,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-134012-va.gov"
+    },
+    {
+      "system": "axe",
+      "set": "dev",
+      "url": "https://www.va.gov/find-locations/",
+      "bug_type": "hide_focus",
+      "seed": 506,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 1,
+      "mapped_bugs": [],
+      "violations": [
+        "region"
+      ],
+      "manifest": {
+        "url": "https://www.va.gov/find-locations/",
+        "bug_type": "hide_focus",
+        "expected_check": "focus_not_visible",
+        "seed": 506,
+        "target_selector": "#street-city-state-zip",
+        "target_text": "",
+        "timestamp": "2026-11-21T18:41:05.114731+00:00"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 8.29
+    },
+    {
+      "system": "single_gemini",
+      "set": "dev",
+      "url": "https://www.va.gov/find-locations/",
+      "bug_type": "hide_focus",
+      "seed": 506,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 0,
+      "categories": [],
+      "findings": [],
+      "manifest": {
+        "url": "https://www.va.gov/find-locations/",
+        "bug_type": "hide_focus",
+        "expected_check": "focus_not_visible",
+        "seed": 506,
+        "target_selector": "#street-city-state-zip",
+        "target_text": "",
+        "timestamp": "2026-11-21T18:41:11.953612+00:00"
+      },
+      "gemini_calls": 1,
+      "total_tokens": 1450,
+      "cost_usd": 0.00184,
+      "duration_s": 11.14
+    },
+    {
+      "system": "code_only",
+      "set": "dev",
+      "url": "https://www.va.gov/find-locations/",
+      "bug_type": "hide_focus",
+      "seed": 506,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 1,
+      "needs_human_count": 12,
+      "confirmed_checks": [
+        "focus_not_visible"
+      ],
+      "manifest": {
+        "url": "https://www.va.gov/find-locations/",
+        "bug_type": "hide_focus",
+        "expected_check": "focus_not_visible",
+        "seed": 506,
+        "target_selector": "#street-city-state-zip",
+        "target_text": "",
+        "timestamp": "2026-11-21T18:41:23.088783+00:00",
+        "sha256": "a95ce5c3459c4774740e6a4b753c498b5dcfde4c80e43c4489a9081bea4a7866"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 29.45,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-134117-va.gov"
+    },
+    {
+      "system": "blindspot",
+      "set": "dev",
+      "url": "https://www.va.gov/find-locations/",
+      "bug_type": "hide_focus",
+      "seed": 506,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 1,
+      "needs_human_count": 19,
+      "confirmed_checks": [
+        "focus_not_visible"
+      ],
+      "manifest": {
+        "url": "https://www.va.gov/find-locations/",
+        "bug_type": "hide_focus",
+        "expected_check": "focus_not_visible",
+        "seed": 506,
+        "target_selector": "#street-city-state-zip",
+        "target_text": "",
+        "timestamp": "2026-11-21T18:41:56.786053+00:00",
+        "sha256": "b914407b98bae668a2e6dc507d188a9702049eb0e2a04b7af75661144f5ac7de"
+      },
+      "gemini_calls": 81,
+      "total_tokens": 225960,
+      "cost_usd": 0.03834,
+      "duration_s": 36.59,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-134146-va.gov"
+    },
+    {
+      "system": "axe",
+      "set": "dev",
+      "url": "https://www.cms.gov/",
+      "bug_type": "keyboard_trap",
+      "seed": 507,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 0,
+      "mapped_bugs": [],
+      "violations": [],
+      "manifest": {
+        "url": "https://www.cms.gov/",
+        "bug_type": "keyboard_trap",
+        "expected_check": "keyboard_trap",
+        "seed": 507,
+        "target_selector": "#Medicaid\\/CHIP",
+        "target_text": "Medicaid/CHIP",
+        "timestamp": "2026-11-21T18:42:30.886456+00:00"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 8.4
+    },
+    {
+      "system": "single_gemini",
+      "set": "dev",
+      "url": "https://www.cms.gov/",
+      "bug_type": "keyboard_trap",
+      "seed": 507,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 0,
+      "categories": [],
+      "findings": [],
+      "manifest": {
+        "url": "https://www.cms.gov/",
+        "bug_type": "keyboard_trap",
+        "expected_check": "keyboard_trap",
+        "seed": 507,
+        "target_selector": "#Medicaid\\/CHIP",
+        "target_text": "Medicaid/CHIP",
+        "timestamp": "2026-11-21T18:42:36.009093+00:00"
+      },
+      "gemini_calls": 1,
+      "total_tokens": 1458,
+      "cost_usd": 0.00185,
+      "duration_s": 10.2
+    },
+    {
+      "system": "code_only",
+      "set": "dev",
+      "url": "https://www.cms.gov/",
+      "bug_type": "keyboard_trap",
+      "seed": 507,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 1,
+      "needs_human_count": 2,
+      "confirmed_checks": [
+        "keyboard_trap"
+      ],
+      "manifest": {
+        "url": "https://www.cms.gov/",
+        "bug_type": "keyboard_trap",
+        "expected_check": "keyboard_trap",
+        "seed": 507,
+        "target_selector": "#Medicaid\\/CHIP",
+        "target_text": "Medicaid/CHIP",
+        "timestamp": "2026-11-21T18:42:47.896359+00:00",
+        "sha256": "c1a115c0d31916b310f0a49ccd5e39dcedc97ac5f098c16491f60ec3f330ff3d"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 17.81,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-134242-cms.gov"
+    },
+    {
+      "system": "blindspot",
+      "set": "dev",
+      "url": "https://www.cms.gov/",
+      "bug_type": "keyboard_trap",
+      "seed": 507,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 2,
+      "needs_human_count": 9,
+      "confirmed_checks": [
+        "indicator_contrast",
+        "keyboard_trap"
+      ],
+      "manifest": {
+        "url": "https://www.cms.gov/",
+        "bug_type": "keyboard_trap",
+        "expected_check": "keyboard_trap",
+        "seed": 507,
+        "target_selector": "#Medicaid\\/CHIP",
+        "target_text": "Medicaid/CHIP",
+        "timestamp": "2026-11-21T18:43:04.777582+00:00",
+        "sha256": "b04f62d732b6d3a68351c73f076d2945a3d41047fed4fdf450ed40d02616a777"
+      },
+      "gemini_calls": 35,
+      "total_tokens": 95906,
+      "cost_usd": 0.0158,
+      "duration_s": 18.71,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-134259-cms.gov"
+    },
+    {
+      "system": "axe",
+      "set": "dev",
+      "url": "https://www.cms.gov/",
+      "bug_type": "covering_banner",
+      "seed": 508,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 0,
+      "mapped_bugs": [],
+      "violations": [],
+      "manifest": {
+        "url": "https://www.cms.gov/",
+        "bug_type": "covering_banner",
+        "expected_check": "focus_obscured",
+        "seed": 508,
+        "target_selector": "#Marketplace\\ \\&\\ Private\\ Insurance",
+        "target_text": "Marketplace & Private Insurance",
+        "timestamp": "2026-11-21T18:43:22.809352+00:00"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 4.87
+    },
+    {
+      "system": "single_gemini",
+      "set": "dev",
+      "url": "https://www.cms.gov/",
+      "bug_type": "covering_banner",
+      "seed": 508,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 0,
+      "categories": [],
+      "findings": [],
+      "manifest": {
+        "url": "https://www.cms.gov/",
+        "bug_type": "covering_banner",
+        "expected_check": "focus_obscured",
+        "seed": 508,
+        "target_selector": "#Marketplace\\ \\&\\ Private\\ Insurance",
+        "target_text": "Marketplace & Private Insurance",
+        "timestamp": "2026-11-21T18:43:26.980378+00:00"
+      },
+      "gemini_calls": 1,
+      "total_tokens": 1458,
+      "cost_usd": 0.00185,
+      "duration_s": 16.13
+    },
+    {
+      "system": "code_only",
+      "set": "dev",
+      "url": "https://www.cms.gov/",
+      "bug_type": "covering_banner",
+      "seed": 508,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 1,
+      "needs_human_count": 11,
+      "confirmed_checks": [
+        "focus_obscured"
+      ],
+      "manifest": {
+        "url": "https://www.cms.gov/",
+        "bug_type": "covering_banner",
+        "expected_check": "focus_obscured",
+        "seed": 508,
+        "target_selector": "#Marketplace\\ \\&\\ Private\\ Insurance",
+        "target_text": "Marketplace & Private Insurance",
+        "timestamp": "2026-11-21T18:43:44.050928+00:00",
+        "sha256": "b714303ab517bfc9dcbc34b91ea7d66627fd990cc5b6994557462b07cc10f0c8"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 27.15,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-134339-cms.gov"
+    },
+    {
+      "system": "blindspot",
+      "set": "dev",
+      "url": "https://www.cms.gov/",
+      "bug_type": "covering_banner",
+      "seed": 508,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 7,
+      "needs_human_count": 52,
+      "confirmed_checks": [
+        "indicator_contrast",
+        "focus_obscured",
+        "indicator_contrast",
+        "indicator_contrast",
+        "indicator_contrast",
+        "indicator_contrast",
+        "indicator_contrast"
+      ],
+      "manifest": {
+        "url": "https://www.cms.gov/",
+        "bug_type": "covering_banner",
+        "expected_check": "focus_obscured",
+        "seed": 508,
+        "target_selector": "#Marketplace\\ \\&\\ Private\\ Insurance",
+        "target_text": "Marketplace & Private Insurance",
+        "timestamp": "2026-11-21T18:44:11.829896+00:00",
+        "sha256": "c767d79ccc1e36d67ca4ca6dbf992f011c0890bfd03609b4ebce6f962e954cb6"
+      },
+      "gemini_calls": 81,
+      "total_tokens": 226855,
+      "cost_usd": 0.03866,
+      "duration_s": 37.37,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-134406-cms.gov"
+    },
+    {
+      "system": "axe",
+      "set": "dev",
+      "url": "https://www.kp.org/",
+      "bug_type": "positive_tabindex",
+      "seed": 509,
+      "status": "ok",
+      "caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 2,
+      "mapped_bugs": [
+        "positive_tabindex"
+      ],
+      "violations": [
+        "page-has-heading-one",
+        "tabindex"
+      ],
+      "manifest": {
+        "url": "https://healthy.kaiserpermanente.org/front-door",
+        "bug_type": "positive_tabindex",
+        "expected_check": "focus_order",
+        "seed": 509,
+        "target_selector": "#dynamic-experience-fragment-f0735d4280 > div > div > div:nth-of-type(2) > footer > div > div > div:nth-of-type(2) > div > div:nth-of-type(3) > div > div:nth-of-type(2) > div > ul > li:nth-of-type(3) > a",
+        "target_text": "",
+        "timestamp": "2026-11-21T18:44:53.728811+00:00"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 10.67
+    },
+    {
+      "system": "single_gemini",
+      "set": "dev",
+      "url": "https://www.kp.org/",
+      "bug_type": "positive_tabindex",
+      "seed": 509,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 1,
+      "categories": [
+        "covering_banner"
+      ],
+      "findings": [
+        {
+          "category": "covering_banner",
+          "wcag": "2.4.11",
+          "element": "Cookie consent banner / Today's suggestions card",
+          "detail": "A semi-transparent cookie consent banner overlays the hero image and overlaps with the 'Today's suggestions' interactive card ('Community Health' button, 'Accept All' button), obscuring content and interactive elements with extreme low cont"
+        }
+      ],
+      "manifest": {
+        "url": "https://healthy.kaiserpermanente.org/front-door",
+        "bug_type": "positive_tabindex",
+        "expected_check": "focus_order",
+        "seed": 509,
+        "target_selector": "#dynamic-experience-fragment-f0735d4280 > div > div > div:nth-of-type(2) > footer > div > div > div:nth-of-type(2) > div > div:nth-of-type(3) > div > div:nth-of-type(2) > div > ul > li:nth-of-type(2) > a",
+        "target_text": "",
+        "timestamp": "2026-11-21T18:45:00.916980+00:00"
+      },
+      "gemini_calls": 1,
+      "total_tokens": 1492,
+      "cost_usd": 0.00221,
+      "duration_s": 16.48
+    },
+    {
+      "system": "code_only",
+      "set": "dev",
+      "url": "https://www.kp.org/",
+      "bug_type": "positive_tabindex",
+      "seed": 509,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 1,
+      "needs_human_count": 1,
+      "confirmed_checks": [
+        "focus_order"
+      ],
+      "manifest": {
+        "url": "https://healthy.kaiserpermanente.org/front-door",
+        "bug_type": "positive_tabindex",
+        "expected_check": "focus_order",
+        "seed": 509,
+        "target_selector": "#dynamic-experience-fragment-f0735d4280 > div > div > div:nth-of-type(2) > footer > div > div > div:nth-of-type(2) > div > div:nth-of-type(3) > div > div:nth-of-type(2) > div > ul > li:nth-of-type(3) > a",
+        "target_text": "",
+        "timestamp": "2026-11-21T18:45:19.193934+00:00",
+        "sha256": "8daa3c3964deecb1976a98287ddcd0b128a8e9856b860adaaa4f1ec5657158f8"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 36.15,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-134511-kp.org"
+    },
+    {
+      "system": "blindspot",
+      "set": "dev",
+      "url": "https://www.kp.org/",
+      "bug_type": "positive_tabindex",
+      "seed": 509,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 1,
+      "needs_human_count": 7,
+      "confirmed_checks": [
+        "focus_order"
+      ],
+      "manifest": {
+        "url": "https://healthy.kaiserpermanente.org/front-door",
+        "bug_type": "positive_tabindex",
+        "expected_check": "focus_order",
+        "seed": 509,
+        "target_selector": "#dynamic-experience-fragment-f0735d4280 > div > div > div:nth-of-type(2) > footer > div > div > div:nth-of-type(2) > div > div:nth-of-type(3) > div > div:nth-of-type(2) > div > ul > li:nth-of-type(3) > a",
+        "target_text": "",
+        "timestamp": "2026-11-21T18:45:55.624903+00:00",
+        "sha256": "5f443e6c265f6f8fa148503580443be5829189fd3ca88666336087de44677a06"
+      },
+      "gemini_calls": 81,
+      "total_tokens": 226691,
+      "cost_usd": 0.03809,
+      "duration_s": 38.79,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-134547-kp.org"
+    },
+    {
+      "system": "axe",
+      "set": "dev",
+      "url": "https://www.kp.org/",
+      "bug_type": "label_mismatch",
+      "seed": 510,
+      "status": "ok",
+      "caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 2,
+      "mapped_bugs": [
+        "label_mismatch"
+      ],
+      "violations": [
+        "color-contrast",
+        "label-content-name-mismatch"
+      ],
+      "manifest": {
+        "url": "https://healthy.kaiserpermanente.org/front-door",
+        "bug_type": "label_mismatch",
+        "expected_check": "label_in_name",
+        "seed": 510,
+        "target_selector": "#nav-0-menu-item-link-2",
+        "target_text": "Doctors & Locations",
+        "timestamp": "2026-11-21T18:46:34.203434+00:00"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 8.62
+    },
+    {
+      "system": "single_gemini",
+      "set": "dev",
+      "url": "https://www.kp.org/",
+      "bug_type": "label_mismatch",
+      "seed": 510,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 2,
+      "categories": [
+        "hide_focus",
+        "other"
+      ],
+      "findings": [
+        {
+          "category": "hide_focus",
+          "wcag": "2.4.7",
+          "element": "Multiple links and buttons across the page (e.g., navigation links, hero buttons, card links, footer links)",
+          "detail": "Interactive elements do not display a visible focus indicator when navigated via keyboard."
+        },
+        {
+          "category": "other",
+          "wcag": "2.4.4",
+          "element": "'Learn more' links under 'Important notices' section",
+          "detail": "Multiple links use identical generic link text ('Learn more') without sufficient programmatic context to distinguish their destinations."
+        }
+      ],
+      "manifest": {
+        "url": "https://healthy.kaiserpermanente.org/front-door",
+        "bug_type": "label_mismatch",
+        "expected_check": "label_in_name",
+        "seed": 510,
+        "target_selector": "#nav-0-menu-item-link-2",
+        "target_text": "Doctors & Locations",
+        "timestamp": "2026-11-21T18:46:41.241488+00:00"
+      },
+      "gemini_calls": 1,
+      "total_tokens": 1529,
+      "cost_usd": 0.00239,
+      "duration_s": 19.73
+    },
+    {
+      "system": "code_only",
+      "set": "dev",
+      "url": "https://www.kp.org/",
+      "bug_type": "label_mismatch",
+      "seed": 510,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 1,
+      "needs_human_count": 1,
+      "confirmed_checks": [
+        "label_in_name"
+      ],
+      "manifest": {
+        "url": "https://healthy.kaiserpermanente.org/front-door",
+        "bug_type": "label_mismatch",
+        "expected_check": "label_in_name",
+        "seed": 510,
+        "target_selector": "#nav-0-menu-item-link-2",
+        "target_text": "Doctors & Locations",
+        "timestamp": "2026-11-21T18:47:03.437161+00:00",
+        "sha256": "0a4906193369be5f35232beacde5896cd74ae3f2f122f19819769e8f3d7c761e"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 36.34,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-134654-kp.org"
+    },
+    {
+      "system": "blindspot",
+      "set": "dev",
+      "url": "https://www.kp.org/",
+      "bug_type": "label_mismatch",
+      "seed": 510,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 1,
+      "needs_human_count": 8,
+      "confirmed_checks": [
+        "label_in_name"
+      ],
+      "manifest": {
+        "url": "https://healthy.kaiserpermanente.org/front-door",
+        "bug_type": "label_mismatch",
+        "expected_check": "label_in_name",
+        "seed": 510,
+        "target_selector": "#nav-0-menu-item-link-2",
+        "target_text": "Doctors & Locations",
+        "timestamp": "2026-11-21T18:47:40.227413+00:00",
+        "sha256": "26ab74af188f9f14a6aef9809e233fd21aad24771fffa42b9251aef39ccc9b72"
+      },
+      "gemini_calls": 81,
+      "total_tokens": 227281,
+      "cost_usd": 0.03845,
+      "duration_s": 40.42,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-134731-kp.org"
+    }
+  ]
+}

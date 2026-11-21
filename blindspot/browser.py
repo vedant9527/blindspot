@@ -24,13 +24,27 @@ TABBABLE_COUNT_JS = """
 }
 """
 
-# A stable CSS path for an element: id if unique, else tag plus nth-of-type chain.
+# Pierce open Shadow DOM roots so custom elements (<va-header>, etc.) report the actual focused control.
+ACTIVE_DEEP_FN = """
+  function activeDeep() {
+    let el = document.activeElement;
+    const hosts = [];
+    while (el && el.shadowRoot && el.shadowRoot.activeElement) {
+      hosts.push(el);
+      el = el.shadowRoot.activeElement;
+    }
+    return { el, hosts };
+  }
+"""
+
+# A stable CSS path for an element: id if unique, else tag plus nth-of-type chain (supports Shadow DOM).
 CSS_PATH_FN = """
-  function cssPath(node) {
-    const uniqueId = n => n.id && document.querySelectorAll('#' + CSS.escape(n.id)).length === 1;
+  function cssPathOne(node, rootDoc) {
+    const root = rootDoc || document;
+    const uniqueId = n => n.id && root.querySelectorAll('#' + CSS.escape(n.id)).length === 1;
     if (uniqueId(node)) return '#' + CSS.escape(node.id);
     const parts = [];
-    while (node && node.nodeType === 1 && node !== document.documentElement) {
+    while (node && node.nodeType === 1 && node !== document.documentElement && node !== root) {
       let part = node.tagName.toLowerCase();
       const parent = node.parentElement;
       if (parent) {
@@ -43,13 +57,28 @@ CSS_PATH_FN = """
     }
     return parts.join(' > ');
   }
+  function cssPath(node) {
+    const chain = [];
+    let cur = node;
+    while (cur) {
+      const rn = cur.getRootNode ? cur.getRootNode() : document;
+      if (rn && rn.host) {
+        chain.unshift(cssPathOne(cur, rn));
+        cur = rn.host;
+      } else {
+        chain.unshift(cssPathOne(cur, document));
+        break;
+      }
+    }
+    return chain.join(' >>> ');
+  }
 """
 
-# Facts about document.activeElement, or null when focus is on <body>.
+# Facts about document.activeElement (piercing open shadow roots), or null when focus is on <body>.
 FOCUS_INFO_JS = """
 () => {
-""" + CSS_PATH_FN + """
-  const el = document.activeElement;
+""" + ACTIVE_DEEP_FN + CSS_PATH_FN + """
+  const { el } = activeDeep();
   if (!el || el === document.body || el === document.documentElement) return null;
   const r = el.getBoundingClientRect();
   return {
@@ -87,7 +116,13 @@ def accessible_name_and_role(page: Page) -> dict[str, Any]:
     try:
         cdp = page.context.new_cdp_session(page)
         cdp.send("Accessibility.enable")
-        res = cdp.send("Runtime.evaluate", {"expression": "document.activeElement", "objectGroup": "blindspot"})
+        res = cdp.send(
+            "Runtime.evaluate",
+            {
+                "expression": "(() => { let e = document.activeElement; while (e && e.shadowRoot && e.shadowRoot.activeElement) e = e.shadowRoot.activeElement; return e; })()",
+                "objectGroup": "blindspot",
+            },
+        )
         object_id = res.get("result", {}).get("objectId")
         if not object_id:
             return {"name": "", "role": "", "ok": False}

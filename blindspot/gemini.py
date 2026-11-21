@@ -85,27 +85,39 @@ def reset_call_log() -> None:
 
 
 def summarize_calls(calls: list[dict[str, Any]]) -> dict[str, Any]:
-    """Aggregate call count, latencies, and token usage by model."""
+    """Aggregate call count, latencies, token usage, and estimated USD cost by model."""
     by_model: dict[str, dict[str, Any]] = {}
     total_input = 0
     total_output = 0
     total_tokens = 0
+    est_cost_usd = 0.0
     for c in calls:
         m = c.get("model", "unknown")
-        bucket = by_model.setdefault(m, {"calls": 0, "errors": 0, "total_tokens": 0, "latency_s_sum": 0.0})
+        bucket = by_model.setdefault(
+            m, {"calls": 0, "errors": 0, "input_tokens": 0, "output_tokens": 0, "total_tokens": 0, "latency_s_sum": 0.0}
+        )
         bucket["calls"] += 1
         if not c.get("ok", True):
             bucket["errors"] += 1
-        bucket["total_tokens"] += int(c.get("total_tokens", 0) or 0)
+        inp = int(c.get("input_tokens", 0) or 0)
+        out = int(c.get("output_tokens", 0) or 0)
+        tot = int(c.get("total_tokens", 0) or 0)
+        bucket["input_tokens"] += inp
+        bucket["output_tokens"] += out
+        bucket["total_tokens"] += tot
         bucket["latency_s_sum"] = round(bucket["latency_s_sum"] + float(c.get("latency_s", 0.0) or 0.0), 3)
-        total_input += int(c.get("input_tokens", 0) or 0)
-        total_output += int(c.get("output_tokens", 0) or 0)
-        total_tokens += int(c.get("total_tokens", 0) or 0)
+        total_input += inp
+        total_output += out
+        total_tokens += tot
+        in_rate = config.COST_PER_1M_INPUT_USD.get(m, 0.30)
+        out_rate = config.COST_PER_1M_OUTPUT_USD.get(m, 1.20)
+        est_cost_usd += (inp * in_rate + out * out_rate) / 1_000_000.0
     return {
         "calls": len(calls),
         "input_tokens": total_input,
         "output_tokens": total_output,
         "total_tokens": total_tokens,
+        "estimated_cost_usd": round(est_cost_usd, 5),
         "by_model": by_model,
     }
 
@@ -262,7 +274,7 @@ def decide(
     last_exc: Exception | None = None
     keys = [False] + ([True] if os.getenv("GEMINI_API_KEY_BACKUP") else [])
     for backup in keys:
-        client = get_client(backup=backup)
+        client = get_client(backup=backup, timeout_s=config.GEMINI_GEN_TIMEOUT_S)
         for attempt in range(config.GEMINI_RETRIES):
             for name in (model, f"models/{model}"):
                 t0 = time.perf_counter()
@@ -375,7 +387,7 @@ def generate_content(
     last_exc: Exception | None = None
     keys = [False] + ([True] if os.getenv("GEMINI_API_KEY_BACKUP") else [])
     for backup in keys:
-        client = get_client(backup=backup)
+        client = get_client(backup=backup, timeout_s=config.GEMINI_GEN_TIMEOUT_S)
         for attempt in range(config.GEMINI_RETRIES):
             for name in (model, f"models/{model}"):
                 t0 = time.perf_counter()
@@ -596,3 +608,75 @@ def score_step(
         "usage": parsed["usage"],
         "latency_s": round(latency, 3),
     }
+
+
+SINGLE_CALL_CATEGORIES = {
+    "hide_focus",
+    "keyboard_trap",
+    "covering_banner",
+    "positive_tabindex",
+    "label_mismatch",
+    "other",
+}
+
+
+def baseline_single_call(
+    full_page_screenshot: bytes,
+    *,
+    call_log: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """Single-call vision baseline (Argon) on one full-page screenshot (SPEC section 5).
+
+    Returns `{findings: list[dict], categories: list[str], latency_s: float}`.
+    """
+    prompt = (
+        "You are an accessibility auditor inspecting a single screenshot of a web page for WCAG 2.1/2.2 "
+        "keyboard and screen-reader accessibility failures.\n"
+        "Classify each confirmed failure you can actually see in this screenshot into one of these exact categories:\n"
+        "- 'hide_focus': a focused interactive element has no visible focus indicator (WCAG 2.4.7)\n"
+        "- 'keyboard_trap': keyboard focus is trapped on an element and cannot move away (WCAG 2.1.2)\n"
+        "- 'covering_banner': a sticky/fixed banner or popup covers a focused element (WCAG 2.4.11)\n"
+        "- 'positive_tabindex': elements use positive tabindex values breaking focus order (WCAG 2.4.3)\n"
+        "- 'label_mismatch': visible button/link text does not match its accessible name (WCAG 2.5.3)\n"
+        "- 'other': another clear WCAG 2.1 AA failure visible in the screenshot\n"
+        "Only report failures you have visual evidence for; return an empty list if none are visible.\n"
+        'Return ONLY JSON: {"findings": [{"category": "...", "wcag": "...", "element": "...", "detail": "..."}]}'
+    )
+    parts = [types.Part.from_bytes(data=full_page_screenshot, mime_type="image/png"), prompt]
+    text, latency = generate_content(
+        config.HARD_CALL_MODEL,
+        parts,
+        json_mode=True,
+        op="baseline_single_call",
+        call_log=call_log,
+    )
+    try:
+        obj = _parse_json_object(text)
+        raw_list = obj.get("findings") if isinstance(obj, dict) else []
+    except Exception:
+        raw_list = []
+
+    findings: list[dict[str, Any]] = []
+    categories: set[str] = set()
+    for item in raw_list or []:
+        if not isinstance(item, dict):
+            continue
+        cat = str(item.get("category", "other") or "other").strip().lower()
+        if cat not in SINGLE_CALL_CATEGORIES:
+            cat = "other"
+        categories.add(cat)
+        findings.append(
+            {
+                "category": cat,
+                "wcag": str(item.get("wcag", "") or ""),
+                "element": str(item.get("element", "") or "")[:120],
+                "detail": str(item.get("detail", "") or "")[:240],
+            }
+        )
+
+    return {
+        "findings": findings,
+        "categories": sorted(categories),
+        "latency_s": round(latency, 3),
+    }
+

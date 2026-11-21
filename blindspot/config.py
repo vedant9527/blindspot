@@ -24,7 +24,8 @@ MAX_POPUP_CLOSES = 2      # popups closed per run (logged); more than that and w
 CONFIRM_P = 0.80          # Decisions API probability to confirm (with code agreement)
 HUMAN_LOW = 0.40          # below this and no code flag = dropped
 
-GEMINI_TIMEOUT_S = 8.0    # per-call timeout (converted to ms for google-genai HttpOptions)
+GEMINI_TIMEOUT_S = 10.0   # minimum deadline allowed by Gemini API (10s)
+GEMINI_GEN_TIMEOUT_S = 20.0  # deadline for generate_content (Hydrogen / Argon / Carbon)
 GEMINI_RETRIES = 2        # attempts per key before falling back or failing
 SCORER_WORKERS = 12       # thread-pool workers for parallel Hydrogen + Decisions calls
 RED_BOX_WIDTH_PX = 3      # red marker box stroke width on scorer/evidence crops
@@ -36,3 +37,17 @@ READER_MODEL = "gemini-4-hydrogen"
 HARD_CALL_MODEL = "gemini-4-argon"
 TICKET_MODEL = "gemini-4-carbon"
 MANAGED_AGENT = "antigravity-preview-05-2026"
+
+# Estimated USD per 1M tokens for transparent cost-per-page reporting in eval/harness.py
+COST_PER_1M_INPUT_USD = {
+    "gemini-decision-1": 0.15,
+    "gemini-4-hydrogen": 0.15,
+    "gemini-4-argon": 1.25,
+    "gemini-4-carbon": 0.50,
+}
+COST_PER_1M_OUTPUT_USD = {
+    "gemini-decision-1": 0.00,
+    "gemini-4-hydrogen": 0.60,
+    "gemini-4-argon": 5.00,
+    "gemini-4-carbon": 2.00,
+}

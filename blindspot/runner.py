@@ -20,14 +20,15 @@ from urllib.parse import urlparse
 from playwright.sync_api import Page
 
 from blindspot import config
-from blindspot.browser import CSS_PATH_FN, TABBABLE_COUNT_JS, focus_info
+from blindspot.browser import ACTIVE_DEEP_FN, CSS_PATH_FN, TABBABLE_COUNT_JS, focus_info
 
 ROOT = Path(__file__).resolve().parent.parent
 
 # Extra facts about the focused element that the checks need, gathered in one call.
 STEP_EXTRA_JS = """
 () => {
-  const el = document.activeElement;
+""" + ACTIVE_DEEP_FN + """
+  const { el } = activeDeep();
   if (!el || el === document.body || el === document.documentElement) return null;
   const short = n => {
     if (!n || n.nodeType !== 1) return '';
@@ -96,10 +97,16 @@ STEP_EXTRA_JS = """
   if (area > 0) for (const [x, y] of pts) {
     if (x < 0 || y < 0 || x >= vw || y >= vh) continue;
     sampled++;
-    const hit = document.elementFromPoint(x, y);
+    let hit = document.elementFromPoint(x, y);
+    while (hit && hit.shadowRoot && hit.shadowRoot.elementFromPoint) {
+      const inner = hit.shadowRoot.elementFromPoint(x, y);
+      if (!inner || inner === hit) break;
+      hit = inner;
+    }
     if (!hit || hit === el || el.contains(hit) || hit.contains(el)) continue;
     covered++;
-    for (let e = hit; e && e !== document.documentElement; e = e.parentElement) {
+    for (let e = hit; e && e !== document.documentElement; e = e.parentElement || (e.getRootNode && e.getRootNode().host)) {
+      if (!e || e.nodeType !== 1) break;
       const p = getComputedStyle(e).position;
       if (p === 'fixed' || p === 'sticky') { fixedCovers++; break; }
     }
@@ -108,7 +115,8 @@ STEP_EXTRA_JS = """
   }
   // Is focus inside a popup? A dialog, or a fixed layer covering a quarter of the screen or more.
   let in_overlay = false;
-  for (let e = el; e && e !== document.body; e = e.parentElement) {
+  for (let e = el; e && e !== document.body; e = e.parentElement || (e.getRootNode && e.getRootNode().host)) {
+    if (!e || e.nodeType !== 1) break;
     if (e.matches('[role=dialog],[role=alertdialog],[aria-modal=true],dialog[open]')) { in_overlay = true; break; }
     if (getComputedStyle(e).position === 'fixed') {
       const fr = e.getBoundingClientRect();
@@ -223,7 +231,9 @@ def capture_step(page: Page, index: int, out_dir: Path) -> dict[str, Any]:
 
     rect = step["rect"]
     if not step["offscreen"] and rect["width"] * rect["height"] > 0:
-        handle = page.evaluate_handle("document.activeElement")
+        handle = page.evaluate_handle(
+            "() => { let e = document.activeElement; while (e && e.shadowRoot && e.shadowRoot.activeElement) e = e.shadowRoot.activeElement; return e; }"
+        )
         handle.evaluate("e => e.blur()")
         page.wait_for_timeout(config.STEP_WAIT_MS)  # let focus transitions finish
         blurred = page.screenshot()
@@ -451,6 +461,7 @@ def run_audit(
     inject: str | None = None,
     seed: int | None = None,
     use_gemini: bool = True,
+    record_video: bool = True,
     emit: Callable[[str, dict[str, Any]], None] | None = None,
 ) -> dict[str, Any]:
     """Full Phase 3 run: preflight (+ warm-up), keyboard loop + parallel Gemini scoring, decision rule.
@@ -488,14 +499,18 @@ def run_audit(
 
     with sync_playwright() as p:
         browser = launch_browser(p, headless=headless)
-        try:
-            context = browser.new_context(
-                viewport={"width": 1280, "height": 800},
-                record_video_dir=str(out_dir / "video"),
-            )
-            page = context.new_page()
-        except Exception as exc:
-            _log(f"Video recording off: {str(exc).splitlines()[0][:80]}")
+        if record_video:
+            try:
+                context = browser.new_context(
+                    viewport={"width": 1280, "height": 800},
+                    record_video_dir=str(out_dir / "video"),
+                )
+                page = context.new_page()
+            except Exception as exc:
+                _log(f"Video recording off: {str(exc).splitlines()[0][:80]}")
+                context = browser.new_context(viewport={"width": 1280, "height": 800})
+                page = context.new_page()
+        else:
             context = browser.new_context(viewport={"width": 1280, "height": 800})
             page = context.new_page()
 

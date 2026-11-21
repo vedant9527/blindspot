@@ -77,18 +77,45 @@ APPLY_BUG_JS = """
   el.setAttribute('data-bs-target', bug_type);
 
   if (bug_type === 'hide_focus') {
-    const cs = getComputedStyle(el);
+    const lockNode = (node, idx) => {
+      const s = getComputedStyle(node);
+      const attr = 'bs-hf-' + idx;
+      node.setAttribute('data-bs-hf', attr);
+      return '[data-bs-hf="' + attr + '"], [data-bs-target]:focus [data-bs-hf="' + attr + '"], ' +
+             '[data-bs-target]:focus-visible [data-bs-hf="' + attr + '"] {' +
+             '  outline: none !important; box-shadow: none !important;' +
+             '  border-top: ' + s.borderTopWidth + ' ' + s.borderTopStyle + ' ' + s.borderTopColor + ' !important;' +
+             '  border-right: ' + s.borderRightWidth + ' ' + s.borderRightStyle + ' ' + s.borderRightColor + ' !important;' +
+             '  border-bottom: ' + s.borderBottomWidth + ' ' + s.borderBottomStyle + ' ' + s.borderBottomColor + ' !important;' +
+             '  border-left: ' + s.borderLeftWidth + ' ' + s.borderLeftStyle + ' ' + s.borderLeftColor + ' !important;' +
+             '  background-color: ' + s.backgroundColor + ' !important;' +
+             '  color: ' + s.color + ' !important;' +
+             '  opacity: ' + s.opacity + ' !important;' +
+             '  text-decoration: ' + s.textDecorationLine + ' !important;' +
+             '}';
+    };
+    const cb = getComputedStyle(el, '::before');
+    const ca = getComputedStyle(el, '::after');
+    let css = lockNode(el, 0);
+    let i = 1;
+    for (const child of el.querySelectorAll('*')) {
+      css += lockNode(child, i++);
+    }
+    css +=
+      '[data-bs-target]:focus, [data-bs-target]:focus-visible {' +
+      '  outline: none !important; box-shadow: none !important;' +
+      '}' +
+      '[data-bs-target]:focus::before, [data-bs-target]:focus-visible::before {' +
+      '  outline: none !important; box-shadow: none !important;' +
+      '  opacity: ' + cb.opacity + ' !important; border-color: ' + cb.borderTopColor + ' !important;' +
+      '}' +
+      '[data-bs-target]:focus::after, [data-bs-target]:focus-visible::after {' +
+      '  outline: none !important; box-shadow: none !important;' +
+      '  opacity: ' + ca.opacity + ' !important; border-color: ' + ca.borderTopColor + ' !important;' +
+      '}';
     const style = document.createElement('style');
     style.id = 'bs-inject-style';
-    style.textContent =
-      '[data-bs-target]:focus, [data-bs-target]:focus-visible {' +
-      '  outline: none !important;' +
-      '  box-shadow: none !important;' +
-      '  border-color: ' + cs.borderColor + ' !important;' +
-      '  background-color: ' + cs.backgroundColor + ' !important;' +
-      '  color: ' + cs.color + ' !important;' +
-      '  text-decoration: ' + cs.textDecorationLine + ' !important;' +
-      '}';
+    style.textContent = css;
     document.head.appendChild(style);
     return true;
   }

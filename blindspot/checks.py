@@ -89,15 +89,47 @@ def pixel_stats(focused_png: bytes, unfocused_png: bytes, rect: dict[str, float]
     changed = absdiff.max(axis=2) > config.PIXEL_DELTA
     crop_changed = changed[y0:y1, x0:x1]
     changed_px = int(crop_changed.sum())
-    contrast = None
-    if changed_px:
-        fc = f[y0:y1, x0:x1][crop_changed].mean(axis=0)
-        uc = u[y0:y1, x0:x1][crop_changed].mean(axis=0)
-        contrast = round(contrast_ratio(fc, uc), 2)
     area_scale = scale * scale  # report pixel counts in CSS pixels
+    contrast = None
+    strong_ring_px = 0
+    border_vanished = False
+    if changed_px:
+        crop_f = f[y0:y1, x0:x1]
+        # Estimate surrounding background from the outer 1px perimeter of the padded crop
+        edge = np.concatenate([crop_f[0, :], crop_f[-1, :], crop_f[:, 0], crop_f[:, -1]], axis=0)
+        bg = np.median(edge, axis=0)
+        f_chg = crop_f[crop_changed].astype(np.float64)
+        u_chg = u[y0:y1, x0:x1][crop_changed].astype(np.float64)
+        f_bg_dist = float(np.abs(f_chg - bg).max(axis=1).mean())
+        u_bg_dist = float(np.abs(u_chg - bg).max(axis=1).mean())
+        # If changed pixels match the surrounding background when focused but stood out when unfocused,
+        # the element's border disappeared on :focus without adding a new indicator (suspect for scorer).
+        if f_bg_dist < config.PIXEL_DELTA and u_bg_dist > config.PIXEL_DELTA * 2:
+            border_vanished = True
+
+        fp = f_chg / 255.0
+        up = u_chg / 255.0
+        f_lin = np.where(fp <= 0.03928, fp / 12.92, ((fp + 0.055) / 1.055) ** 2.4)
+        u_lin = np.where(up <= 0.03928, up / 12.92, ((up + 0.055) / 1.055) ** 2.4)
+        f_lum = 0.2126 * f_lin[:, 0] + 0.7152 * f_lin[:, 1] + 0.0722 * f_lin[:, 2]
+        u_lum = 0.2126 * u_lin[:, 0] + 0.7152 * u_lin[:, 1] + 0.0722 * u_lin[:, 2]
+        hi = np.maximum(f_lum, u_lum)
+        lo = np.minimum(f_lum, u_lum)
+        per_px_cr = (hi + 0.05) / (lo + 0.05)
+        strong_ring_px = round(int((per_px_cr >= config.INDICATOR_CONTRAST_MIN).sum()) / area_scale)
+        # If enough pixels form a >=3:1 ring (e.g. a crisp outline alongside a text-color swap),
+        # report the ring's contrast rather than diluting it with interior color changes.
+        if strong_ring_px >= config.FOCUS_CHANGED_PX_MIN:
+            contrast = round(float(np.percentile(per_px_cr, 80)), 2)
+        else:
+            fc = f_chg.mean(axis=0)
+            uc = u_chg.mean(axis=0)
+            contrast = round(contrast_ratio(fc, uc), 2)
     return {
         "mean_diff": round(float(absdiff[y0:y1, x0:x1].mean()), 2),
         "changed_px": round(changed_px / area_scale),
+        "strong_ring_px": strong_ring_px,
+        "border_vanished": border_vanished,
         "changed_elsewhere": round((int(changed.sum()) - changed_px) / area_scale),
         "contrast": contrast,
         "crop_px": round((x1 - x0) * (y1 - y0) / area_scale),
@@ -168,7 +200,10 @@ def check_focus_not_visible(step: dict[str, Any]) -> dict[str, Any] | None:
         return _result("focus_not_visible", "2.4.7", True, step,
                        f"No visible focus indicator: {px['changed_px']} pixels change around the element "
                        "between focused and unfocused", pixels=px)
-    if px["mean_diff"] < config.FOCUS_DIFF_MIN:
+    if px.get("border_vanished"):
+        return _result("focus_not_visible", "2.4.7", False, step,
+                       "Element border disappeared into the background on focus with no replacement outline", pixels=px)
+    if px["mean_diff"] < config.FOCUS_DIFF_MIN and px.get("strong_ring_px", 0) < config.FOCUS_CHANGED_PX_MIN:
         return _result("focus_not_visible", "2.4.7", False, step,
                        f"Focus indicator is very faint (mean pixel change {px['mean_diff']})", pixels=px)
     return None
