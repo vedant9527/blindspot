@@ -2,7 +2,7 @@
 
 Read AGENTS.md first. This file says where the build stands.
 
-**Status (Nov 21, ~14:55, Google Antigravity):** **THRESHOLDS FROZEN (`blindspot/config.py` locked — do not modify).** `eval/heldout_manifest.json` built from `eval/submissions.jsonl` (16 stranger URLs, 14 loadable, 2 blocked honestly in preflight).
+**Status (Nov 21, ~15:38, Google Antigravity):** **THRESHOLDS FROZEN (`blindspot/config.py` locked).** Phase 8 held-out evaluation (`eval/results/results.md`, **Blindspot 12/13, 0 W3C clean false flags**) and Phase 9 final `README.md` are complete (HAR snapshots skipped per plan). Next: demo rehearsal, 1-minute video, and submit by 4:50 PM.
 - **Held-out manifest SHA-256:** `816e4bb137338731ce06adaf5d2c76a90c9f2ed9c985b7907332226e606f2492`
 
 Note: restart `uvicorn` when convenient so the live `:8000` server picks up the new `run_replay` background hook (per instructions, port 8000 was not restarted).
@@ -188,6 +188,11 @@ Ran `python eval/harness.py --set heldout --set govuk --set w3c_clean --out-pref
 - **`single_gemini` (`gemini-4-argon`):** **0/13** held-out caught, **0** W3C clean false flags, 12.1s median, \$0.0022/page.
 - Dropped/blocked pages reported separately (not counted as caught or missed): `carbonhealth.com` and `ticketmaster.com` (manifest preflight bot check), `headway.co` (HTTP 403), `asktia.com` (axe-only load race: no visible tabbable elements on load).
 
+## Phase 9 (README only — HAR snapshots skipped, done, Antigravity, ~15:38)
+
+- Finalized `README.md` with plain-language overview, HHS Section 504 May 11, 2027 deadline (15+ employees, Federal Register May 11, 2026), all model roles + 5/5 Managed Agent replay + 0.80 decision rule, held-out results table (`SHA-256: 816e4bb1...`, Blindspot 12/13 vs code_only 10/13, axe 5/12, single_gemini 0/13; 0 W3C clean false flags), dev-set table labelled as tuning data, honest limits + 4 dropped held-out pages + `failure_log.md` highlights, run instructions, and unmistakable Built-before vs. Built-at-event disclosure.
+- Confirmed `.env` is not tracked in git.
+
 ## Next
 
-Phase 9 (4:00 to 4:30 in `docs/PLAN.md`): HAR snapshots of the 3 stable demo pages + 3 demo rehearsals, then Phase 10 (1-min video, final README polish, submit by 4:50 PM).
+Phase 10 (submit by 4:50 PM): rehearse the 3-minute live demo on `nyulangone.org/doctors`, `va.gov/find-locations/`, or `medlineplus.gov/` (restart `uvicorn` before demoing if you want the background `Replayed ✓` badge live), record the 1-minute submission video, confirm repo is public, and submit by 4:50 PM.
