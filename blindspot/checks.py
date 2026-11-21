@@ -100,6 +100,7 @@ def pixel_stats(focused_png: bytes, unfocused_png: bytes, rect: dict[str, float]
         "changed_px": round(changed_px / area_scale),
         "changed_elsewhere": round((int(changed.sum()) - changed_px) / area_scale),
         "contrast": contrast,
+        "crop_px": round((x1 - x0) * (y1 - y0) / area_scale),
     }
 
 
@@ -151,7 +152,7 @@ def check_keyboard_trap(run: dict[str, Any]) -> dict[str, Any] | None:
 
 def check_focus_not_visible(step: dict[str, Any]) -> dict[str, Any] | None:
     """2.4.7: the screen does not change when the element gains focus, or focus is off screen."""
-    if step.get("body"):
+    if step.get("body") or step.get("tag") == "iframe":  # focus inside a frame is not visible from outside
         return None
     if step.get("offscreen"):
         return _result("focus_not_visible", "2.4.7", True, step,
@@ -182,6 +183,10 @@ def check_focus_obscured(step: dict[str, Any]) -> dict[str, Any] | None:
         return _result("focus_obscured", "2.4.11", True, step,
                        f"Focused element is entirely hidden behind {', '.join(ob['covering'])} (fixed or sticky)",
                        obscured=ob)
+    if ob["covered"] == ob["sampled"]:
+        return _result("focus_obscured", "2.4.11", False, step,
+                       f"Focused element is under {', '.join(ob['covering'])} at every sample point, but the layer "
+                       "is not fixed or sticky (it may be see-through); needs the scorer", obscured=ob)
     return _result("focus_obscured", "2.4.11", False, step,
                    f"Focused element is partly covered by {', '.join(ob['covering'])} "
                    f"({ob['covered']} of {ob['sampled']} points)", obscured=ob)
@@ -231,8 +236,10 @@ def check_label_in_name(step: dict[str, Any]) -> dict[str, Any] | None:
 def check_indicator_contrast(step: dict[str, Any]) -> dict[str, Any] | None:
     """1.4.11 (suspect only): focused vs unfocused colors of the indicator differ by less than 3:1."""
     px = step.get("pixels")
-    if not px or px.get("contrast") is None or px["changed_px"] < config.FOCUS_CHANGED_PX_MIN:
+    if not px or step.get("tag") == "iframe" or px.get("contrast") is None or px["changed_px"] < config.FOCUS_CHANGED_PX_MIN:
         return None
+    if px["changed_px"] > config.RING_MAX_FRACTION * px.get("crop_px", 0):
+        return None  # a whole region changed (menu opened, content swapped), not a focus ring
     if px["contrast"] >= config.INDICATOR_CONTRAST_MIN:
         return None
     return _result("indicator_contrast", "1.4.11", False, step,

@@ -36,6 +36,24 @@ Read AGENTS.md first. This file says where the build stands.
 - Response: `resp.answers[id]` with `.type` and `.confidence`. Noul: `.noul` is the probability of true, and confidence is `max(noul, 1 - noul)`. Choice: `.choice` and `.probabilities`. Score: `.score` (expected level), `.probabilities`, `.legend`.
 - Managed Agents: `client.interactions.create(agent="antigravity-preview-05-2026", input=..., environment={"type": "remote"})`; result has `.status`, `.output_text`, `.errors`. A newer agent `antigravity-preview-09-2026` also exists in the SDK.
 
+## Phase 2: runner, fixtures, code checks (done, Claude Code, ~11:40)
+
+- `blindspot/runner.py`: `run_keyboard(page, out_dir, max_tabs, timeout_s, on_step, dismiss_popup)` Tabs through a loaded page. Per step it saves the full screenshot (`steps/NN.png`), focused and unfocused crops (`crops/NN_focused.png`, `NN_unfocused.png`; unfocused = after `el.blur()`, then focus is restored), CDP accessible name and role, visible label text (skips aria-hidden and 1px screen-reader text), landmark, coverage samples (`elementFromPoint` at center and four corners) and pixel stats. Stops on cycle, trap (then runs the Shift+Tab and Escape escape test), 40 Tabs or 60 s. Focus starts at the top of the document via a body-focus trick instead of clicking a spot (a click could follow a link).
+- CLI: `python -m blindspot.runner --url URL [--headless] [--tabs N]` runs preflight, the keyboard run and the checks; saves `runs/<run_id>/steps.json`, `checks.json`, screenshots, crops and a `.webm` screen recording (needs `playwright install ffmpeg`, already installed here; it falls back to no video if missing).
+- `blindspot/checks.py`: `run_checks(run)` returns `{check, wcag, proven, suspect, evidence, detail}` per (check, selector). Proven: keyboard_trap, focus_not_visible (fewer than 8 changed pixels around the element and the screen did not change elsewhere, or focus entirely off screen), focus_obscured (all sample points under a fixed or sticky layer), focus_order (positive tabindex), label_in_name. Suspect only: faint indicators, partial or non-fixed coverage, upward jumps over 300 px in one region, indicator contrast under 3:1.
+- Thresholds added to `blindspot/config.py` (PIXEL_DELTA, FOCUS_CHANGED_PX_MIN, ELSEWHERE_PX_MAX, RING_MAX_FRACTION, TRAP_*, MAX_POPUP_CLOSES).
+- `fixtures/`: clean, trap, hidden_focus, covered, tabindex, label_mismatch (12 focusable elements each). `pytest -q`: 12 passed (~65 s, headless Chrome).
+- Real pages:
+  - medicare.gov: 1 proven on the first runs (focus lands on an off-screen, unnamed div), then a sign-up popup changed the results run to run. Latest run: 1 proven focus_obscured (footer "Next Step" under the popup's fixed iframe) and many suspects.
+  - healthcare.gov: 9 proven focus_obscured, footer links hidden under the opaque "Get covered for 2027" popup (screenshot checked). Suspects: elements under the see-through dimming layer.
+  - Both runs: 40 steps in about 25 s.
+
+### Open issues
+
+- Both .gov pages show Qualtrics sign-up popups at random, so results differ between runs. For the demo, use a page without popups or Phase 9 snapshots. The close-and-restart path (`dismiss_popup`) has not fired on a real page yet; it only runs when focus goes inside the popup.
+- indicator_contrast is noisy (many suspects under dimming layers). It is suspect-only, so it cannot confirm anything without the scorer, but consider not sending it to the scorer when the element is under an overlay.
+- Phase 3 should parallelise scoring (see the latency notes above): the run takes ~0.6 s per step without Gemini.
+
 ## Next
 
-Prompt B is done. Next: the Handoff prompt in PROMPTS.md (Claude Code), then Prompt 2 (runner, fixtures, code checks) in Antigravity. The first page in `eval/pages_ok.txt` is https://www.medicare.gov/.
+Phase 3 (Prompt 3 in PROMPTS.md): Gemini reading and scoring, the decision rule, SSE events. The Decisions API parser can be written from `docs/decisions_response_example.json`. Read `failure_log.md` first.

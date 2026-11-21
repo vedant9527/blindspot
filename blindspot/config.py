@@ -14,10 +14,12 @@ PIXEL_DELTA = 24          # a pixel "changed" if any channel differs by more tha
 FOCUS_CHANGED_PX_MIN = 8  # fewer changed pixels in the crop = no indicator at all (proven)
 ELSEWHERE_PX_MAX = 200    # more changed pixels outside the crop = focus style may be elsewhere (suspect, not proven)
 INDICATOR_CONTRAST_MIN = 3.0  # WCAG 1.4.11 non-text contrast
+RING_MAX_FRACTION = 0.5   # judge indicator contrast only when under half the crop changed (a ring, not a region)
 OFFSCREEN_RECHECK_MS = 300    # wait before trusting an off-screen focus position (animations)
 TRAP_WINDOW = 10          # look at this many recent steps for a trap
 TRAP_MAX_DISTINCT = 2     # at most this many distinct elements in the window = trap suspect
 TRAP_MIN_TABBABLE = 10    # only judge traps on pages with at least this many tabbable elements
+MAX_POPUP_CLOSES = 2      # popups closed per run (logged); more than that and we test what is there
 
 CONFIRM_P = 0.80          # Decisions API probability to confirm (with code agreement)
 HUMAN_LOW = 0.40          # below this and no code flag = dropped

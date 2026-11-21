@@ -1,0 +1,8 @@
+# Failure log
+
+One line per failure on a real page: page, what went wrong, the change, the re-run result.
+
+- medicare.gov (11:32): an e-mail sign-up popup (Qualtrics, no `role="dialog"`) appeared after load, so the run tested the popup, not the page. Change: the runner closes a popup when focus lands inside a dialog or a fixed layer covering 25%+ of the screen (reject, close, accept order, logged in `run["popups"]`), then restarts from the top; the close pattern now accepts "Close dialog". Re-run: the popup appeared again but focus went behind it instead of into it, so it was reported, not closed (the close path is still untested on a real page).
+- medicare.gov (11:33): cycle detection only stopped when focus returned to the very first element, so the run circled the popup five times to the 40-Tab cap. Change: stop when any element repeats after a loop of 3+ distinct elements. Re-run: tests pass; loop detection is covered by the clean.html test.
+- medicare.gov (11:33): indicator_contrast suspects fired on iframes and on steps where a whole region changed. Change: skip iframes for pixel checks; judge contrast only when under half the crop changed (`RING_MAX_FRACTION`). Re-run: fewer, but still many suspects under the popup's dimming layer (left for the scorer).
+- healthcare.gov (11:36): the survey's dimming layer covers focused elements at all 5 sample points but is see-through (screenshot checked: the focus ring shows through). Kept as suspect because the layer is not fixed. Elements under the opaque fixed popup (steps 33-40, 0 pixels changed on focus) are proven; screenshot of step 35 checked by eye: "For States" is fully hidden.

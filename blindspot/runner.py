@@ -106,7 +106,16 @@ STEP_EXTRA_JS = """
     const d = short(hit);
     if (!covering.includes(d)) covering.push(d);
   }
-  return {rect, offscreen, landmark, label_text: label,
+  // Is focus inside a popup? A dialog, or a fixed layer covering a quarter of the screen or more.
+  let in_overlay = false;
+  for (let e = el; e && e !== document.body; e = e.parentElement) {
+    if (e.matches('[role=dialog],[role=alertdialog],[aria-modal=true],dialog[open]')) { in_overlay = true; break; }
+    if (getComputedStyle(e).position === 'fixed') {
+      const fr = e.getBoundingClientRect();
+      if (fr.width * fr.height >= 0.25 * vw * vh) { in_overlay = true; break; }
+    }
+  }
+  return {rect, offscreen, landmark, label_text: label, in_overlay,
           obscured: {sampled, covered, fixed_covers: fixedCovers, covering}};
 }
 """
@@ -210,7 +219,7 @@ def capture_step(page: Page, index: int, out_dir: Path) -> dict[str, Any]:
 
     step.update(info)
     step["element_rect"] = info["rect"]
-    step.update({k: extra[k] for k in ("rect", "offscreen", "landmark", "label_text", "obscured")})
+    step.update({k: extra[k] for k in ("rect", "offscreen", "landmark", "label_text", "obscured", "in_overlay")})
 
     rect = step["rect"]
     if not step["offscreen"] and rect["width"] * rect["height"] > 0:
@@ -235,11 +244,13 @@ def capture_step(page: Page, index: int, out_dir: Path) -> dict[str, Any]:
 
 def run_keyboard(page: Page, out_dir: Path | str, max_tabs: int = config.MAX_TABS,
                  timeout_s: float = config.RUN_TIMEOUT_S,
-                 on_step: Callable[[dict[str, Any]], None] | None = None) -> dict[str, Any]:
+                 on_step: Callable[[dict[str, Any]], None] | None = None,
+                 dismiss_popup: Callable[[Page], str] | None = None) -> dict[str, Any]:
     """Tab through an already-loaded page and return every step plus page facts.
 
-    Stops at max_tabs, after timeout_s, when focus cycles back to the first element,
-    or when a keyboard trap is suspected (then runs the escape test).
+    Stops at max_tabs, after timeout_s, when focus goes round the page and repeats,
+    or when a keyboard trap is suspected (then runs the escape test). If focus lands
+    in a popup and dismiss_popup is given, it is called (and logged) and the run restarts.
     """
     out_dir = Path(out_dir)
     (out_dir / "steps").mkdir(parents=True, exist_ok=True)
@@ -255,7 +266,8 @@ def run_keyboard(page: Page, out_dir: Path | str, max_tabs: int = config.MAX_TAB
     steps: list[dict[str, Any]] = []
     stop_reason = "max_tabs"
     trap_test = None
-    first_selector = None
+    popups: list[dict[str, Any]] = []
+    cycle_start = 0  # steps before this index belong to an earlier pass (before a popup was closed)
     for i in range(1, max_tabs + 1):
         if time.perf_counter() - t0 > timeout_s:
             stop_reason = "timeout"
@@ -267,16 +279,29 @@ def run_keyboard(page: Page, out_dir: Path | str, max_tabs: int = config.MAX_TAB
         if on_step:
             on_step(step)
 
-        sel = step["selector"]
-        seen = {s["selector"] for s in steps if s["selector"]}
-        if first_selector is None and sel:
-            first_selector = sel
-        elif sel and sel == first_selector and len(seen) > config.TRAP_MAX_DISTINCT:
-            stop_reason = "cycle"
-            break
+        # A popup that appeared after load (e-mail sign-up, survey): close it the way a user would
+        # (reject, then close, then accept), log it, and start again from the top of the page.
+        if step.get("in_overlay") and dismiss_popup and len(popups) < config.MAX_POPUP_CLOSES:
+            action = dismiss_popup(page)
+            popups.append({"step": i, "action": action, "selector": step["selector"]})
+            if action != "none":
+                step["popup_closed"] = action
+                page.wait_for_timeout(500)
+                focus_document_start(page)
+                cycle_start = len(steps)
+                continue
 
-        recent = steps[-config.TRAP_WINDOW:]
-        if (len(steps) >= config.TRAP_WINDOW and page_facts["tabbable"] >= config.TRAP_MIN_TABBABLE
+        sel = step["selector"]
+        current = steps[cycle_start:]
+        earlier = [s["selector"] for s in current[:-1]]
+        if sel and sel in earlier:
+            loop_steps = current[earlier.index(sel):-1]
+            if len({s["selector"] for s in loop_steps}) > config.TRAP_MAX_DISTINCT:
+                stop_reason = "cycle"  # focus went all the way round and came back
+                break
+
+        recent = current[-config.TRAP_WINDOW:]
+        if (len(recent) >= config.TRAP_WINDOW and page_facts["tabbable"] >= config.TRAP_MIN_TABBABLE
                 and not any(s["tag"] == "iframe" for s in recent)):  # focus inside an iframe looks stuck from outside
             selectors = [s["selector"] for s in recent]
             distinct = set(selectors)
@@ -292,6 +317,7 @@ def run_keyboard(page: Page, out_dir: Path | str, max_tabs: int = config.MAX_TAB
         "steps": steps,
         "stop_reason": stop_reason,
         "trap_test": trap_test,
+        "popups": popups,
         "duration_s": round(time.perf_counter() - t0, 2),
         "out_dir": str(out_dir),
     }
@@ -307,7 +333,8 @@ def _print_step(step: dict[str, Any]) -> None:
     print(f"{step['index']:2d}. <{step['tag']}> role={step['role']!r} name={step['accessible_name'][:40]!r} "
           f"label={step['label_text'][:30]!r} at ({r['x']:.0f},{r['y']:.0f}) "
           f"changed_px={px.get('changed_px', '-')} covered={ob.get('covered', 0)}/{ob.get('sampled', 0)}"
-          f"{' OFFSCREEN' if step.get('offscreen') else ''}")
+          f"{' OFFSCREEN' if step.get('offscreen') else ''}"
+          f"{' -> closed popup (' + step['popup_closed'] + ')' if step.get('popup_closed') else ''}")
 
 
 def main() -> None:
@@ -316,7 +343,7 @@ def main() -> None:
 
     from blindspot.browser import launch_browser
     from blindspot.checks import run_checks
-    from blindspot.preflight import run_preflight
+    from blindspot.preflight import dismiss_banner, run_preflight
 
     ap = argparse.ArgumentParser()
     ap.add_argument("--url", required=True)
@@ -330,16 +357,26 @@ def main() -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     with sync_playwright() as p:
         browser = launch_browser(p, headless=args.headless)
-        context = browser.new_context(viewport={"width": 1280, "height": 800},
-                                      record_video_dir=str(out_dir / "video"))
-        page = context.new_page()
+        try:  # the screen recording is optional evidence; it needs `playwright install ffmpeg`
+            context = browser.new_context(viewport={"width": 1280, "height": 800},
+                                          record_video_dir=str(out_dir / "video"))
+            page = context.new_page()
+        except Exception as exc:
+            print(f"Video recording off ({str(exc).splitlines()[0][:80]})")
+            context = browser.new_context(viewport={"width": 1280, "height": 800})
+            page = context.new_page()
         pre = run_preflight(page, args.url)
         print(f"Preflight: {pre.status} {pre.reason} (focusable: {pre.tabbable}, banner: {pre.banner_action})")
         if pre.status != "ok":
             context.close()
             browser.close()
             return
-        run = run_keyboard(page, out_dir, max_tabs=args.tabs, on_step=_print_step)
+        late = dismiss_banner(page)  # popups that appear after load (e-mail sign-ups, surveys)
+        if late != "none":
+            print(f"Late popup: clicked {late}")
+            page.wait_for_timeout(500)
+        run = run_keyboard(page, out_dir, max_tabs=args.tabs, on_step=_print_step, dismiss_popup=dismiss_banner)
+        run["late_banner_action"] = late
         run["preflight"] = pre.__dict__
         context.close()
         browser.close()

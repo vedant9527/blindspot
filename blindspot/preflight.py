@@ -25,7 +25,7 @@ LOGIN_PATH = re.compile(r"(login|signin|sign-in|sso|/auth)", re.I)
 
 BANNER_ORDER = [
     ("reject", re.compile(r"reject|decline|necessary only|only necessary|refuse", re.I), ["#onetrust-reject-all-handler"]),
-    ("close", re.compile(r"^(close|dismiss|no thanks|x)$", re.I), []),
+    ("close", re.compile(r"^(close|dismiss|no thanks|x)\b", re.I), []),  # "Close", "Close dialog", "Dismiss banner"
     ("accept", re.compile(r"accept|agree|allow|got it|^ok$", re.I), ["#onetrust-accept-btn-handler"]),
 ]
 
