@@ -24,11 +24,8 @@ TABBABLE_COUNT_JS = """
 }
 """
 
-# Facts about document.activeElement, or null when focus is on <body>.
-FOCUS_INFO_JS = """
-() => {
-  const el = document.activeElement;
-  if (!el || el === document.body || el === document.documentElement) return null;
+# A stable CSS path for an element: id if unique, else tag plus nth-of-type chain.
+CSS_PATH_FN = """
   function cssPath(node) {
     const uniqueId = n => n.id && document.querySelectorAll('#' + CSS.escape(n.id)).length === 1;
     if (uniqueId(node)) return '#' + CSS.escape(node.id);
@@ -46,6 +43,14 @@ FOCUS_INFO_JS = """
     }
     return parts.join(' > ');
   }
+"""
+
+# Facts about document.activeElement, or null when focus is on <body>.
+FOCUS_INFO_JS = """
+() => {
+""" + CSS_PATH_FN + """
+  const el = document.activeElement;
+  if (!el || el === document.body || el === document.documentElement) return null;
   const r = el.getBoundingClientRect();
   return {
     selector: cssPath(el),
@@ -85,16 +90,17 @@ def accessible_name_and_role(page: Page) -> dict[str, Any]:
         res = cdp.send("Runtime.evaluate", {"expression": "document.activeElement", "objectGroup": "blindspot"})
         object_id = res.get("result", {}).get("objectId")
         if not object_id:
-            return {"name": "", "role": ""}
+            return {"name": "", "role": "", "ok": False}
         ax = cdp.send("Accessibility.getPartialAXTree", {"objectId": object_id, "fetchRelatives": False})
         node = (ax.get("nodes") or [{}])[0]
         cdp.detach()
         return {
             "name": (node.get("name") or {}).get("value", "") or "",
             "role": (node.get("role") or {}).get("value", "") or "",
+            "ok": True,
         }
     except Exception:
-        return {"name": "", "role": ""}
+        return {"name": "", "role": "", "ok": False}
 
 
 def focus_info(page: Page) -> dict[str, Any] | None:
@@ -105,4 +111,5 @@ def focus_info(page: Page) -> dict[str, Any] | None:
     ax = accessible_name_and_role(page)
     info["accessible_name"] = ax["name"]
     info["role"] = ax["role"] or info.get("role_attr") or ""
+    info["ax_ok"] = ax["ok"]  # False means the name could not be read; never treat that as an empty name
     return info

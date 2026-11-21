@@ -10,6 +10,15 @@ FOCUS_DIFF_MIN = 3.0      # mean abs pixel diff (0-255) below this = no visible 
 ORDER_JUMP_PX = 300       # upward jump larger than this = order suspect
 MIN_TABBABLE = 5          # fewer = page treated as empty or blocked
 
+PIXEL_DELTA = 24          # a pixel "changed" if any channel differs by more than this (0-255)
+FOCUS_CHANGED_PX_MIN = 8  # fewer changed pixels in the crop = no indicator at all (proven)
+ELSEWHERE_PX_MAX = 200    # more changed pixels outside the crop = focus style may be elsewhere (suspect, not proven)
+INDICATOR_CONTRAST_MIN = 3.0  # WCAG 1.4.11 non-text contrast
+OFFSCREEN_RECHECK_MS = 300    # wait before trusting an off-screen focus position (animations)
+TRAP_WINDOW = 10          # look at this many recent steps for a trap
+TRAP_MAX_DISTINCT = 2     # at most this many distinct elements in the window = trap suspect
+TRAP_MIN_TABBABLE = 10    # only judge traps on pages with at least this many tabbable elements
+
 CONFIRM_P = 0.80          # Decisions API probability to confirm (with code agreement)
 HUMAN_LOW = 0.40          # below this and no code flag = dropped
 
