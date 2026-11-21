@@ -680,3 +680,71 @@ def baseline_single_call(
         "latency_s": round(latency, 3),
     }
 
+
+def write_ticket(
+    finding: dict[str, Any],
+    url: str,
+    *,
+    crop_png: bytes | None = None,
+    crop_rel_path: str = "",
+    call_log: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """Carbon writes an actionable accessibility ticket in Markdown (SPEC section 5).
+
+    Includes title, WCAG criterion and level, severity, steps to reproduce,
+    what a patient experiences, evidence crop path, and a short CSS/HTML fix.
+    """
+    ev = finding.get("evidence") or {}
+    step_num = ev.get("step")
+    selector = ev.get("selector") or "(page-level)"
+    visible_text = ev.get("visible_text") or ev.get("label_text") or ""
+    acc_name = ev.get("accessible_name") or ""
+    reader = ev.get("reader") or {}
+    prompt = (
+        "You are an accessibility engineer writing a concise, actionable GitHub-style bug ticket "
+        "for a healthcare web team preparing for HHS Section 504 (WCAG 2.1 AA, May 2027 deadline).\n"
+        "Write clean Markdown with these exact sections:\n"
+        "# <Short specific ticket title>\n"
+        "- **WCAG Criterion:** <number, name, and level A/AA>\n"
+        "- **Severity:** <Critical | High | Medium>\n"
+        "- **Status:** Confirmed\n\n"
+        "## Steps to Reproduce\n"
+        "Numbered list including the exact URL, number of Tab presses (if applicable), and CSS selector.\n\n"
+        "## What a Patient Experiences\n"
+        "2-3 plain sentences explaining how this locks out a keyboard or screen-reader patient.\n\n"
+        "## Evidence\n"
+        f"Reference the evidence crop path `{crop_rel_path or 'n/a'}` and summarize the measured proof.\n\n"
+        "## Suggested Fix\n"
+        "A short, concrete CSS or HTML code snippet that fixes the root cause.\n\n"
+        "Finding facts:\n"
+        f"- URL: {url}\n"
+        f"- Check: {finding.get('check')}\n"
+        f"- WCAG: {finding.get('wcag')}\n"
+        f"- Step (Tab press #): {step_num if step_num is not None else 'page-level check'}\n"
+        f"- Selector: `{selector}`\n"
+        f"- Visible text: {visible_text!r}\n"
+        f"- Accessible name: {acc_name!r}\n"
+        f"- Measured detail: {finding.get('detail')}\n"
+        f"- Scorer failing probability: {finding.get('scorer_fail_p')}\n"
+        f"- Reader notes: {reader.get('notes', '')}\n"
+    )
+    parts: list[Any] = []
+    if crop_png:
+        parts.append(types.Part.from_bytes(data=crop_png, mime_type="image/png"))
+    parts.append(prompt)
+    md, latency = generate_content(
+        config.TICKET_MODEL,
+        parts,
+        json_mode=False,
+        op="write_ticket",
+        call_log=call_log,
+    )
+    md = md.strip()
+    title = f"{finding.get('check', 'Accessibility issue')} (WCAG {finding.get('wcag', '')})"
+    for line in md.splitlines():
+        if line.startswith("# "):
+            title = line[2:].strip()
+            break
+    return {"title": title, "markdown": md, "latency_s": round(latency, 3)}
+
+

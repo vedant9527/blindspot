@@ -174,6 +174,7 @@ def _run_runner_case(
         seed=seed,
         use_gemini=use_gemini,
         record_video=False,
+        write_tickets=False,
     )
     if res.get("status") == "blocked":
         return {"status": "blocked", "reason": res.get("reason", ""), "duration_s": res.get("duration_s", 0.0)}

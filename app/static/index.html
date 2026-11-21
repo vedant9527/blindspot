@@ -3,28 +3,952 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Blindspot</title>
+  <title>Blindspot — Keyboard &amp; Screen-Reader Accessibility Agent</title>
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; max-width: 900px; margin: 0 auto; padding: 32px; line-height: 1.5; }
-    h1 { font-size: 2.4rem; margin-bottom: 0; }
-    .tag { font-size: 1.2rem; opacity: 0.8; }
-    .card { border: 2px solid #ccc; border-radius: 12px; padding: 20px; margin-top: 24px; }
-    a:focus-visible { outline: 3px solid #1a73e8; outline-offset: 2px; }
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --ink: #0f172a;
+      --muted: #475569;
+      --border: #cbd5e1;
+      --primary: #1d4ed8;
+      --primary-hover: #1e40af;
+      --danger: #b91c1c;
+      --danger-bg: #fef2f2;
+      --warn: #b45309;
+      --warn-bg: #fffbeb;
+      --ok: #15803d;
+      --ok-bg: #f0fdf4;
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 18px;
+      line-height: 1.45;
+      background: var(--bg);
+      color: var(--ink);
+    }
+    a { color: var(--primary); }
+    :focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+
+    header {
+      background: #0f172a;
+      color: #ffffff;
+      padding: 18px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .brand { display: flex; align-items: baseline; gap: 14px; }
+    .brand h1 { margin: 0; font-size: 2rem; letter-spacing: -0.02em; }
+    .brand span { font-size: 1rem; color: #cbd5e1; }
+    .tabs { display: flex; gap: 10px; align-items: center; }
+    .tab-btn {
+      background: #1e293b;
+      color: #e2e8f0;
+      border: 2px solid #334155;
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .tab-btn.active { background: #ffffff; color: #0f172a; border-color: #ffffff; }
+    .submit-link {
+      color: #93c5fd;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      margin-left: 8px;
+    }
+    .submit-link:hover { text-decoration: underline; }
+
+    main { max-width: 1480px; margin: 0 auto; padding: 22px 28px 48px; }
+    .hidden { display: none !important; }
+
+    /* Controls card */
+    .controls {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 22px;
+      margin-bottom: 20px;
+    }
+    .url-row {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr auto;
+      gap: 12px;
+      align-items: end;
+    }
+    label.field-label {
+      display: block;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    input[type="url"], select {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 1.1rem;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      background: #ffffff;
+      color: var(--ink);
+    }
+    #run-btn {
+      padding: 13px 28px;
+      font-size: 1.15rem;
+      font-weight: 800;
+      background: var(--primary);
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    #run-btn:hover:not(:disabled) { background: var(--primary-hover); }
+    #run-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .break-row {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .break-label {
+      font-weight: 800;
+      font-size: 1rem;
+      color: var(--danger);
+      margin-right: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .bug-btn {
+      padding: 9px 15px;
+      font-size: 1rem;
+      font-weight: 700;
+      border-radius: 999px;
+      border: 2px solid var(--border);
+      background: #f1f5f9;
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .bug-btn.selected {
+      background: var(--danger);
+      color: #ffffff;
+      border-color: var(--danger);
+    }
+    .bug-btn[data-bug=""].selected {
+      background: #0f172a;
+      border-color: #0f172a;
+    }
+
+    /* Big-number KPI row (one big number per panel) */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+    .kpi-card {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 22px;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .kpi-label { font-size: 1.1rem; font-weight: 700; color: var(--muted); }
+    .kpi-num { font-size: 3.1rem; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
+    .kpi-num.danger { color: var(--danger); }
+    .kpi-num.primary { color: var(--primary); }
+
+    /* Status strip */
+    .status-bar {
+      background: #eff6ff;
+      border: 2px solid #93c5fd;
+      border-radius: 12px;
+      padding: 12px 18px;
+      margin-bottom: 20px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .status-bar.blocked { background: var(--danger-bg); border-color: #fca5a5; color: var(--danger); }
+    .status-bar.done { background: var(--ok-bg); border-color: #86efac; color: #14532d; }
+
+    /* Main two-column workspace */
+    .workspace {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 20px;
+      align-items: start;
+      margin-bottom: 24px;
+    }
+    .panel {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+    }
+    .panel h2 {
+      margin: 0 0 14px;
+      font-size: 1.35rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .frame-box {
+      background: #0f172a;
+      border-radius: 10px;
+      overflow: hidden;
+      min-height: 360px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #334155;
+    }
+    #live-frame {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .frame-placeholder {
+      color: #cbd5e1;
+      font-size: 1.2rem;
+      padding: 32px;
+      text-align: center;
+    }
+    .step-caption {
+      margin-top: 12px;
+      padding: 12px 14px;
+      background: #f1f5f9;
+      border-radius: 10px;
+      font-size: 1.05rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      word-break: break-word;
+    }
+
+    /* Findings cards */
+    .findings-list { display: flex; flex-direction: column; gap: 16px; max-height: 680px; overflow-y: auto; }
+    .finding-card {
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      background: #ffffff;
+    }
+    .finding-card.confirmed { border-color: var(--danger); background: var(--danger-bg); }
+    .finding-card.needs_human { border-color: #f59e0b; background: var(--warn-bg); }
+    .badge-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+    .badge {
+      display: inline-block;
+      padding: 4px 11px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    .badge.confirmed { background: var(--danger); color: #ffffff; }
+    .badge.needs_human { background: var(--warn); color: #ffffff; }
+    .badge.wcag { background: #0f172a; color: #ffffff; }
+    .badge.step { background: #e2e8f0; color: #0f172a; }
+    .crop-wrap {
+      background: #ffffff;
+      border: 2px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 8px;
+      margin: 10px 0;
+      text-align: center;
+    }
+    .crop-img {
+      width: 100%;
+      max-height: 220px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto;
+    }
+    .finding-title { font-size: 1.2rem; font-weight: 800; margin: 4px 0; }
+    .finding-detail { font-size: 1rem; color: #1e293b; margin: 4px 0 10px; }
+    .finding-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .ticket-btn {
+      padding: 10px 18px;
+      font-size: 1rem;
+      font-weight: 800;
+      background: #0f172a;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .ticket-btn:hover:not(:disabled) { background: var(--primary); }
+    .ticket-btn:disabled { opacity: 0.5; cursor: wait; }
+
+    /* Side-by-side Blindspot vs axe-core */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .compare-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+    .compare-item {
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #f8fafc;
+      font-size: 1.05rem;
+    }
+    .axe-banner {
+      padding: 12px 14px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+    .axe-banner.missed { background: #fef2f2; border: 2px solid #fca5a5; color: var(--danger); }
+    .axe-banner.caught { background: #f0fdf4; border: 2px solid #86efac; color: var(--ok); }
+
+    /* Proof tab */
+    .proof-box {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 26px 30px;
+    }
+    .hash-pill {
+      display: inline-block;
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.95rem;
+      word-break: break-all;
+      margin-bottom: 16px;
+    }
+    table.proof-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 1.05rem;
+    }
+    table.proof-table th, table.proof-table td {
+      border: 1px solid var(--border);
+      padding: 12px 14px;
+      text-align: left;
+    }
+    table.proof-table th { background: #0f172a; color: #ffffff; font-weight: 800; }
+    table.proof-table tr:nth-child(even) { background: #f8fafc; }
+
+    /* Ticket modal */
+    dialog#ticket-modal {
+      width: min(920px, 94vw);
+      max-height: 88vh;
+      border: 3px solid #0f172a;
+      border-radius: 16px;
+      padding: 0;
+      box-shadow: 0 24px 64px rgba(15, 23, 42, 0.45);
+    }
+    dialog::backdrop { background: rgba(15, 23, 42, 0.65); }
+    .modal-head {
+      background: #0f172a;
+      color: #ffffff;
+      padding: 16px 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .modal-head h3 { margin: 0; font-size: 1.3rem; }
+    .modal-body { padding: 22px 26px; overflow-y: auto; max-height: 70vh; font-size: 1.08rem; }
+    .modal-body pre {
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 14px 16px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-size: 0.98rem;
+    }
+    .modal-body code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .modal-actions {
+      padding: 14px 22px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+    .close-btn {
+      background: #ffffff;
+      color: #0f172a;
+      border: 2px solid #0f172a;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    @media (max-width: 1020px) {
+      .url-row, .workspace, .compare-grid, .kpi-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
-  <main>
-    <h1>Blindspot</h1>
-    <p class="tag">Uses a website the way a keyboard or screen-reader user does, and proves where they get stuck.</p>
-    <div class="card">
-      <p><strong>Status:</strong> setup complete. The live run screen arrives in Phase 6.</p>
-      <p>Websites submitted for testing: <strong id="count">0</strong> &middot; <a href="/submit">Submit a website</a></p>
+  <header>
+    <div class="brand">
+      <h1>Blindspot</h1>
+      <span>HHS Section 504 / WCAG 2.1 AA · Keyboard &amp; Screen-Reader Audit Agent</span>
     </div>
+    <nav class="tabs" aria-label="Views">
+      <button type="button" class="tab-btn active" id="tab-live">Live Audit</button>
+      <button type="button" class="tab-btn" id="tab-proof">Proof</button>
+      <a class="submit-link" href="/submit">Submit URL (<span id="sub-count">0</span>)</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- LIVE AUDIT VIEW -->
+    <section id="view-live">
+      <div class="controls">
+        <div class="url-row">
+          <div>
+            <label class="field-label" for="url-input">Target Public Healthcare URL</label>
+            <input type="url" id="url-input" placeholder="https://nyulangone.org/doctors" value="https://nyulangone.org/doctors">
+          </div>
+          <div>
+            <label class="field-label" for="vetted-select">Vetted Pages (3 Stable Demo Pages First)</label>
+            <select id="vetted-select" aria-label="Choose a vetted public healthcare page">
+              <option value="">Loading vetted pages...</option>
+            </select>
+          </div>
+          <button type="button" id="run-btn">Run Audit</button>
+        </div>
+
+        <div class="break-row" role="group" aria-label="Break it bug injector">
+          <span class="break-label">Break it:</span>
+          <button type="button" class="bug-btn selected" data-bug="">None (real site)</button>
+          <button type="button" class="bug-btn" data-bug="hide_focus">Hide focus</button>
+          <button type="button" class="bug-btn" data-bug="keyboard_trap">Keyboard trap</button>
+          <button type="button" class="bug-btn" data-bug="covering_banner">Covering banner</button>
+          <button type="button" class="bug-btn" data-bug="positive_tabindex">Positive tabindex</button>
+          <button type="button" class="bug-btn" data-bug="label_mismatch">Label mismatch</button>
+          <button type="button" class="bug-btn" data-bug="random">Random</button>
+        </div>
+      </div>
+
+      <!-- One big number per panel -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <span class="kpi-label">Blindspot Confirmed</span>
+          <span class="kpi-num danger" id="kpi-confirmed">0</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">axe-core Violations</span>
+          <span class="kpi-num" id="kpi-axe">0</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Tab Steps</span>
+          <span class="kpi-num primary" id="kpi-steps">0 / 40</span>
+        </div>
+      </div>
+
+      <div class="status-bar" id="status-bar" role="status" aria-live="polite">
+        <span id="status-text">Ready. Pick a healthcare page (and optional "Break it" bug) and click Run Audit.</span>
+        <span id="status-meta"></span>
+      </div>
+
+      <div class="workspace">
+        <div class="panel">
+          <h2>
+            <span>Live Keyboard Frame</span>
+            <span id="frame-step-tag" class="badge step">Idle</span>
+          </h2>
+          <div class="frame-box">
+            <img id="live-frame" class="hidden" alt="Latest keyboard navigation frame">
+            <div id="frame-placeholder" class="frame-placeholder">
+              Live browser screenshots stream here on every Tab press.
+            </div>
+          </div>
+          <div class="step-caption" id="step-caption">Waiting to start...</div>
+        </div>
+
+        <div class="panel">
+          <h2>
+            <span>Findings &amp; Evidence Tickets</span>
+            <span id="findings-summary" class="badge step">0 findings</span>
+          </h2>
+          <div class="findings-list" id="findings-list">
+            <div style="color: var(--muted); padding: 16px 4px;">
+              Confirmed findings appear here with zoomed red-box crops and Carbon Markdown tickets.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Side-by-side Blindspot vs axe-core -->
+      <div class="compare-grid">
+        <div class="panel">
+          <h2>Blindspot (Keyboard + Vision + Decisions)</h2>
+          <ul class="compare-list" id="blindspot-compare">
+            <li class="compare-item" style="color: var(--muted);">Run an audit to compare Blindspot with axe-core on the same page.</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <h2>axe-core Baseline (Same Page)</h2>
+          <div id="axe-callout" class="axe-banner hidden"></div>
+          <ul class="compare-list" id="axe-compare">
+            <li class="compare-item" style="color: var(--muted);">axe-core violations will appear here at the end of the run.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROOF TAB -->
+    <section id="view-proof" class="hidden">
+      <div class="proof-box">
+        <h2 style="margin-top: 0; font-size: 1.8rem;">Held-Out Evaluation Proof</h2>
+        <div id="proof-hash" class="hash-pill hidden"></div>
+        <div id="proof-content" style="font-size: 1.2rem;">Loading evaluation results...</div>
+      </div>
+    </section>
   </main>
+
+  <!-- TICKET MODAL -->
+  <dialog id="ticket-modal" aria-labelledby="modal-title">
+    <div class="modal-head">
+      <h3 id="modal-title">Accessibility Ticket</h3>
+      <button type="button" class="close-btn" id="modal-close">Close</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-actions">
+      <a id="modal-raw-link" href="#" target="_blank" rel="noopener" style="margin-right: auto; font-weight: 700;">Open raw .md</a>
+      <button type="button" class="close-btn" id="modal-copy">Copy Markdown</button>
+    </div>
+  </dialog>
+
   <script>
-    fetch('/api/submissions/count').then(r => r.json()).then(d => {
-      document.getElementById('count').textContent = d.count;
-    }).catch(() => {});
+    const state = {
+      selectedBug: "",
+      es: null,
+      findings: [],
+      ticketsByKey: {},
+      manifest: null,
+      activeTicketMd: "",
+    };
+
+    const $ = id => document.getElementById(id);
+
+    function esc(s) {
+      return String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    }
+
+    // Tabs
+    function setTab(which) {
+      const live = which === "live";
+      $("view-live").classList.toggle("hidden", !live);
+      $("view-proof").classList.toggle("hidden", live);
+      $("tab-live").classList.toggle("active", live);
+      $("tab-proof").classList.toggle("active", !live);
+      if (!live) loadProof();
+    }
+    $("tab-live").addEventListener("click", () => setTab("live"));
+    $("tab-proof").addEventListener("click", () => setTab("proof"));
+
+    // Break-it bug buttons
+    document.querySelectorAll(".bug-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".bug-btn").forEach(b => b.classList.remove("selected"));
+        btn.classList.add("selected");
+        state.selectedBug = btn.dataset.bug || "";
+      });
+    });
+
+    // Load vetted pages + submission count
+    async function initMeta() {
+      try {
+        const res = await fetch("/api/vetted");
+        const data = await res.json();
+        const sel = $("vetted-select");
+        sel.innerHTML = "";
+        const featured = new Set(data.featured || []);
+        const g1 = document.createElement("optgroup");
+        g1.label = "Recommended Stable Demo Pages";
+        const g2 = document.createElement("optgroup");
+        g2.label = "All Vetted Public Healthcare Pages";
+        (data.urls || []).forEach(u => {
+          const opt = document.createElement("option");
+          opt.value = u;
+          opt.textContent = u.replace(/^https?:\/\//, "");
+          if (featured.has(u)) g1.appendChild(opt);
+          else g2.appendChild(opt);
+        });
+        if (g1.children.length) sel.appendChild(g1);
+        if (g2.children.length) sel.appendChild(g2);
+        if (data.urls && data.urls.length) {
+          sel.value = data.urls[0];
+          $("url-input").value = data.urls[0];
+        }
+        sel.addEventListener("change", () => {
+          if (sel.value) $("url-input").value = sel.value;
+        });
+      } catch (e) {
+        $("vetted-select").innerHTML = '<option value="">Could not load vetted list</option>';
+      }
+      try {
+        const sc = await fetch("/api/submissions/count").then(r => r.json());
+        $("sub-count").textContent = sc.count ?? 0;
+      } catch (e) {}
+    }
+
+    // Minimal Markdown -> HTML renderer for Carbon tickets & Proof table
+    function renderMarkdown(md) {
+      const lines = String(md || "").split("\n");
+      let html = "";
+      let inCode = false;
+      let inList = false;
+      let inTable = false;
+      let tableHeadDone = false;
+
+      const inline = txt => esc(txt)
+        .replace(/`([^`]+)`/g, "<code>$1</code>")
+        .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+        .replace(/\*([^*]+)\*/g, "<em>$1</em>");
+
+      for (const raw of lines) {
+        if (raw.trim().startsWith("```")) {
+          if (inList) { html += "</ul>"; inList = false; }
+          if (inTable) { html += "</tbody></table>"; inTable = false; tableHeadDone = false; }
+          if (!inCode) { html += "<pre><code>"; inCode = true; }
+          else { html += "</code></pre>"; inCode = false; }
+          continue;
+        }
+        if (inCode) { html += esc(raw) + "\n"; continue; }
+
+        const line = raw.trim();
+        if (line.startsWith("|") && line.endsWith("|")) {
+          if (inList) { html += "</ul>"; inList = false; }
+          const cells = line.slice(1, -1).split("|").map(c => c.trim());
+          if (cells.every(c => /^:?-{2,}:?$/.test(c))) {
+            tableHeadDone = true;
+            continue;
+          }
+          if (!inTable) {
+            html += '<table class="proof-table"><thead><tr>' + cells.map(c => `<th>${inline(c)}</th>`).join("") + "</tr></thead><tbody>";
+            inTable = true;
+          } else {
+            html += "<tr>" + cells.map(c => `<td>${inline(c)}</td>`).join("") + "</tr>";
+          }
+          continue;
+        } else if (inTable) {
+          html += "</tbody></table>";
+          inTable = false;
+          tableHeadDone = false;
+        }
+
+        if (!line) {
+          if (inList) { html += "</ul>"; inList = false; }
+          continue;
+        }
+        if (line.startsWith("# ")) { html += `<h1>${inline(line.slice(2))}</h1>`; continue; }
+        if (line.startsWith("## ")) { html += `<h2>${inline(line.slice(3))}</h2>`; continue; }
+        if (line.startsWith("### ")) { html += `<h3>${inline(line.slice(4))}</h3>`; continue; }
+        if (line === "---") { html += "<hr>"; continue; }
+        if (/^[-*]\s+/.test(line) || /^\d+\.\s+/.test(line)) {
+          if (!inList) { html += "<ul>"; inList = true; }
+          html += `<li>${inline(line.replace(/^([-*]|\d+\.)\s+/, ""))}</li>`;
+          continue;
+        }
+        if (inList) { html += "</ul>"; inList = false; }
+        html += `<p>${inline(line)}</p>`;
+      }
+      if (inCode) html += "</code></pre>";
+      if (inList) html += "</ul>";
+      if (inTable) html += "</tbody></table>";
+      return html;
+    }
+
+    async function loadProof() {
+      try {
+        const d = await fetch("/api/proof").then(r => r.json());
+        if (d.manifest_sha256) {
+          $("proof-hash").textContent = "Held-out manifest SHA-256: " + d.manifest_sha256;
+          $("proof-hash").classList.remove("hidden");
+        } else {
+          $("proof-hash").classList.add("hidden");
+        }
+        if (d.ready && d.markdown) {
+          $("proof-content").innerHTML = renderMarkdown(d.markdown);
+        } else {
+          $("proof-content").innerHTML = `<p style="font-size:1.35rem; color: var(--muted); font-weight:700;">${esc(d.message || "Results after the held-out run.")}</p>`;
+        }
+      } catch (e) {
+        $("proof-content").textContent = "Could not load evaluation results.";
+      }
+    }
+
+    function findingKey(f) {
+      const ev = f.evidence || {};
+      return `${f.check}::${ev.selector || f.selector || ""}::${ev.step ?? f.step ?? ""}`;
+    }
+
+    function openTicketModal(ticket) {
+      state.activeTicketMd = ticket.markdown || "";
+      $("modal-title").textContent = ticket.title || "Accessibility Ticket";
+      let bodyHtml = "";
+      if (ticket.crop_url) {
+        bodyHtml += `<div class="crop-wrap"><img class="crop-img" src="${esc(ticket.crop_url)}" alt="Evidence crop with red marker box"></div>`;
+      }
+      bodyHtml += renderMarkdown(ticket.markdown || "");
+      $("modal-body").innerHTML = bodyHtml;
+      $("modal-raw-link").href = ticket.ticket_url || "#";
+      $("ticket-modal").showModal();
+    }
+
+    $("modal-close").addEventListener("click", () => $("ticket-modal").close());
+    $("modal-copy").addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(state.activeTicketMd);
+        $("modal-copy").textContent = "Copied!";
+        setTimeout(() => ($("modal-copy").textContent = "Copy Markdown"), 1500);
+      } catch (e) {}
+    });
+
+    function renderFindings() {
+      const list = $("findings-list");
+      const cmp = $("blindspot-compare");
+      const confirmed = state.findings.filter(f => f.status === "confirmed");
+      $("kpi-confirmed").textContent = String(confirmed.length);
+      $("findings-summary").textContent = `${confirmed.length} confirmed · ${state.findings.length - confirmed.length} needs human`;
+
+      if (!state.findings.length) {
+        list.innerHTML = '<div style="color: var(--muted); padding: 14px 4px;">No findings yet.</div>';
+        cmp.innerHTML = '<li class="compare-item" style="color: var(--muted);">0 confirmed findings.</li>';
+        return;
+      }
+
+      list.innerHTML = "";
+      state.findings.forEach(f => {
+        const ev = f.evidence || {};
+        const key = findingKey(f);
+        const ticket = state.ticketsByKey[key];
+        const card = document.createElement("article");
+        card.className = `finding-card ${f.status}`;
+        const label = f.status === "confirmed" ? "Confirmed" : "Needs Human";
+        const scoreTxt = f.scorer_fail_p != null ? `Scorer p=${Number(f.scorer_fail_p).toFixed(2)}` : "Code proven";
+        card.innerHTML = `
+          <div class="badge-row">
+            <span class="badge ${esc(f.status)}">${label}</span>
+            <span class="badge wcag">WCAG ${esc(f.wcag)}</span>
+            ${ev.step != null ? `<span class="badge step">Step ${esc(ev.step)}</span>` : ""}
+            <span class="badge step">${esc(scoreTxt)}</span>
+          </div>
+          <div class="finding-title">${esc(f.check.replace(/_/g, " "))}</div>
+          <div class="finding-detail">${esc(f.detail)}</div>
+          ${f.crop_url ? `<div class="crop-wrap"><img class="crop-img" src="${esc(f.crop_url)}" alt="Zoomed evidence crop for ${esc(f.check)}"></div>` : ""}
+          <div class="finding-actions">
+            ${f.status === "confirmed"
+              ? `<button type="button" class="ticket-btn" ${ticket ? "" : "disabled"}>${ticket ? "View Ticket" : "Writing Carbon Ticket..."}</button>`
+              : `<span style="font-size:0.95rem; color: var(--warn); font-weight:700;">Flagged for human review (not confirmed)</span>`}
+          </div>
+        `;
+        if (f.status === "confirmed" && ticket) {
+          card.querySelector(".ticket-btn").addEventListener("click", () => openTicketModal(ticket));
+        }
+        list.appendChild(card);
+      });
+
+      if (!confirmed.length) {
+        cmp.innerHTML = '<li class="compare-item" style="color: var(--ok); font-weight:700;">0 confirmed keyboard/focus failures.</li>';
+      } else {
+        cmp.innerHTML = "";
+        confirmed.forEach(f => {
+          const ev = f.evidence || {};
+          const li = document.createElement("li");
+          li.className = "compare-item";
+          li.innerHTML = `<strong>${esc(f.check)}</strong> (WCAG ${esc(f.wcag)}) · Step ${esc(ev.step ?? "page")} · <code>${esc((ev.selector || "").slice(0, 60))}</code>`;
+          cmp.appendChild(li);
+        });
+      }
+    }
+
+    function renderAxe(axe) {
+      $("kpi-axe").textContent = String(axe.violation_count ?? 0);
+      const list = $("axe-compare");
+      const callout = $("axe-callout");
+      const injectedBug = state.manifest ? state.manifest.bug_type : (state.selectedBug || null);
+      if (injectedBug && injectedBug !== "random") {
+        const caught = (axe.mapped_bugs || []).includes(injectedBug);
+        callout.classList.remove("hidden", "missed", "caught");
+        callout.classList.add(caught ? "caught" : "missed");
+        callout.textContent = caught
+          ? `axe-core CAUGHT injected bug: ${injectedBug}`
+          : `axe-core MISSED injected bug: ${injectedBug} (no static rule for runtime focus/keyboard behavior)`;
+      } else {
+        callout.classList.add("hidden");
+      }
+
+      const viols = axe.violations || [];
+      if (!viols.length) {
+        list.innerHTML = '<li class="compare-item">0 axe-core violations reported on this page.</li>';
+        return;
+      }
+      list.innerHTML = "";
+      viols.forEach(v => {
+        const li = document.createElement("li");
+        li.className = "compare-item";
+        li.innerHTML = `<strong>${esc(v.id)}</strong> (${esc(v.impact || "unknown")}, ${esc(v.nodes_count)} node${v.nodes_count === 1 ? "" : "s"})${v.mapped_bug ? ` · <span class="badge wcag">${esc(v.mapped_bug)}</span>` : ""}<br><span style="color:var(--muted)">${esc(v.help)}</span>`;
+        list.appendChild(li);
+      });
+    }
+
+    function setStatus(text, kind = "", meta = "") {
+      const bar = $("status-bar");
+      bar.className = "status-bar" + (kind ? ` ${kind}` : "");
+      $("status-text").textContent = text;
+      if (meta !== null) $("status-meta").textContent = meta;
+    }
+
+    async function startAudit() {
+      const url = $("url-input").value.trim();
+      if (!url) return;
+      if (state.es) { state.es.close(); state.es = null; }
+
+      state.findings = [];
+      state.ticketsByKey = {};
+      state.manifest = null;
+      $("kpi-confirmed").textContent = "0";
+      $("kpi-axe").textContent = "0";
+      $("kpi-steps").textContent = "0 / 40";
+      $("frame-step-tag").textContent = "Starting...";
+      $("step-caption").textContent = "Launching browser & running preflight...";
+      $("live-frame").classList.add("hidden");
+      $("frame-placeholder").classList.remove("hidden");
+      $("axe-callout").classList.add("hidden");
+      $("axe-compare").innerHTML = '<li class="compare-item" style="color:var(--muted);">Waiting for axe-core...</li>';
+      renderFindings();
+
+      $("run-btn").disabled = true;
+      setStatus(`Starting audit on ${url}...`, "", state.selectedBug ? `Inject: ${state.selectedBug}` : "Live site");
+
+      try {
+        const body = { url, inject: state.selectedBug || null, seed: null, headless: false, use_gemini: true };
+        const res = await fetch("/api/run", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          setStatus(`Could not start: ${data.detail || res.statusText}`, "blocked", "");
+          $("run-btn").disabled = false;
+          return;
+        }
+        const runId = data.run_id;
+        const es = new EventSource(`/api/run/${encodeURIComponent(runId)}/events`);
+        state.es = es;
+
+        es.addEventListener("preflight", e => {
+          const d = JSON.parse(e.data);
+          if (d.status !== "ok") {
+            setStatus(`Blocked in preflight: ${d.reason}. Pick another page from the vetted list.`, "blocked", "");
+          } else {
+            const ps = d.page_state ? ` · page_state=${d.page_state.choice}` : "";
+            setStatus(`Preflight OK (${d.tabbable} focusable, banner: ${d.banner_action}${ps}). Tabbing through page...`, "", state.selectedBug ? `Inject: ${state.selectedBug}` : "Live site");
+          }
+        });
+
+        es.addEventListener("step", e => {
+          const s = JSON.parse(e.data);
+          $("kpi-steps").textContent = `${s.index} / 40`;
+          $("frame-step-tag").textContent = `Step ${s.index}`;
+          if (s.full_screenshot) {
+            $("live-frame").src = s.full_screenshot + "?t=" + Date.now();
+            $("live-frame").classList.remove("hidden");
+            $("frame-placeholder").classList.add("hidden");
+          }
+          if (s.body) {
+            $("step-caption").textContent = `Step ${s.index}: focus on <body>`;
+          } else {
+            $("step-caption").textContent = `Step ${s.index}: <${s.tag}> role=${s.role || "none"} · name="${s.accessible_name || ""}" · ${s.selector || ""}`;
+          }
+        });
+
+        es.addEventListener("finding", e => {
+          const f = JSON.parse(e.data);
+          state.findings.push(f);
+          renderFindings();
+        });
+
+        es.addEventListener("axe", e => {
+          const axe = JSON.parse(e.data);
+          renderAxe(axe);
+        });
+
+        es.addEventListener("ticket", e => {
+          const t = JSON.parse(e.data);
+          const key = `${t.check}::${t.selector || ""}::${t.step ?? ""}`;
+          state.ticketsByKey[key] = t;
+          renderFindings();
+        });
+
+        es.addEventListener("done", e => {
+          const d = JSON.parse(e.data);
+          if (d.manifest) state.manifest = d.manifest;
+          if (d.status === "blocked") {
+            setStatus(`Stopped: ${d.reason}`, "blocked", `${d.duration_s}s`);
+          } else {
+            const injTxt = d.manifest ? ` · Injected ${d.manifest.bug_type} on ${d.manifest.target_selector}` : "";
+            setStatus(
+              `Done in ${d.duration_s}s — ${d.confirmed} confirmed, ${d.needs_human} needs human, ${d.tickets || 0} ticket(s), ${d.axe_violations || 0} axe violations.${injTxt}`,
+              "done",
+              `${d.gemini_usage ? d.gemini_usage.calls : 0} Gemini calls`
+            );
+            // Refresh axe banner with final resolved manifest (e.g. for "random")
+            if (d.manifest && $("axe-compare").children.length) {
+              fetch(`/api/run/${encodeURIComponent(d.run_id)}`).then(r => r.json()).then(full => {
+                if (full.axe) renderAxe(full.axe);
+              }).catch(() => {});
+            }
+          }
+          $("run-btn").disabled = false;
+          es.close();
+          state.es = null;
+        });
+
+        es.addEventListener("error", e => {
+          if (e.data) {
+            const d = JSON.parse(e.data);
+            setStatus(`Run error: ${d.message}`, "blocked", "");
+          }
+          $("run-btn").disabled = false;
+          es.close();
+          state.es = null;
+        });
+      } catch (err) {
+        setStatus(`Request failed: ${err}`, "blocked", "");
+        $("run-btn").disabled = false;
+      }
+    }
+
+    $("run-btn").addEventListener("click", startAudit);
+    initMeta();
   </script>
 </body>
 </html>

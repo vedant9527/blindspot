@@ -462,6 +462,7 @@ def run_audit(
     seed: int | None = None,
     use_gemini: bool = True,
     record_video: bool = True,
+    write_tickets: bool = True,
     emit: Callable[[str, dict[str, Any]], None] | None = None,
 ) -> dict[str, Any]:
     """Full Phase 3 run: preflight (+ warm-up), keyboard loop + parallel Gemini scoring, decision rule.
@@ -478,6 +479,7 @@ def run_audit(
     from blindspot.gemini import score_page_state, summarize_calls
     from blindspot.injector import inject as inject_bug, write_manifest
     from blindspot.preflight import dismiss_banner, run_preflight
+    from blindspot.tickets import generate_tickets
 
     host = urlparse(url).netloc.replace("www.", "") or Path(urlparse(url).path).stem or "local"
     run_id = run_id or f"{datetime.now():%Y%m%d-%H%M%S}-{host}"
@@ -686,6 +688,22 @@ def run_audit(
 
     _emit("axe", {"run_id": run_id, **axe_res})
 
+    tickets: list[dict[str, Any]] = []
+    if write_tickets and decisions["confirmed"]:
+        tickets = generate_tickets(
+            run,
+            decisions["confirmed"],
+            out_dir,
+            use_gemini=use_gemini,
+            call_log=call_log,
+            on_ticket=lambda t: _emit("ticket", t),
+        )
+        # Recompute gemini_summary so Carbon ticket tokens/calls are included
+        gemini_summary = summarize_calls(call_log)
+        run["gemini_usage"] = gemini_summary
+        total_duration = round(time.perf_counter() - t_run0, 2)
+        run["total_duration_s"] = total_duration
+
     for c in call_log:
         _log(
             f"GEMINI op={c['op']} model={c['model']} ok={c['ok']} "
@@ -696,7 +714,7 @@ def run_audit(
     _log(
         f"Done in {total_duration}s: steps={len(run['steps'])} "
         f"confirmed={len(decisions['confirmed'])} needs_human={len(decisions['needs_human'])} "
-        f"dropped={len(decisions['dropped'])} gemini_calls={gemini_summary['calls']} "
+        f"dropped={len(decisions['dropped'])} tickets={len(tickets)} gemini_calls={gemini_summary['calls']} "
         f"tokens={gemini_summary['total_tokens']}"
     )
 
@@ -707,6 +725,9 @@ def run_audit(
         "needs_human": decisions["needs_human"],
         "dropped": decisions["dropped"],
         "findings": decisions["findings"],
+        "tickets": tickets,
+        "axe": axe_res,
+        "manifest": manifest,
         "gemini_usage": gemini_summary,
         "duration_s": total_duration,
     }
@@ -724,6 +745,7 @@ def run_audit(
         "confirmed": len(decisions["confirmed"]),
         "needs_human": len(decisions["needs_human"]),
         "dropped": len(decisions["dropped"]),
+        "tickets": len(tickets),
         "axe_violations": axe_res["violation_count"],
         "manifest": manifest,
         "duration_s": total_duration,
@@ -736,6 +758,7 @@ def run_audit(
         "run": run,
         "checks": raw_checks,
         "decisions": decisions,
+        "tickets": tickets,
         "axe": axe_res,
         "manifest": manifest,
         "gemini_usage": gemini_summary,

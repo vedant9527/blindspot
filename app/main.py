@@ -29,6 +29,15 @@ STATIC = ROOT / "app" / "static"
 RUNS_DIR = ROOT / "runs"
 SUBMISSIONS = ROOT / "eval" / "submissions.jsonl"
 VETTED_OK = ROOT / "eval" / "pages_ok.txt"
+RESULTS_MD = ROOT / "eval" / "results" / "results.md"
+HELDOUT_MANIFEST = ROOT / "eval" / "heldout_manifest.json"
+
+# Three most stable live-demo pages from HANDOFF.md appear first in the vetted dropdown.
+STABLE_DEMO_PAGES = [
+    "https://nyulangone.org/doctors",
+    "https://www.va.gov/find-locations/",
+    "https://medlineplus.gov/",
+]
 
 RUNS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -163,12 +172,42 @@ def submissions_count() -> dict[str, int]:
 
 
 @app.get("/api/vetted")
-def vetted_pages() -> dict[str, list[str]]:
-    """Return vetted public healthcare URLs from eval/pages_ok.txt."""
-    if not VETTED_OK.exists():
-        return {"urls": []}
-    urls = [ln.strip() for ln in VETTED_OK.read_text(encoding="utf-8").splitlines() if ln.strip() and not ln.startswith("#")]
-    return {"urls": urls}
+def vetted_pages() -> dict[str, Any]:
+    """Return vetted public healthcare URLs: the 3 stable demo pages first, then eval/pages_ok.txt."""
+    file_urls: list[str] = []
+    if VETTED_OK.exists():
+        file_urls = [
+            ln.strip()
+            for ln in VETTED_OK.read_text(encoding="utf-8").splitlines()
+            if ln.strip() and not ln.startswith("#")
+        ]
+    ordered: list[str] = []
+    seen: set[str] = set()
+    for u in STABLE_DEMO_PAGES + file_urls:
+        if u not in seen:
+            seen.add(u)
+            ordered.append(u)
+    return {"urls": ordered, "featured": STABLE_DEMO_PAGES}
+
+
+@app.get("/api/proof")
+def proof_results() -> dict[str, Any]:
+    """Return eval/results/results.md and held-out manifest SHA-256 for the Proof tab."""
+    from blindspot.injector import manifest_sha256
+
+    m_hash = manifest_sha256(HELDOUT_MANIFEST) if HELDOUT_MANIFEST.exists() else None
+    if RESULTS_MD.exists():
+        return {
+            "ready": True,
+            "markdown": RESULTS_MD.read_text(encoding="utf-8"),
+            "manifest_sha256": m_hash,
+        }
+    return {
+        "ready": False,
+        "markdown": "",
+        "message": "Results after the held-out run.",
+        "manifest_sha256": m_hash,
+    }
 
 
 @app.post("/api/run")

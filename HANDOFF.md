@@ -2,7 +2,7 @@
 
 Read AGENTS.md first. This file says where the build stands.
 
-**Status (Nov 21, ~13:49, Google Antigravity):** 1:30 Gate passed; Phase 5 dev-set run & fixes done (`blindspot` 10/10 vs `axe` 4/10 and `single_gemini` 0/10). Waiting on the 2:00 PM `"freeze"` signal to freeze `config.py` and build `eval/heldout_manifest.json` + SHA-256.
+**Status (Nov 21, ~14:15, Google Antigravity):** Phases 0–6 done and verified in a live browser demo (`uvicorn` running on `:8000`, `/submit` verified HTTP 200 with 15 stranger URLs). Ready for the ~2:40 PM `"freeze"` signal (do not edit `config.py` or `eval/submissions.jsonl`).
 
 ## Setup and run (exact commands)
 
@@ -11,7 +11,7 @@ cd ~/blindspot
 source .venv/bin/activate              # Python 3.12; create with: python3 -m venv .venv
 pip install -r requirements.txt
 playwright install ffmpeg              # screen recordings (already installed on this laptop)
-pytest -q                              # 45 tests, ~118 s, headless Chrome
+pytest -q                              # 49 tests, ~125 s, headless Chrome
 uvicorn app.main:app --host 0.0.0.0 --port 8000     # app + run API + SSE + stranger form at /submit
 ipconfig getifaddr en0                 # laptop IP; regenerate eval/submit_qr.png if it changed
 python -m blindspot.runner --url https://medlineplus.gov/ --score --inject hide_focus --seed 101
@@ -153,6 +153,16 @@ API quirks found so far: the first Decisions API call is ~3 s (cold), later ones
   - `single_gemini` (`gemini-4-argon` 1 screenshot): **0/10**; 13.1s median, \$0.0020/page.
 - Security fixes in `app/main.py` (`tests/test_app.py`): single-run HTTP 409 guard and SSRF/private-IP/localhost/`.local`/`file://` rejection with DNS resolution. `pytest -q`: **45 passed**.
 
+## Phase 6: Carbon tickets & projector-ready one-page app (done, Antigravity, ~14:15)
+
+- `blindspot/gemini.py`: added `write_ticket(finding, url, crop_png, crop_rel_path)` using `gemini-4-carbon` to generate Markdown tickets with title, WCAG criterion & level, severity, steps to reproduce, patient experience, evidence crop path, and a CSS/HTML fix snippet.
+- `blindspot/tickets.py`: `save_evidence_crop` saves `runs/<id>/tickets/<n>_evidence.png` (3 px red box around the element rect); `generate_tickets` writes `runs/<id>/tickets/<n>.md` in parallel (Carbon for top confirmed findings with deterministic Markdown fallback) and streams `ticket` SSE events.
+- `blindspot/runner.py`: wired `generate_tickets` into `run_audit` (`write_tickets=True` by default, `False` in `eval/harness.py` batch loops).
+- `app/main.py`: `/api/vetted` orders the 3 stable demo pages (`nyulangone.org/doctors`, `va.gov/find-locations/`, `medlineplus.gov/`) first, then the rest of `eval/pages_ok.txt`; added `GET /api/proof` returning `eval/results/results.md` + held-out manifest SHA-256 (or `"Results after the held-out run."` until Phase 8).
+- `app/static/index.html`: projector-ready plain HTML + vanilla JS app with URL input, vetted dropdown, Break-it buttons (5 bugs + Random), 3 big-number KPI panels, live streaming viewport frame, zoomed red-box finding cards with "View Ticket" modal (rendered Markdown + Copy + raw `.md` link), side-by-side Blindspot vs axe-core comparison, and Proof tab.
+- Verified live in browser against `http://127.0.0.1:8000/` (`medlineplus.gov` + `hide_focus`): completed in **50.87s**, **4 confirmed** (`Missing keyboard focus indicator on "What's New" header navigation link` written by Carbon with red-box crop + CSS fix), **2 axe violations** with explicit `"axe-core MISSED injected bug: hide_focus"` callout, Proof tab shows `"Results after the held-out run."`, `/submit` HTTP 200.
+- Tests: `tests/test_tickets.py` added; `pytest -q`: **49 passed**.
+
 ## Next
 
-At 2:00 PM `"freeze"`: freeze `blindspot/config.py`, run `python eval/harness.py --build-heldout-manifest --headed` (from `eval/submissions.jsonl`), record the SHA-256, then proceed to Phase 6 (`tickets.py` with Carbon + `app/static/index.html`).
+At ~2:40 PM `"freeze"`: freeze `blindspot/config.py`, build `eval/heldout_manifest.json` + SHA-256 from `eval/submissions.jsonl`, then Phase 6/7 gate (Managed Agent replay `replay.py` + `managed_agent.py`) and Phase 8 held-out evaluation run.
