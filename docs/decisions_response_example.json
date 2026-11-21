@@ -1,0 +1,92 @@
+{
+  "latency_s": 2.920025750001514,
+  "questions": {
+    "page_state": {
+      "type": "choice",
+      "instructions": "What kind of page is shown in this screenshot?",
+      "criteria": {
+        "normal": "A normal, usable web page.",
+        "bot_check": "A bot check or CAPTCHA, such as 'verify you are human'.",
+        "login_wall": "A login or sign-in page blocking the content.",
+        "error_page": "An error page, such as access denied or not found.",
+        "cookie_banner": "A cookie or consent banner covering most of the page."
+      }
+    },
+    "has_visible_focus": {
+      "type": "noul",
+      "instructions": "Does any element on the page show a visible keyboard focus indicator, such as an outline or highlight ring?"
+    },
+    "has_cookie_banner": {
+      "type": "noul",
+      "instructions": "Is a cookie or consent banner visible?"
+    },
+    "has_main_navigation": {
+      "type": "noul",
+      "instructions": "Is a main navigation menu visible?"
+    },
+    "has_search_box": {
+      "type": "noul",
+      "instructions": "Is a search box visible?"
+    },
+    "has_sticky_header": {
+      "type": "noul",
+      "instructions": "Does the page appear to have a header or banner fixed to the top of the screen?"
+    }
+  },
+  "response": {
+    "answers": {
+      "has_sticky_header": {
+        "confidence": 0.61318311463057,
+        "noul": 0.38681688536943,
+        "type": "noul"
+      },
+      "has_visible_focus": {
+        "confidence": 0.8312169175934377,
+        "noul": 0.16878308240656228,
+        "type": "noul"
+      },
+      "has_search_box": {
+        "confidence": 0.8630986941964381,
+        "noul": 0.13690130580356188,
+        "type": "noul"
+      },
+      "page_state": {
+        "choice": "normal",
+        "confidence": 0.9976000184124147,
+        "probabilities": {
+          "error_page": 0.0002869929130009383,
+          "cookie_banner": 0.0009960338595580394,
+          "normal": 0.9976000184124147,
+          "login_wall": 0.0009032652773809799,
+          "bot_check": 0.00021368953764543998
+        },
+        "type": "choice"
+      },
+      "has_cookie_banner": {
+        "confidence": 0.9286760794688562,
+        "noul": 0.07132392053114373,
+        "type": "noul"
+      },
+      "has_main_navigation": {
+        "confidence": 0.8530036465397071,
+        "noul": 0.8530036465397071,
+        "type": "noul"
+      }
+    },
+    "usage": {
+      "input_tokens_by_modality": [
+        {
+          "modality": "text",
+          "tokens": 443
+        },
+        {
+          "modality": "image",
+          "tokens": 1092
+        }
+      ],
+      "total_input_tokens": 1535,
+      "total_output_tokens": 0,
+      "total_tokens": 1535
+    }
+  }
+}

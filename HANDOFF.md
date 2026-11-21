@@ -18,13 +18,16 @@ Read AGENTS.md first. This file says where the build stands.
   - `python scripts/spike_runner.py --url https://www.medicare.gov/ --tabs 10` works: steps 1-9 return correct roles and accessible names from CDP. Step 10 landed on an unnamed `<div>` (role generic) at (-696,-870), off screen: a real candidate for focus_not_visible / focus_order once checks exist. Steps saved to `runs/spike/steps.json` (gitignored).
   - `qrcode[pil]` added to requirements. The app runs in the background with `uvicorn app.main:app --host 0.0.0.0 --port 8000`; `/api/health` returns `{"status":"ok"}`. Stranger form: `http://172.16.249.56:8000/submit` (venue Wi-Fi IP, may change), QR at `eval/submit_qr.png`. If venue Wi-Fi blocks device-to-device traffic, phones cannot reach it; test from a phone first.
 
-## Not done yet (needs a real API key)
+- **Prompt B (Claude Code, Nov 21):** `GEMINI_API_KEY` is in `.env` (not tracked; the backup key is empty).
+  - `python scripts/spike_models.py`: `gemini-4-hydrogen`, `gemini-4-argon`, `gemini-4-carbon`, `gemini-decision-1` all FOUND (also visible: `gemini-4-neon`). No config changes needed. A Hydrogen text call returned "OK" in 2.9 s.
+  - `python scripts/spike_decisions.py --url https://www.medicare.gov/`: works, saved `docs/decisions_response_example.json` (6 questions: 5 noul and 1 choice `page_state`, which answered "normal" at 0.998).
+  - `python scripts/spike_agent.py`: Managed Agent completed in 15.8 s and printed `blindspot ok 3.12.3` (the sandbox runs Python 3.12.3).
 
-There is no `.env` yet. Copy `.env.example` to `.env` and add `GEMINI_API_KEY` (and optionally `GEMINI_API_KEY_BACKUP`), then run Prompt B in PROMPTS.md:
+## Decisions API: what we measured
 
-- [ ] `python scripts/spike_models.py`: confirm `gemini-4-hydrogen`, `gemini-4-argon`, `gemini-4-carbon`, `gemini-decision-1` exist for the key. If a name differs, update `blindspot/config.py`.
-- [ ] `python scripts/spike_decisions.py --url https://www.medicare.gov/`: saves `docs/decisions_response_example.json`.
-- [ ] `python scripts/spike_agent.py`: Managed Agent hello-world ("blindspot ok").
+- Shape matches the SDK notes below. Noul: `{type, noul, confidence}` with `confidence = max(noul, 1 - noul)`. Choice: `{type, choice, confidence, probabilities}`, where `confidence` equals the chosen option's probability.
+- Not in our notes: the response also has a top-level `usage` with `input_tokens_by_modality` (text and image), `total_input_tokens` and `total_output_tokens` (0 for decisions). A full 1280x800 screenshot costs about 1,092 image tokens. Log these from `usage` for the cost-per-page metric.
+- Latency: the **first call is about 3 s** (cold start); later calls with a small crop take 0.33 to 0.47 s. Five parallel calls finished in 0.68 s wall time (0.34 to 0.55 s each). For Phase 3: make one warm-up call during preflight, and score steps in a thread pool alongside the Tab loop instead of in series, so 40 steps stay inside the 60-second cap.
 
 ## API facts confirmed from the google-genai 3.6 SDK
 
@@ -35,4 +38,4 @@ There is no `.env` yet. Copy `.env.example` to `.env` and add `GEMINI_API_KEY` (
 
 ## Next
 
-Add a key to `.env`, run Prompt B in PROMPTS.md, then the Handoff prompt, then Prompt 2 (runner, fixtures, code checks). The first page in `eval/pages_ok.txt` is https://www.medicare.gov/.
+Prompt B is done. Next: the Handoff prompt in PROMPTS.md (Claude Code), then Prompt 2 (runner, fixtures, code checks) in Antigravity. The first page in `eval/pages_ok.txt` is https://www.medicare.gov/.

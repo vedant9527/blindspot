@@ -49,6 +49,7 @@ Filled in after the held-out run (see `eval/results/results.md`).
 - Phase 1: browser helpers (focused element, computed accessible name and role via the Chrome DevTools Protocol), preflight with honest block detection and cookie-banner handling, page check script, and spike scripts for the runner, models, Decisions API and Managed Agents.
 - Page check run: 18 of 20 candidate healthcare pages load cleanly three times in a visible browser (`eval/pages_ok.txt`); two returned HTTP 403 and were dropped, with no bot-protection workarounds.
 - QR code for the stranger URL form (`eval/submit_qr.png`).
+- API checks: all four Gemini models confirmed; one Decisions API call on a real page (`docs/decisions_response_example.json`, cold call ~3 s, warm calls ~0.4 s); Managed Agent hello-world ran in Google's sandbox in 16 s.
 
 ## License
 
