@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 import statistics
 import sys
 import time
@@ -175,7 +176,14 @@ def _run_runner_case(
         use_gemini=use_gemini,
         record_video=False,
         write_tickets=False,
+        run_replay=False,
     )
+    # Free screenshot/crop PNGs immediately after scoring to protect disk space
+    out_dir_str = res.get("out_dir")
+    if out_dir_str:
+        out_p = Path(out_dir_str)
+        for sub in ("steps", "crops", "video"):
+            shutil.rmtree(out_p / sub, ignore_errors=True)
     if res.get("status") == "blocked":
         return {"status": "blocked", "reason": res.get("reason", ""), "duration_s": res.get("duration_s", 0.0)}
     dec = res["decisions"]
@@ -312,11 +320,36 @@ def load_cases_for_set(set_name: str, limit: int | None = None) -> list[dict[str
 
 # ---------- Aggregation & Markdown output ----------
 
-def summarize_results(records: list[dict[str, Any]], systems: list[str], manifest_hash: str | None) -> tuple[dict[str, Any], str]:
+def summarize_results(
+    records: list[dict[str, Any]],
+    systems: list[str],
+    manifest_hash: str | None,
+    manifest_blocked: list[dict[str, Any]] | None = None,
+) -> tuple[dict[str, Any], str]:
+    # Collect dropped/blocked pages (from manifest preflight and from harness runs)
+    dropped_pages: dict[tuple[str, str], dict[str, Any]] = {}
+    for mb in manifest_blocked or []:
+        dropped_pages[("heldout", mb["url"])] = {
+            "set": "heldout",
+            "url": mb["url"],
+            "reason": mb.get("reason", "blocked in manifest preflight"),
+            "systems": ["manifest_preflight"],
+        }
+    for r in records:
+        if r.get("status") != "ok":
+            k = (r["set"], r["url"])
+            entry = dropped_pages.setdefault(
+                k,
+                {"set": r["set"], "url": r["url"], "reason": r.get("reason") or r.get("error") or r.get("status"), "systems": []},
+            )
+            if r["system"] not in entry["systems"]:
+                entry["systems"].append(r["system"])
+
     summary: dict[str, Any] = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "heldout_manifest_sha256": manifest_hash,
         "by_system": {},
+        "dropped_pages": list(dropped_pages.values()),
         "records": records,
     }
 
@@ -374,6 +407,22 @@ def summarize_results(records: list[dict[str, Any]], systems: list[str], manifes
             f"{bb['label_mismatch']['caught']}/{bb['label_mismatch']['total']} | "
             f"{ff} | {s['median_seconds']:.1f}s | {s['mean_gemini_calls']:.1f} | \\${s['mean_cost_usd']:.4f} |"
         )
+    if any(summary["by_system"][sn]["govuk_confirmed"] > 0 for sn in systems) or any(r["set"] == "govuk" for r in records):
+        md_lines.extend(["", "## GOV.UK Accessibility Audit Page (Keyboard & Focus Cases)", ""])
+        for sn in systems:
+            md_lines.append(f"- `{sn}`: {summary['by_system'][sn]['govuk_confirmed']} confirmed/reported")
+    if dropped_pages:
+        md_lines.extend(
+            [
+                "",
+                "## Dropped / Blocked Pages (Not Counted as Caught or Missed)",
+                "",
+                "| Set | URL | Reason | Affected |",
+                "| --- | --- | --- | --- |",
+            ]
+        )
+        for dp in dropped_pages.values():
+            md_lines.append(f"| `{dp['set']}` | {dp['url']} | {dp['reason']} | {', '.join(dp['systems'])} |")
     md_lines.append("")
     return summary, "\n".join(md_lines)
 
@@ -407,7 +456,10 @@ def main() -> None:
     for idx, case in enumerate(all_cases, start=1):
         print(f"\n[{idx}/{len(all_cases)}] set={case['set']} url={case['url']} bug={case['bug_type']} seed={case['seed']}", flush=True)
         for sys_name in systems:
-            res = run_case(sys_name, case["url"], case["bug_type"], case["seed"], headless=headless)
+            try:
+                res = run_case(sys_name, case["url"], case["bug_type"], case["seed"], headless=headless)
+            except Exception as exc:
+                res = {"status": "error", "reason": f"{type(exc).__name__}: {str(exc)[:180]}", "duration_s": 0.0}
             rec = {"system": sys_name, **case, **res}
             records.append(rec)
             print(
@@ -418,7 +470,13 @@ def main() -> None:
             )
 
     m_hash = manifest_sha256(HELDOUT_MANIFEST) if HELDOUT_MANIFEST.exists() else None
-    summary, md = summarize_results(records, systems, m_hash)
+    manifest_blocked = []
+    if "heldout" in sets and HELDOUT_MANIFEST.exists():
+        manifest_blocked = [
+            e for e in json.loads(HELDOUT_MANIFEST.read_text(encoding="utf-8"))
+            if e.get("status") == "blocked_in_preflight"
+        ]
+    summary, md = summarize_results(records, systems, m_hash, manifest_blocked=manifest_blocked)
 
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     json_path = RESULTS_DIR / f"{args.out_prefix}.json"

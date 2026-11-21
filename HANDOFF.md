@@ -178,6 +178,16 @@ API quirks found so far: the first Decisions API call is ~3 s (cold), later ones
 - `eval/heldout_manifest.json` built from `eval/submissions.jsonl` (16 stranger URLs: 14 loadable, 2 blocked honestly in preflight — `carbonhealth.com` and `ticketmaster.com`, bot check challenge widget) via `python eval/harness.py --build-heldout-manifest --headed`.
 - **Held-out manifest SHA-256:** `816e4bb137338731ce06adaf5d2c76a90c9f2ed9c985b7907332226e606f2492`
 
+## Phase 8: Held-out Evaluation Run (done, Antigravity, ~15:24)
+
+Ran `python eval/harness.py --set heldout --set govuk --set w3c_clean --out-prefix results` once with frozen `blindspot/config.py` and sealed `eval/heldout_manifest.json` (`SHA-256: 816e4bb137338731ce06adaf5d2c76a90c9f2ed9c985b7907332226e606f2492`). Saved `eval/results/results.json` and `eval/results/results.md` (live on the app's Proof tab).
+
+- **`blindspot`:** **12/13** held-out injected bugs caught (`3/3 hide_focus`, `2/3 keyboard_trap`, `1/1 covering_banner`, `3/3 positive_tabindex`, `3/3 label_mismatch`), **0 false flags** across 4 W3C BAD "after" clean pages, **8** keyboard/focus findings on GOV.UK, 32.6s median, 73.8 Gemini calls/page, \$0.0362/page.
+- **`code_only`:** **10/13** held-out caught, **0** W3C clean false flags, **1** on GOV.UK, 27.7s median (Blindspot beat `code_only` by +2 held-out catches and +7 GOV.UK catches with 0 false flags).
+- **`axe`:** **5/12** held-out caught (`0/7` on runtime focus/trap/banner bugs), **10** violations on W3C clean pages, 6.2s median.
+- **`single_gemini` (`gemini-4-argon`):** **0/13** held-out caught, **0** W3C clean false flags, 12.1s median, \$0.0022/page.
+- Dropped/blocked pages reported separately (not counted as caught or missed): `carbonhealth.com` and `ticketmaster.com` (manifest preflight bot check), `headway.co` (HTTP 403), `asktia.com` (axe-only load race: no visible tabbable elements on load).
+
 ## Next
 
-Phase 8 (3:30 to 4:00 in `docs/PLAN.md`): run `python eval/harness.py --set heldout --set govuk --set w3c_clean` once for all four systems, save `eval/results/results.json` and `eval/results/results.md`, and verify the Proof tab; then Phase 9 (HAR snapshots + 3 demo rehearsals) and Phase 10 (1-min video + submit by 4:50 PM).
+Phase 9 (4:00 to 4:30 in `docs/PLAN.md`): HAR snapshots of the 3 stable demo pages + 3 demo rehearsals, then Phase 10 (1-min video, final README polish, submit by 4:50 PM).

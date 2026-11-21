@@ -39,7 +39,14 @@ uvicorn app.main:app --reload      # http://localhost:8000 and /submit
 
 ## Results
 
-Filled in after the held-out run (see `eval/results/results.md`).
+Held-out evaluation run with frozen thresholds (`blindspot/config.py`) and pre-committed manifest `eval/heldout_manifest.json` (`SHA-256: 816e4bb137338731ce06adaf5d2c76a90c9f2ed9c985b7907332226e606f2492`). Full table and dropped-pages log in `eval/results/results.md`.
+
+| System | Held-out Injected Caught | `hide_focus` | `keyboard_trap` | `covering_banner` | `positive_tabindex` | `label_mismatch` | W3C Clean False Flags | GOV.UK | Median s/page | Est. Cost/page |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `axe` | **5/12** | 0/3 | 0/3 | 0/1 | 2/2 | 3/3 | 10 (4p) | 22 | 6.2s | \$0.0000 |
+| `single_gemini` | **0/13** | 0/3 | 0/3 | 0/1 | 0/3 | 0/3 | 0 (4p) | 2 | 12.1s | \$0.0022 |
+| `code_only` | **10/13** | 2/3 | 2/3 | 1/1 | 3/3 | 2/3 | 0 (4p) | 1 | 27.7s | \$0.0000 |
+| `blindspot` | **12/13** | 3/3 | 2/3 | 1/1 | 3/3 | 3/3 | **0 (4p)** | 8 | 32.6s | \$0.0362 |
 
 ## Built before the event
 
@@ -58,6 +65,7 @@ Filled in after the held-out run (see `eval/results/results.md`).
 - Phase 5 (pre-freeze): Gemini 4 Argon single-screenshot baseline (`baseline_single_call`), four-system evaluation harness (`eval/harness.py`: `axe`, `single_gemini`, `code_only`, `blindspot`), Shadow DOM focus piercing and per-pixel ring contrast / disappearing-border fixes from dev-set inspection (`failure_log.md`). On the 10-case dev set: Blindspot **10/10**, code-only **10/10**, axe-core **4/10**, single-call Gemini **0/10**.
 - Phase 6: Gemini 4 Carbon ticket writer (`blindspot/tickets.py`, `write_ticket` in `blindspot/gemini.py`) saving red-box evidence crops (`tickets/<n>_evidence.png`) and Markdown tickets (`tickets/<n>.md`) streamed over SSE, plus the projector-ready one-page app (`app/static/index.html`) with URL input, vetted dropdown (3 stable demo pages first), Break-it buttons, live Tab frame, zoomed finding cards, Carbon ticket modal, side-by-side axe-core comparison, and Proof tab (`/api/proof`).
 - 2:30 Gate (Managed Agent replay): standalone `blindspot/replay.py` (zero repo imports) + `blindspot/managed_agent.py` verified **5/5 consecutive passes** in Google's remote Managed Agent sandbox (`antigravity-preview-05-2026`, 82–118s each), wired to run in the background after `done` so confirmed finding cards flip to **`Replayed ✓`** without slowing the live demo.
+- Phase 8 (Held-out evaluation): sealed `eval/heldout_manifest.json` from 16 stranger-submitted URLs (`SHA-256: 816e4bb137338731ce06adaf5d2c76a90c9f2ed9c985b7907332226e606f2492`) and ran all four systems once across `heldout`, `govuk`, and `w3c_clean` (`eval/results/results.md`): Blindspot caught **12/13** with **0** W3C clean false flags vs `code_only` **10/13**, `axe` **5/12** (10 W3C clean flags), and `single_gemini` **0/13**.
 
 ## License
 

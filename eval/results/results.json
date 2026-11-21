@@ -1,0 +1,2440 @@
+{
+  "generated_at": "2026-11-21T20:23:38.413921+00:00",
+  "heldout_manifest_sha256": "816e4bb137338731ce06adaf5d2c76a90c9f2ed9c985b7907332226e606f2492",
+  "by_system": {
+    "axe": {
+      "pages_ok": 17,
+      "injected_caught": 5,
+      "injected_total": 12,
+      "by_bug": {
+        "hide_focus": {
+          "caught": 0,
+          "total": 3
+        },
+        "keyboard_trap": {
+          "caught": 0,
+          "total": 3
+        },
+        "covering_banner": {
+          "caught": 0,
+          "total": 1
+        },
+        "positive_tabindex": {
+          "caught": 2,
+          "total": 2
+        },
+        "label_mismatch": {
+          "caught": 3,
+          "total": 3
+        }
+      },
+      "w3c_clean_false_flags": 10,
+      "w3c_clean_pages": 4,
+      "govuk_confirmed": 22,
+      "median_seconds": 6.19,
+      "mean_gemini_calls": 0,
+      "mean_cost_usd": 0.0
+    },
+    "single_gemini": {
+      "pages_ok": 18,
+      "injected_caught": 0,
+      "injected_total": 13,
+      "by_bug": {
+        "hide_focus": {
+          "caught": 0,
+          "total": 3
+        },
+        "keyboard_trap": {
+          "caught": 0,
+          "total": 3
+        },
+        "covering_banner": {
+          "caught": 0,
+          "total": 1
+        },
+        "positive_tabindex": {
+          "caught": 0,
+          "total": 3
+        },
+        "label_mismatch": {
+          "caught": 0,
+          "total": 3
+        }
+      },
+      "w3c_clean_false_flags": 0,
+      "w3c_clean_pages": 4,
+      "govuk_confirmed": 2,
+      "median_seconds": 12.13,
+      "mean_gemini_calls": 1,
+      "mean_cost_usd": 0.0022
+    },
+    "code_only": {
+      "pages_ok": 18,
+      "injected_caught": 10,
+      "injected_total": 13,
+      "by_bug": {
+        "hide_focus": {
+          "caught": 2,
+          "total": 3
+        },
+        "keyboard_trap": {
+          "caught": 2,
+          "total": 3
+        },
+        "covering_banner": {
+          "caught": 1,
+          "total": 1
+        },
+        "positive_tabindex": {
+          "caught": 3,
+          "total": 3
+        },
+        "label_mismatch": {
+          "caught": 2,
+          "total": 3
+        }
+      },
+      "w3c_clean_false_flags": 0,
+      "w3c_clean_pages": 4,
+      "govuk_confirmed": 1,
+      "median_seconds": 27.73,
+      "mean_gemini_calls": 0,
+      "mean_cost_usd": 0.0
+    },
+    "blindspot": {
+      "pages_ok": 18,
+      "injected_caught": 12,
+      "injected_total": 13,
+      "by_bug": {
+        "hide_focus": {
+          "caught": 3,
+          "total": 3
+        },
+        "keyboard_trap": {
+          "caught": 2,
+          "total": 3
+        },
+        "covering_banner": {
+          "caught": 1,
+          "total": 1
+        },
+        "positive_tabindex": {
+          "caught": 3,
+          "total": 3
+        },
+        "label_mismatch": {
+          "caught": 3,
+          "total": 3
+        }
+      },
+      "w3c_clean_false_flags": 0,
+      "w3c_clean_pages": 4,
+      "govuk_confirmed": 8,
+      "median_seconds": 32.57,
+      "mean_gemini_calls": 73.8,
+      "mean_cost_usd": 0.0362
+    }
+  },
+  "dropped_pages": [
+    {
+      "set": "heldout",
+      "url": "https://carbonhealth.com/",
+      "reason": "bot check (challenge widget)",
+      "systems": [
+        "manifest_preflight"
+      ]
+    },
+    {
+      "set": "heldout",
+      "url": "https://www.ticketmaster.com/",
+      "reason": "bot check (challenge widget)",
+      "systems": [
+        "manifest_preflight"
+      ]
+    },
+    {
+      "set": "heldout",
+      "url": "https://headway.co/",
+      "reason": "HTTP 403",
+      "systems": [
+        "axe",
+        "single_gemini",
+        "code_only",
+        "blindspot"
+      ]
+    },
+    {
+      "set": "heldout",
+      "url": "https://asktia.com/",
+      "reason": "RuntimeError: No visible tabbable elements found on https://asktia.com/ to inject positive_tabindex",
+      "systems": [
+        "axe"
+      ]
+    }
+  ],
+  "records": [
+    {
+      "system": "axe",
+      "set": "heldout",
+      "url": "https://www.uclahealth.org/",
+      "bug_type": "hide_focus",
+      "seed": 2001,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 1,
+      "mapped_bugs": [],
+      "violations": [
+        "color-contrast"
+      ],
+      "manifest": {
+        "url": "https://www.uclahealth.org/",
+        "bug_type": "hide_focus",
+        "expected_check": "focus_not_visible",
+        "seed": 2001,
+        "target_selector": "#block-primary-navigation > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > button",
+        "target_text": "Menu toggle",
+        "timestamp": "2026-11-21T19:59:02.110053+00:00"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 10.31
+    },
+    {
+      "system": "single_gemini",
+      "set": "heldout",
+      "url": "https://www.uclahealth.org/",
+      "bug_type": "hide_focus",
+      "seed": 2001,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 1,
+      "categories": [
+        "covering_banner"
+      ],
+      "findings": [
+        {
+          "category": "covering_banner",
+          "wcag": "2.4.11",
+          "element": "cookie consent dialog and floating search/chat button",
+          "detail": "A semi-transparent cookie consent dialog and a floating yellow button overlap and obscure page text ('Achieving the exceptional doesn't just happen...') and controls beneath them."
+        }
+      ],
+      "manifest": {
+        "url": "https://www.uclahealth.org/",
+        "bug_type": "hide_focus",
+        "expected_check": "focus_not_visible",
+        "seed": 2001,
+        "target_selector": "#block-primary-navigation > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > button",
+        "target_text": "Menu toggle",
+        "timestamp": "2026-11-21T19:59:09.448539+00:00"
+      },
+      "gemini_calls": 1,
+      "total_tokens": 1524,
+      "cost_usd": 0.0022,
+      "duration_s": 13.98
+    },
+    {
+      "system": "code_only",
+      "set": "heldout",
+      "url": "https://www.uclahealth.org/",
+      "bug_type": "hide_focus",
+      "seed": 2001,
+      "status": "ok",
+      "caught": false,
+      "category_caught": true,
+      "exact_target_caught": false,
+      "confirmed_count": 1,
+      "needs_human_count": 3,
+      "confirmed_checks": [
+        "focus_not_visible"
+      ],
+      "manifest": {
+        "url": "https://www.uclahealth.org/",
+        "bug_type": "hide_focus",
+        "expected_check": "focus_not_visible",
+        "seed": 2001,
+        "target_selector": "#block-primary-navigation > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > button",
+        "target_text": "Menu toggle",
+        "timestamp": "2026-11-21T19:59:25.427367+00:00",
+        "sha256": "c23d7f3ffce1e9ebab3af2f828248eb01d2a96b4e87efba4782a6f5073ee467c"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 31.74,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-145918-uclahealth.org"
+    },
+    {
+      "system": "blindspot",
+      "set": "heldout",
+      "url": "https://www.uclahealth.org/",
+      "bug_type": "hide_focus",
+      "seed": 2001,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 2,
+      "needs_human_count": 26,
+      "confirmed_checks": [
+        "focus_not_visible",
+        "focus_not_visible"
+      ],
+      "manifest": {
+        "url": "https://www.uclahealth.org/",
+        "bug_type": "hide_focus",
+        "expected_check": "focus_not_visible",
+        "seed": 2001,
+        "target_selector": "#block-primary-navigation > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > button",
+        "target_text": "Menu toggle",
+        "timestamp": "2026-11-21T19:59:56.939512+00:00",
+        "sha256": "b6b1ff32a8fb22900dc3724ca507b585a8ea4a920a937dd423f9312821717efc"
+      },
+      "gemini_calls": 81,
+      "total_tokens": 230341,
+      "cost_usd": 0.04032,
+      "duration_s": 35.37,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-145949-uclahealth.org"
+    },
+    {
+      "system": "axe",
+      "set": "heldout",
+      "url": "https://www.medtronic.com/en-us/index.html",
+      "bug_type": "keyboard_trap",
+      "seed": 2002,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 6,
+      "mapped_bugs": [
+        "label_mismatch"
+      ],
+      "violations": [
+        "aria-allowed-attr",
+        "color-contrast",
+        "image-redundant-alt",
+        "label-content-name-mismatch",
+        "region",
+        "select-name"
+      ],
+      "manifest": {
+        "url": "https://www.medtronic.com/en-us/index.html",
+        "bug_type": "keyboard_trap",
+        "expected_check": "keyboard_trap",
+        "seed": 2002,
+        "target_selector": "#container-5bd3147e2a > div > div:nth-of-type(5) > div > ul > li:nth-of-type(2) > a",
+        "target_text": "",
+        "timestamp": "2026-11-21T20:00:29.719387+00:00"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 5.89
+    },
+    {
+      "system": "single_gemini",
+      "set": "heldout",
+      "url": "https://www.medtronic.com/en-us/index.html",
+      "bug_type": "keyboard_trap",
+      "seed": 2002,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 0,
+      "categories": [],
+      "findings": [],
+      "manifest": {
+        "url": "https://www.medtronic.com/en-us/index.html",
+        "bug_type": "keyboard_trap",
+        "expected_check": "keyboard_trap",
+        "seed": 2002,
+        "target_selector": "#container-5bd3147e2a > div > div:nth-of-type(5) > div > ul > li:nth-of-type(2) > a",
+        "target_text": "",
+        "timestamp": "2026-11-21T20:00:35.132306+00:00"
+      },
+      "gemini_calls": 1,
+      "total_tokens": 1408,
+      "cost_usd": 0.00179,
+      "duration_s": 13.71
+    },
+    {
+      "system": "code_only",
+      "set": "heldout",
+      "url": "https://www.medtronic.com/en-us/index.html",
+      "bug_type": "keyboard_trap",
+      "seed": 2002,
+      "status": "ok",
+      "caught": false,
+      "category_caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 21,
+      "needs_human_count": 8,
+      "confirmed_checks": [
+        "focus_not_visible",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "focus_not_visible",
+        "label_in_name",
+        "label_in_name",
+        "focus_not_visible",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "focus_not_visible",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name"
+      ],
+      "manifest": {
+        "url": "https://www.medtronic.com/en-us/index.html",
+        "bug_type": "keyboard_trap",
+        "expected_check": "keyboard_trap",
+        "seed": 2002,
+        "target_selector": "#container-5bd3147e2a > div > div:nth-of-type(5) > div > ul > li:nth-of-type(2) > a",
+        "target_text": "",
+        "timestamp": "2026-11-21T20:00:51.911249+00:00",
+        "sha256": "f2cb7781281eee5405168d6d8ca8e565c33b9c0030a5f94d0db5334c51d88b7e"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 32.48,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-150044-medtronic.com"
+    },
+    {
+      "system": "blindspot",
+      "set": "heldout",
+      "url": "https://www.medtronic.com/en-us/index.html",
+      "bug_type": "keyboard_trap",
+      "seed": 2002,
+      "status": "ok",
+      "caught": false,
+      "category_caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 34,
+      "needs_human_count": 43,
+      "confirmed_checks": [
+        "focus_not_visible",
+        "indicator_contrast",
+        "indicator_contrast",
+        "indicator_contrast",
+        "label_in_name",
+        "focus_not_visible",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "focus_not_visible",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "focus_not_visible",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "focus_not_visible",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name"
+      ],
+      "manifest": {
+        "url": "https://www.medtronic.com/en-us/index.html",
+        "bug_type": "keyboard_trap",
+        "expected_check": "keyboard_trap",
+        "seed": 2002,
+        "target_selector": "#container-5bd3147e2a > div > div:nth-of-type(5) > div > ul > li:nth-of-type(2) > a",
+        "target_text": "",
+        "timestamp": "2026-11-21T20:01:30.338206+00:00",
+        "sha256": "e63512e8d4dee4b9b77b991229561b7127d138fb296f162b620de15e5cf1963b"
+      },
+      "gemini_calls": 80,
+      "total_tokens": 229527,
+      "cost_usd": 0.04312,
+      "duration_s": 67.03,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-150117-medtronic.com"
+    },
+    {
+      "system": "axe",
+      "set": "heldout",
+      "url": "https://www.cityblock.com/",
+      "bug_type": "positive_tabindex",
+      "seed": 2004,
+      "status": "ok",
+      "caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 4,
+      "mapped_bugs": [
+        "positive_tabindex"
+      ],
+      "violations": [
+        "frame-title",
+        "heading-order",
+        "list",
+        "tabindex"
+      ],
+      "manifest": {
+        "url": "https://www.cityblock.com/",
+        "bug_type": "positive_tabindex",
+        "expected_check": "focus_order",
+        "seed": 2004,
+        "target_selector": "#main-content > footer > div:nth-of-type(3) > div:nth-of-type(2) > ul > li:nth-of-type(4) > a",
+        "target_text": "Notice of Privacy Practices",
+        "timestamp": "2026-11-21T20:02:32.465601+00:00"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 9.13
+    },
+    {
+      "system": "single_gemini",
+      "set": "heldout",
+      "url": "https://www.cityblock.com/",
+      "bug_type": "positive_tabindex",
+      "seed": 2004,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 0,
+      "categories": [],
+      "findings": [],
+      "manifest": {
+        "url": "https://www.cityblock.com/",
+        "bug_type": "positive_tabindex",
+        "expected_check": "focus_order",
+        "seed": 2004,
+        "target_selector": "#main-content > footer > div:nth-of-type(3) > div:nth-of-type(2) > ul > li:nth-of-type(4) > a",
+        "target_text": "Notice of Privacy Practices",
+        "timestamp": "2026-11-21T20:02:36.608909+00:00"
+      },
+      "gemini_calls": 1,
+      "total_tokens": 1446,
+      "cost_usd": 0.00184,
+      "duration_s": 17.41
+    },
+    {
+      "system": "code_only",
+      "set": "heldout",
+      "url": "https://www.cityblock.com/",
+      "bug_type": "positive_tabindex",
+      "seed": 2004,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 2,
+      "needs_human_count": 0,
+      "confirmed_checks": [
+        "focus_order",
+        "focus_not_visible"
+      ],
+      "manifest": {
+        "url": "https://www.cityblock.com/",
+        "bug_type": "positive_tabindex",
+        "expected_check": "focus_order",
+        "seed": 2004,
+        "target_selector": "#main-content > footer > div:nth-of-type(3) > div:nth-of-type(2) > ul > li:nth-of-type(4) > a",
+        "target_text": "Notice of Privacy Practices",
+        "timestamp": "2026-11-21T20:02:56.975300+00:00",
+        "sha256": "2911dcd19a9017c6336b886c3ac2cb12ee6ea86c2bc7c2449cb8ed4a537dfaed"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 41.22,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-150251-cityblock.com"
+    },
+    {
+      "system": "blindspot",
+      "set": "heldout",
+      "url": "https://www.cityblock.com/",
+      "bug_type": "positive_tabindex",
+      "seed": 2004,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 1,
+      "needs_human_count": 7,
+      "confirmed_checks": [
+        "focus_order"
+      ],
+      "manifest": {
+        "url": "https://www.cityblock.com/",
+        "bug_type": "positive_tabindex",
+        "expected_check": "focus_order",
+        "seed": 2004,
+        "target_selector": "#main-content > footer > div:nth-of-type(3) > div:nth-of-type(2) > ul > li:nth-of-type(4) > a",
+        "target_text": "Notice of Privacy Practices",
+        "timestamp": "2026-11-21T20:03:39.161674+00:00",
+        "sha256": "1e2f63cb22d112dc3cc7590fbc1900060645dc068933065b7292735059536477"
+      },
+      "gemini_calls": 81,
+      "total_tokens": 227720,
+      "cost_usd": 0.0404,
+      "duration_s": 42.36,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-150332-cityblock.com"
+    },
+    {
+      "system": "axe",
+      "set": "heldout",
+      "url": "https://www.khealth.com/",
+      "bug_type": "label_mismatch",
+      "seed": 2005,
+      "status": "ok",
+      "caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 2,
+      "mapped_bugs": [
+        "label_mismatch"
+      ],
+      "violations": [
+        "label-content-name-mismatch",
+        "link-name"
+      ],
+      "manifest": {
+        "url": "https://www.khealth.com/",
+        "bug_type": "label_mismatch",
+        "expected_check": "label_in_name",
+        "seed": 2005,
+        "target_selector": "#comp-mvh4ir8g_r_comp-mvh4iiv67-menu-content > nav > ul > li:nth-of-type(4) > div > div > a",
+        "target_text": "Careers",
+        "timestamp": "2026-11-21T20:04:19.180757+00:00"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 5.17
+    },
+    {
+      "system": "single_gemini",
+      "set": "heldout",
+      "url": "https://www.khealth.com/",
+      "bug_type": "label_mismatch",
+      "seed": 2005,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 2,
+      "categories": [
+        "other"
+      ],
+      "findings": [
+        {
+          "category": "other",
+          "wcag": "1.4.3",
+          "element": "Header navigation links and button ('Product', 'Our Team', 'Press & Research', 'Careers', 'Request PatientGPT Access')",
+          "detail": "White text rendered over the bright cyan-blue gradient background in the header has insufficient color contrast, falling below the 4.5:1 minimum ratio required for normal text."
+        },
+        {
+          "category": "other",
+          "wcag": "1.4.11",
+          "element": "Two empty rounded square buttons in the bottom-left footer",
+          "detail": "Two social/icon button placeholders in the bottom-left of the footer appear as faint translucent blue squares with no visible icon or label and less than 3:1 non-text contrast against the blue footer background."
+        }
+      ],
+      "manifest": {
+        "url": "https://www.khealth.com/",
+        "bug_type": "label_mismatch",
+        "expected_check": "label_in_name",
+        "seed": 2005,
+        "target_selector": "#comp-mvh4ir8g_r_comp-mvh4iiv67-menu-content > nav > ul > li:nth-of-type(4) > div > div > a",
+        "target_text": "Careers",
+        "timestamp": "2026-11-21T20:04:23.422772+00:00"
+      },
+      "gemini_calls": 1,
+      "total_tokens": 1629,
+      "cost_usd": 0.00269,
+      "duration_s": 10.83
+    },
+    {
+      "system": "code_only",
+      "set": "heldout",
+      "url": "https://www.khealth.com/",
+      "bug_type": "label_mismatch",
+      "seed": 2005,
+      "status": "ok",
+      "caught": false,
+      "category_caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 1,
+      "needs_human_count": 2,
+      "confirmed_checks": [
+        "focus_not_visible"
+      ],
+      "manifest": {
+        "url": "https://www.khealth.com/",
+        "bug_type": "label_mismatch",
+        "expected_check": "label_in_name",
+        "seed": 2005,
+        "target_selector": "#comp-mvh4ir8g_r_comp-mvh4iiv67-menu-content > nav > ul > li:nth-of-type(4) > div > div > a",
+        "target_text": "Careers",
+        "timestamp": "2026-11-21T20:04:34.541831+00:00",
+        "sha256": "a557ac2ce0e4c61616cad8797d31596ebce39264d216291b9674250d7459f36a"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 8.05,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-150430-khealth.com"
+    },
+    {
+      "system": "blindspot",
+      "set": "heldout",
+      "url": "https://www.khealth.com/",
+      "bug_type": "label_mismatch",
+      "seed": 2005,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 5,
+      "needs_human_count": 30,
+      "confirmed_checks": [
+        "focus_not_visible",
+        "indicator_contrast",
+        "label_in_name",
+        "focus_not_visible",
+        "focus_not_visible"
+      ],
+      "manifest": {
+        "url": "https://www.khealth.com/",
+        "bug_type": "label_mismatch",
+        "expected_check": "label_in_name",
+        "seed": 2005,
+        "target_selector": "#comp-mvh4ir8g_r_comp-mvh4iiv67-menu-content > nav > ul > li:nth-of-type(4) > div > div > a",
+        "target_text": "Careers",
+        "timestamp": "2026-11-21T20:04:44.133100+00:00",
+        "sha256": "ae502c7801779afe6b0e2f90dd808be17a6dfc7af5ac11d56ca29ed6e3d7550b"
+      },
+      "gemini_calls": 69,
+      "total_tokens": 197424,
+      "cost_usd": 0.03621,
+      "duration_s": 42.17,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-150438-khealth.com"
+    },
+    {
+      "system": "axe",
+      "set": "heldout",
+      "url": "https://www.springhealth.com/",
+      "bug_type": "hide_focus",
+      "seed": 2006,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 2,
+      "mapped_bugs": [],
+      "violations": [
+        "color-contrast",
+        "region"
+      ],
+      "manifest": {
+        "url": "https://www.springhealth.com/",
+        "bug_type": "hide_focus",
+        "expected_check": "focus_not_visible",
+        "seed": 2006,
+        "target_selector": "body > div:nth-of-type(1) > main > div > div:nth-of-type(2) > div > div:nth-of-type(1) > div:nth-of-type(1) > div > div:nth-of-type(2) > a",
+        "target_text": "Find your therapist",
+        "timestamp": "2026-11-21T20:05:28.459784+00:00"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 8.42
+    },
+    {
+      "system": "single_gemini",
+      "set": "heldout",
+      "url": "https://www.springhealth.com/",
+      "bug_type": "hide_focus",
+      "seed": 2006,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 0,
+      "categories": [],
+      "findings": [],
+      "manifest": {
+        "url": "https://www.springhealth.com/",
+        "bug_type": "hide_focus",
+        "expected_check": "focus_not_visible",
+        "seed": 2006,
+        "target_selector": "body > div:nth-of-type(1) > main > div > div:nth-of-type(2) > div > div:nth-of-type(1) > div:nth-of-type(1) > div > div:nth-of-type(2) > a",
+        "target_text": "Find your therapist",
+        "timestamp": "2026-11-21T20:05:34.443731+00:00"
+      },
+      "gemini_calls": 1,
+      "total_tokens": 1423,
+      "cost_usd": 0.00181,
+      "duration_s": 13.45
+    },
+    {
+      "system": "code_only",
+      "set": "heldout",
+      "url": "https://www.springhealth.com/",
+      "bug_type": "hide_focus",
+      "seed": 2006,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 1,
+      "needs_human_count": 33,
+      "confirmed_checks": [
+        "focus_not_visible"
+      ],
+      "manifest": {
+        "url": "https://www.springhealth.com/",
+        "bug_type": "hide_focus",
+        "expected_check": "focus_not_visible",
+        "seed": 2006,
+        "target_selector": "body > div:nth-of-type(1) > main > div > div:nth-of-type(2) > div > div:nth-of-type(1) > div:nth-of-type(1) > div > div:nth-of-type(2) > a",
+        "target_text": "Find your therapist",
+        "timestamp": "2026-11-21T20:05:48.141522+00:00",
+        "sha256": "ce9075b6a24cfeee7006691035c06cec8df8a97b76dc7003431934f8ecca858b"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 27.94,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-150542-springhealth.com"
+    },
+    {
+      "system": "blindspot",
+      "set": "heldout",
+      "url": "https://www.springhealth.com/",
+      "bug_type": "hide_focus",
+      "seed": 2006,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 21,
+      "needs_human_count": 49,
+      "confirmed_checks": [
+        "indicator_contrast",
+        "indicator_contrast",
+        "focus_not_visible",
+        "indicator_contrast",
+        "focus_not_visible",
+        "indicator_contrast",
+        "focus_not_visible",
+        "indicator_contrast",
+        "indicator_contrast",
+        "indicator_contrast",
+        "indicator_contrast",
+        "indicator_contrast",
+        "indicator_contrast",
+        "indicator_contrast",
+        "indicator_contrast",
+        "indicator_contrast",
+        "indicator_contrast",
+        "indicator_contrast",
+        "indicator_contrast",
+        "indicator_contrast",
+        "indicator_contrast"
+      ],
+      "manifest": {
+        "url": "https://www.springhealth.com/",
+        "bug_type": "hide_focus",
+        "expected_check": "focus_not_visible",
+        "seed": 2006,
+        "target_selector": "body > div:nth-of-type(1) > main > div > div:nth-of-type(2) > div > div:nth-of-type(1) > div:nth-of-type(1) > div > div:nth-of-type(2) > a",
+        "target_text": "Find your therapist",
+        "timestamp": "2026-11-21T20:06:19.041387+00:00",
+        "sha256": "170cd4fb438903a0aa0939a96a1c3293c7c10e0934d498df06786a65739f272f"
+      },
+      "gemini_calls": 77,
+      "total_tokens": 213888,
+      "cost_usd": 0.03557,
+      "duration_s": 40.39,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-150610-springhealth.com"
+    },
+    {
+      "system": "axe",
+      "set": "heldout",
+      "url": "https://www.mavenclinic.com/",
+      "bug_type": "keyboard_trap",
+      "seed": 2007,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 5,
+      "mapped_bugs": [
+        "label_mismatch"
+      ],
+      "violations": [
+        "aria-prohibited-attr",
+        "heading-order",
+        "label-content-name-mismatch",
+        "meta-viewport-large",
+        "region"
+      ],
+      "manifest": {
+        "url": "https://www.mavenclinic.com/",
+        "bug_type": "keyboard_trap",
+        "expected_check": "keyboard_trap",
+        "seed": 2007,
+        "target_selector": "#w-dropdown-toggle-0",
+        "target_text": "For You",
+        "timestamp": "2026-11-21T20:06:56.843137+00:00"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 6.68
+    },
+    {
+      "system": "single_gemini",
+      "set": "heldout",
+      "url": "https://www.mavenclinic.com/",
+      "bug_type": "keyboard_trap",
+      "seed": 2007,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 0,
+      "categories": [],
+      "findings": [],
+      "manifest": {
+        "url": "https://www.mavenclinic.com/",
+        "bug_type": "keyboard_trap",
+        "expected_check": "keyboard_trap",
+        "seed": 2007,
+        "target_selector": "#w-dropdown-toggle-0",
+        "target_text": "For You",
+        "timestamp": "2026-11-21T20:07:01.776593+00:00"
+      },
+      "gemini_calls": 1,
+      "total_tokens": 1402,
+      "cost_usd": 0.00178,
+      "duration_s": 14.45
+    },
+    {
+      "system": "code_only",
+      "set": "heldout",
+      "url": "https://www.mavenclinic.com/",
+      "bug_type": "keyboard_trap",
+      "seed": 2007,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 1,
+      "needs_human_count": 4,
+      "confirmed_checks": [
+        "keyboard_trap"
+      ],
+      "manifest": {
+        "url": "https://www.mavenclinic.com/",
+        "bug_type": "keyboard_trap",
+        "expected_check": "keyboard_trap",
+        "seed": 2007,
+        "target_selector": "#w-dropdown-toggle-0",
+        "target_text": "For You",
+        "timestamp": "2026-11-21T20:07:17.997259+00:00",
+        "sha256": "dfd86e060bd1660a7da10a8ca57bf0c916f3652499d0c338f088eb5795a067e1"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 20.31,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-150712-mavenclinic.com"
+    },
+    {
+      "system": "blindspot",
+      "set": "heldout",
+      "url": "https://www.mavenclinic.com/",
+      "bug_type": "keyboard_trap",
+      "seed": 2007,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 1,
+      "needs_human_count": 8,
+      "confirmed_checks": [
+        "keyboard_trap"
+      ],
+      "manifest": {
+        "url": "https://www.mavenclinic.com/",
+        "bug_type": "keyboard_trap",
+        "expected_check": "keyboard_trap",
+        "seed": 2007,
+        "target_selector": "#w-dropdown-toggle-0",
+        "target_text": "For You",
+        "timestamp": "2026-11-21T20:07:40.321923+00:00",
+        "sha256": "0cfe2d0d6ceb97dd66aafc8a7a7172df6029734471fa63d5bc3eda6369d10235"
+      },
+      "gemini_calls": 27,
+      "total_tokens": 74841,
+      "cost_usd": 0.01288,
+      "duration_s": 25.29,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-150732-mavenclinic.com"
+    },
+    {
+      "system": "axe",
+      "set": "heldout",
+      "url": "https://headway.co/",
+      "bug_type": "covering_banner",
+      "seed": 2008,
+      "status": "blocked",
+      "reason": "HTTP 403",
+      "duration_s": 4.72
+    },
+    {
+      "system": "single_gemini",
+      "set": "heldout",
+      "url": "https://headway.co/",
+      "bug_type": "covering_banner",
+      "seed": 2008,
+      "status": "blocked",
+      "reason": "HTTP 403",
+      "duration_s": 3.49
+    },
+    {
+      "system": "code_only",
+      "set": "heldout",
+      "url": "https://headway.co/",
+      "bug_type": "covering_banner",
+      "seed": 2008,
+      "status": "blocked",
+      "reason": "HTTP 403",
+      "duration_s": 3.26
+    },
+    {
+      "system": "blindspot",
+      "set": "heldout",
+      "url": "https://headway.co/",
+      "bug_type": "covering_banner",
+      "seed": 2008,
+      "status": "blocked",
+      "reason": "HTTP 403",
+      "duration_s": 3.34
+    },
+    {
+      "system": "axe",
+      "set": "heldout",
+      "url": "https://www.citymd.com/",
+      "bug_type": "positive_tabindex",
+      "seed": 2009,
+      "status": "ok",
+      "caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 4,
+      "mapped_bugs": [
+        "positive_tabindex"
+      ],
+      "violations": [
+        "aria-command-name",
+        "color-contrast",
+        "region",
+        "tabindex"
+      ],
+      "manifest": {
+        "url": "https://www.citymd.com/",
+        "bug_type": "positive_tabindex",
+        "expected_check": "focus_order",
+        "seed": 2009,
+        "target_selector": "body > div:nth-of-type(2) > div > footer > div > div:nth-of-type(4) > p > a:nth-of-type(1)",
+        "target_text": "Digital Privacy Policy",
+        "timestamp": "2026-11-21T20:08:16.729960+00:00"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 4.5
+    },
+    {
+      "system": "single_gemini",
+      "set": "heldout",
+      "url": "https://www.citymd.com/",
+      "bug_type": "positive_tabindex",
+      "seed": 2009,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 1,
+      "categories": [
+        "covering_banner"
+      ],
+      "findings": [
+        {
+          "category": "covering_banner",
+          "wcag": "2.4.11",
+          "element": "cookie consent banner covering 'Pay my bill' card/link",
+          "detail": "A fixed/sticky red cookie consent banner overlays the page content in the middle of the viewport, partially obscuring the fourth action card link beneath 'Get virtual care'."
+        }
+      ],
+      "manifest": {
+        "url": "https://www.citymd.com/",
+        "bug_type": "positive_tabindex",
+        "expected_check": "focus_order",
+        "seed": 2009,
+        "target_selector": "body > div:nth-of-type(2) > div > footer > div > div:nth-of-type(4) > p > a:nth-of-type(1)",
+        "target_text": "Digital Privacy Policy",
+        "timestamp": "2026-11-21T20:08:21.328634+00:00"
+      },
+      "gemini_calls": 1,
+      "total_tokens": 1531,
+      "cost_usd": 0.00222,
+      "duration_s": 11.22
+    },
+    {
+      "system": "code_only",
+      "set": "heldout",
+      "url": "https://www.citymd.com/",
+      "bug_type": "positive_tabindex",
+      "seed": 2009,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 1,
+      "needs_human_count": 1,
+      "confirmed_checks": [
+        "focus_order"
+      ],
+      "manifest": {
+        "url": "https://www.citymd.com/",
+        "bug_type": "positive_tabindex",
+        "expected_check": "focus_order",
+        "seed": 2009,
+        "target_selector": "body > div:nth-of-type(2) > div > footer > div > div:nth-of-type(4) > p > a:nth-of-type(1)",
+        "target_text": "Digital Privacy Policy",
+        "timestamp": "2026-11-21T20:08:32.941724+00:00",
+        "sha256": "6a3afe5587d6cf7a626ef72fc0fc2ccfff28c35b841e53fc3b45a56f6124e421"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 27.53,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-150828-citymd.com"
+    },
+    {
+      "system": "blindspot",
+      "set": "heldout",
+      "url": "https://www.citymd.com/",
+      "bug_type": "positive_tabindex",
+      "seed": 2009,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 1,
+      "needs_human_count": 47,
+      "confirmed_checks": [
+        "focus_order"
+      ],
+      "manifest": {
+        "url": "https://www.citymd.com/",
+        "bug_type": "positive_tabindex",
+        "expected_check": "focus_order",
+        "seed": 2009,
+        "target_selector": "body > div:nth-of-type(2) > div > footer > div > div:nth-of-type(4) > p > a:nth-of-type(2)",
+        "target_text": "No Surprises Act",
+        "timestamp": "2026-11-21T20:09:01.161489+00:00",
+        "sha256": "02422e50085cf6e4c4dd00ab2fff9d3ef8a0f0426a1823665371c088c71b8c1b"
+      },
+      "gemini_calls": 81,
+      "total_tokens": 226494,
+      "cost_usd": 0.03833,
+      "duration_s": 32.54,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-150856-citymd.com"
+    },
+    {
+      "system": "axe",
+      "set": "heldout",
+      "url": "https://www.nurx.com/",
+      "bug_type": "label_mismatch",
+      "seed": 2010,
+      "status": "ok",
+      "caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 4,
+      "mapped_bugs": [
+        "label_mismatch"
+      ],
+      "violations": [
+        "color-contrast",
+        "heading-order",
+        "label-content-name-mismatch",
+        "region"
+      ],
+      "manifest": {
+        "url": "https://www.nurx.com/",
+        "bug_type": "label_mismatch",
+        "expected_check": "label_in_name",
+        "seed": 2010,
+        "target_selector": "#notification-bar > div > div > a:nth-of-type(1)",
+        "target_text": "GET WEIGHT MANAGEMENT TREATMENT FOR AS LOW AS $0 WITH INSURANCE \u2192",
+        "timestamp": "2026-11-21T20:09:34.453740+00:00"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 6.19
+    },
+    {
+      "system": "single_gemini",
+      "set": "heldout",
+      "url": "https://www.nurx.com/",
+      "bug_type": "label_mismatch",
+      "seed": 2010,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 2,
+      "categories": [
+        "covering_banner",
+        "other"
+      ],
+      "findings": [
+        {
+          "category": "covering_banner",
+          "wcag": "2.4.11",
+          "element": "Cookie consent banner",
+          "detail": "A persistent cookie banner at the top of the content area covers the heading and controls of the card carousel section ('Treatments for your unique needs'), potentially obscuring focused elements behind it."
+        },
+        {
+          "category": "other",
+          "wcag": "1.4.3",
+          "element": "'How Nurx works' section and 'Exceptional care at every step' CTA button",
+          "detail": "In the 'How Nurx works' section, white text ('Request treatment', 'Connect with a provider', 'Get it delivered' and their descriptions) is placed on a light beige background with extremely low contrast. Additionally, in the 'Exceptional car"
+        }
+      ],
+      "manifest": {
+        "url": "https://www.nurx.com/",
+        "bug_type": "label_mismatch",
+        "expected_check": "label_in_name",
+        "seed": 2010,
+        "target_selector": "#notification-bar > div > div > a:nth-of-type(1)",
+        "target_text": "GET WEIGHT MANAGEMENT TREATMENT FOR AS LOW AS $0 WITH INSURANCE \u2192",
+        "timestamp": "2026-11-21T20:09:37.256944+00:00"
+      },
+      "gemini_calls": 1,
+      "total_tokens": 1624,
+      "cost_usd": 0.00276,
+      "duration_s": 10.17
+    },
+    {
+      "system": "code_only",
+      "set": "heldout",
+      "url": "https://www.nurx.com/",
+      "bug_type": "label_mismatch",
+      "seed": 2010,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 10,
+      "needs_human_count": 9,
+      "confirmed_checks": [
+        "label_in_name",
+        "focus_not_visible",
+        "focus_not_visible",
+        "focus_not_visible",
+        "focus_not_visible",
+        "focus_not_visible",
+        "focus_not_visible",
+        "focus_not_visible",
+        "focus_not_visible",
+        "focus_not_visible"
+      ],
+      "manifest": {
+        "url": "https://www.nurx.com/",
+        "bug_type": "label_mismatch",
+        "expected_check": "label_in_name",
+        "seed": 2010,
+        "target_selector": "#notification-bar > div > div > a:nth-of-type(1)",
+        "target_text": "GET WEIGHT MANAGEMENT TREATMENT FOR AS LOW AS $0 WITH INSURANCE \u2192",
+        "timestamp": "2026-11-21T20:09:48.997875+00:00",
+        "sha256": "fc12b9b61c15d91c20561434d54f685f030e83471ce6e55dc6a6a5e79b044837"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 30.27,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-150945-nurx.com"
+    },
+    {
+      "system": "blindspot",
+      "set": "heldout",
+      "url": "https://www.nurx.com/",
+      "bug_type": "label_mismatch",
+      "seed": 2010,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 11,
+      "needs_human_count": 38,
+      "confirmed_checks": [
+        "label_in_name",
+        "focus_not_visible",
+        "focus_not_visible",
+        "focus_not_visible",
+        "focus_not_visible",
+        "focus_not_visible",
+        "focus_not_visible",
+        "focus_not_visible",
+        "focus_not_visible",
+        "focus_not_visible",
+        "focus_not_visible"
+      ],
+      "manifest": {
+        "url": "https://www.nurx.com/",
+        "bug_type": "label_mismatch",
+        "expected_check": "label_in_name",
+        "seed": 2010,
+        "target_selector": "#menu-item-25942 > a",
+        "target_text": "BIRTH CONTROL",
+        "timestamp": "2026-11-21T20:10:19.711613+00:00",
+        "sha256": "4add61598df418eb3e10a0a7fc698af2b99d99abba6d25f34e9731a52e37a449"
+      },
+      "gemini_calls": 81,
+      "total_tokens": 230927,
+      "cost_usd": 0.0421,
+      "duration_s": 42.73,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-151015-nurx.com"
+    },
+    {
+      "system": "axe",
+      "set": "heldout",
+      "url": "https://www.papa.com/",
+      "bug_type": "hide_focus",
+      "seed": 2011,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 1,
+      "mapped_bugs": [],
+      "violations": [
+        "region"
+      ],
+      "manifest": {
+        "url": "https://www.papa.com/",
+        "bug_type": "hide_focus",
+        "expected_check": "focus_not_visible",
+        "seed": 2011,
+        "target_selector": "#papa-global-nav-pals",
+        "target_text": "Be a Papa Pal",
+        "timestamp": "2026-11-21T20:11:04.771528+00:00"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 7.54
+    },
+    {
+      "system": "single_gemini",
+      "set": "heldout",
+      "url": "https://www.papa.com/",
+      "bug_type": "hide_focus",
+      "seed": 2011,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 1,
+      "categories": [
+        "other"
+      ],
+      "findings": [
+        {
+          "category": "other",
+          "wcag": "1.4.3",
+          "element": "Cookie consent banner text and 'Manage Preferences' button",
+          "detail": "The cookie consent banner positioned beneath the hero section uses a translucent gray background with light gray/white text ('This website stores data such as cookies... Privacy Policy' and 'Manage Preferences'), resulting in insufficient c"
+        }
+      ],
+      "manifest": {
+        "url": "https://www.papa.com/",
+        "bug_type": "hide_focus",
+        "expected_check": "focus_not_visible",
+        "seed": 2011,
+        "target_selector": "#papa-global-nav-pals",
+        "target_text": "Be a Papa Pal",
+        "timestamp": "2026-11-21T20:11:10.559538+00:00"
+      },
+      "gemini_calls": 1,
+      "total_tokens": 1521,
+      "cost_usd": 0.0023,
+      "duration_s": 11.41
+    },
+    {
+      "system": "code_only",
+      "set": "heldout",
+      "url": "https://www.papa.com/",
+      "bug_type": "hide_focus",
+      "seed": 2011,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 1,
+      "needs_human_count": 4,
+      "confirmed_checks": [
+        "focus_not_visible"
+      ],
+      "manifest": {
+        "url": "https://www.papa.com/",
+        "bug_type": "hide_focus",
+        "expected_check": "focus_not_visible",
+        "seed": 2011,
+        "target_selector": "#papa-global-nav-menu-toggle",
+        "target_text": "",
+        "timestamp": "2026-11-21T20:11:23.346306+00:00",
+        "sha256": "e420734496e181f79d93af9e215e3b2e673baf5cc3c9a1a61272c128b88d74ef"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 28.72,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-151117-papa.com"
+    },
+    {
+      "system": "blindspot",
+      "set": "heldout",
+      "url": "https://www.papa.com/",
+      "bug_type": "hide_focus",
+      "seed": 2011,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 1,
+      "needs_human_count": 8,
+      "confirmed_checks": [
+        "focus_not_visible"
+      ],
+      "manifest": {
+        "url": "https://www.papa.com/",
+        "bug_type": "hide_focus",
+        "expected_check": "focus_not_visible",
+        "seed": 2011,
+        "target_selector": "#papa-global-nav-menu-toggle",
+        "target_text": "",
+        "timestamp": "2026-11-21T20:11:52.846237+00:00",
+        "sha256": "e75d59997393b38a277ed9765f568f4b094595a6da871abb39241440f2331996"
+      },
+      "gemini_calls": 81,
+      "total_tokens": 226447,
+      "cost_usd": 0.0392,
+      "duration_s": 32.6,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-151146-papa.com"
+    },
+    {
+      "system": "axe",
+      "set": "heldout",
+      "url": "https://www.baba.com/",
+      "bug_type": "keyboard_trap",
+      "seed": 2012,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 3,
+      "mapped_bugs": [],
+      "violations": [
+        "aria-prohibited-attr",
+        "color-contrast",
+        "svg-img-alt"
+      ],
+      "manifest": {
+        "url": "https://www.baba.com/",
+        "bug_type": "keyboard_trap",
+        "expected_check": "keyboard_trap",
+        "seed": 2012,
+        "target_selector": "body > div > div:nth-of-type(1) > div > header > div:nth-of-type(2) > div > nav > a:nth-of-type(1)",
+        "target_text": "What we do",
+        "timestamp": "2026-11-21T20:12:23.423658+00:00"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 5.29
+    },
+    {
+      "system": "single_gemini",
+      "set": "heldout",
+      "url": "https://www.baba.com/",
+      "bug_type": "keyboard_trap",
+      "seed": 2012,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 1,
+      "categories": [
+        "hide_focus"
+      ],
+      "findings": [
+        {
+          "category": "hide_focus",
+          "wcag": "2.4.7",
+          "element": "Interactive element on the page (e.g., navigation links, buttons, or accordion toggles)",
+          "detail": "There is no visible keyboard focus indicator on any interactive element in the screenshot."
+        }
+      ],
+      "manifest": {
+        "url": "https://www.baba.com/",
+        "bug_type": "keyboard_trap",
+        "expected_check": "keyboard_trap",
+        "seed": 2012,
+        "target_selector": "body > div > div:nth-of-type(1) > div > header > div:nth-of-type(2) > div > nav > a:nth-of-type(1)",
+        "target_text": "What we do",
+        "timestamp": "2026-11-21T20:12:28.373699+00:00"
+      },
+      "gemini_calls": 1,
+      "total_tokens": 1486,
+      "cost_usd": 0.00212,
+      "duration_s": 14.92
+    },
+    {
+      "system": "code_only",
+      "set": "heldout",
+      "url": "https://www.baba.com/",
+      "bug_type": "keyboard_trap",
+      "seed": 2012,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 1,
+      "needs_human_count": 2,
+      "confirmed_checks": [
+        "keyboard_trap"
+      ],
+      "manifest": {
+        "url": "https://www.baba.com/",
+        "bug_type": "keyboard_trap",
+        "expected_check": "keyboard_trap",
+        "seed": 2012,
+        "target_selector": "body > div > div:nth-of-type(1) > div > header > div:nth-of-type(2) > div > nav > a:nth-of-type(1)",
+        "target_text": "What we do",
+        "timestamp": "2026-11-21T20:12:43.255828+00:00",
+        "sha256": "4804ac3f5f138e94046701fa06890ebb6a5e77656d59bac3d189c37936045fe7"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 15.29,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-151238-baba.com"
+    },
+    {
+      "system": "blindspot",
+      "set": "heldout",
+      "url": "https://www.baba.com/",
+      "bug_type": "keyboard_trap",
+      "seed": 2012,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 3,
+      "needs_human_count": 2,
+      "confirmed_checks": [
+        "indicator_contrast",
+        "keyboard_trap",
+        "indicator_contrast"
+      ],
+      "manifest": {
+        "url": "https://www.baba.com/",
+        "bug_type": "keyboard_trap",
+        "expected_check": "keyboard_trap",
+        "seed": 2012,
+        "target_selector": "body > div > div:nth-of-type(1) > div > header > div:nth-of-type(2) > div > nav > a:nth-of-type(1)",
+        "target_text": "What we do",
+        "timestamp": "2026-11-21T20:13:00.560026+00:00",
+        "sha256": "db869e7e97783341dedb8e25f9b5b42d61827495c8e58f87430891d66fe176ab"
+      },
+      "gemini_calls": 23,
+      "total_tokens": 63394,
+      "cost_usd": 0.0107,
+      "duration_s": 19.13,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-151254-baba.com"
+    },
+    {
+      "system": "axe",
+      "set": "heldout",
+      "url": "https://pharmacy.amazon.com/",
+      "bug_type": "covering_banner",
+      "seed": 2013,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 5,
+      "mapped_bugs": [
+        "label_mismatch"
+      ],
+      "violations": [
+        "heading-order",
+        "label-content-name-mismatch",
+        "landmark-one-main",
+        "link-name",
+        "region"
+      ],
+      "manifest": {
+        "url": "https://pharmacy.amazon.com/",
+        "bug_type": "covering_banner",
+        "expected_check": "focus_obscured",
+        "seed": 2013,
+        "target_selector": "#desktop-pharmacy-logo",
+        "target_text": "",
+        "timestamp": "2026-11-21T20:13:18.893274+00:00"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 6.41
+    },
+    {
+      "system": "single_gemini",
+      "set": "heldout",
+      "url": "https://pharmacy.amazon.com/",
+      "bug_type": "covering_banner",
+      "seed": 2013,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 2,
+      "categories": [
+        "other"
+      ],
+      "findings": [
+        {
+          "category": "other",
+          "wcag": "2.4.4",
+          "element": "More to explore cards - 'Learn more' links",
+          "detail": "Multiple cards under 'More to explore' use identical ambiguous link text ('Learn more \u203a') without unique visual context inside the link itself."
+        },
+        {
+          "category": "other",
+          "wcag": "1.1.1",
+          "element": "Images of text in 'More ways to spend less' cards",
+          "detail": "The cards for Prime savings, RxPass, and Coupons contain raster images with embedded text (e.g., 'Price with Prime -80% $10.00', '$5 /month', 'Price with coupon $250 $50.00') rather than styled HTML text."
+        }
+      ],
+      "manifest": {
+        "url": "https://pharmacy.amazon.com/",
+        "bug_type": "covering_banner",
+        "expected_check": "focus_obscured",
+        "seed": 2013,
+        "target_selector": "#desktop-pharmacy-logo",
+        "target_text": "",
+        "timestamp": "2026-11-21T20:13:23.291984+00:00"
+      },
+      "gemini_calls": 1,
+      "total_tokens": 1628,
+      "cost_usd": 0.00268,
+      "duration_s": 10.62
+    },
+    {
+      "system": "code_only",
+      "set": "heldout",
+      "url": "https://pharmacy.amazon.com/",
+      "bug_type": "covering_banner",
+      "seed": 2013,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 17,
+      "needs_human_count": 3,
+      "confirmed_checks": [
+        "focus_not_visible",
+        "focus_not_visible",
+        "focus_not_visible",
+        "focus_obscured",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name"
+      ],
+      "manifest": {
+        "url": "https://pharmacy.amazon.com/",
+        "bug_type": "covering_banner",
+        "expected_check": "focus_obscured",
+        "seed": 2013,
+        "target_selector": "#desktop-pharmacy-logo",
+        "target_text": "",
+        "timestamp": "2026-11-21T20:13:35.137429+00:00",
+        "sha256": "d50f2d8ffd1b7bd7ea56bc040885fa9968f6334cec5309bb8987ec142e6952a6"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 28.37,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-151330-pharmacy.amazon.com"
+    },
+    {
+      "system": "blindspot",
+      "set": "heldout",
+      "url": "https://pharmacy.amazon.com/",
+      "bug_type": "covering_banner",
+      "seed": 2013,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 17,
+      "needs_human_count": 17,
+      "confirmed_checks": [
+        "focus_not_visible",
+        "focus_not_visible",
+        "focus_not_visible",
+        "focus_obscured",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name",
+        "label_in_name"
+      ],
+      "manifest": {
+        "url": "https://pharmacy.amazon.com/",
+        "bug_type": "covering_banner",
+        "expected_check": "focus_obscured",
+        "seed": 2013,
+        "target_selector": "#desktop-pharmacy-logo",
+        "target_text": "",
+        "timestamp": "2026-11-21T20:14:05.482454+00:00",
+        "sha256": "c4783228150a3ffb7f64b39a4fda4699076fdd8c4885c90749f16abf111ddf28"
+      },
+      "gemini_calls": 81,
+      "total_tokens": 225262,
+      "cost_usd": 0.03902,
+      "duration_s": 31.87,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-151358-pharmacy.amazon.com"
+    },
+    {
+      "system": "axe",
+      "set": "heldout",
+      "url": "https://asktia.com/",
+      "bug_type": "positive_tabindex",
+      "seed": 2014,
+      "status": "error",
+      "reason": "RuntimeError: No visible tabbable elements found on https://asktia.com/ to inject positive_tabindex",
+      "duration_s": 0.0
+    },
+    {
+      "system": "single_gemini",
+      "set": "heldout",
+      "url": "https://asktia.com/",
+      "bug_type": "positive_tabindex",
+      "seed": 2014,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 1,
+      "categories": [
+        "other"
+      ],
+      "findings": [
+        {
+          "category": "other",
+          "wcag": "1.4.3",
+          "element": "Why Tia section text",
+          "detail": "White text ('Why Tia', '90% Patient satisfaction', '2.5x Better prevention', '6 / 1 6 Care types - 1 Roof', '+8.8 Quality of life boost' and their descriptions) on a very light cream/beige background has extremely low color contrast, well b"
+        }
+      ],
+      "manifest": {
+        "url": "https://asktia.com/",
+        "bug_type": "positive_tabindex",
+        "expected_check": "focus_order",
+        "seed": 2014,
+        "target_selector": "#gatsby-focus-wrapper > div > footer > div > div:nth-of-type(1) > nav > div:nth-of-type(3) > div > a:nth-of-type(3)",
+        "target_text": "Careers",
+        "timestamp": "2026-11-21T20:14:40.516242+00:00"
+      },
+      "gemini_calls": 1,
+      "total_tokens": 1578,
+      "cost_usd": 0.00243,
+      "duration_s": 12.85
+    },
+    {
+      "system": "code_only",
+      "set": "heldout",
+      "url": "https://asktia.com/",
+      "bug_type": "positive_tabindex",
+      "seed": 2014,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 1,
+      "needs_human_count": 2,
+      "confirmed_checks": [
+        "focus_order"
+      ],
+      "manifest": {
+        "url": "https://asktia.com/",
+        "bug_type": "positive_tabindex",
+        "expected_check": "focus_order",
+        "seed": 2014,
+        "target_selector": "#gatsby-focus-wrapper > div > footer > div > div:nth-of-type(1) > nav > div:nth-of-type(3) > div > a:nth-of-type(3)",
+        "target_text": "Careers",
+        "timestamp": "2026-11-21T20:14:53.021769+00:00",
+        "sha256": "8a9ca3bb2479666c7daa1251ad45d5e9b2591bd27baa245c675280a7ed6b023a"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 39.5,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-151449-asktia.com"
+    },
+    {
+      "system": "blindspot",
+      "set": "heldout",
+      "url": "https://asktia.com/",
+      "bug_type": "positive_tabindex",
+      "seed": 2014,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 2,
+      "needs_human_count": 9,
+      "confirmed_checks": [
+        "focus_order",
+        "focus_not_visible"
+      ],
+      "manifest": {
+        "url": "https://asktia.com/",
+        "bug_type": "positive_tabindex",
+        "expected_check": "focus_order",
+        "seed": 2014,
+        "target_selector": "#gatsby-focus-wrapper > div > footer > div > div:nth-of-type(1) > nav > div:nth-of-type(3) > div > a:nth-of-type(3)",
+        "target_text": "Careers",
+        "timestamp": "2026-11-21T20:15:37.934539+00:00",
+        "sha256": "045b6176dcd8983e9d962bfe9940078ff0db57738078abe77fff31a3b305c722"
+      },
+      "gemini_calls": 81,
+      "total_tokens": 228667,
+      "cost_usd": 0.03921,
+      "duration_s": 61.67,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-151529-asktia.com"
+    },
+    {
+      "system": "axe",
+      "set": "heldout",
+      "url": "https://www.nerdwallet.com/",
+      "bug_type": "label_mismatch",
+      "seed": 2015,
+      "status": "ok",
+      "caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 2,
+      "mapped_bugs": [
+        "label_mismatch"
+      ],
+      "violations": [
+        "color-contrast",
+        "label-content-name-mismatch"
+      ],
+      "manifest": {
+        "url": "https://www.nerdwallet.com/",
+        "bug_type": "label_mismatch",
+        "expected_check": "label_in_name",
+        "seed": 2015,
+        "target_selector": "#compass-auth-buttons > a:nth-of-type(1)",
+        "target_text": "SIGN IN",
+        "timestamp": "2026-11-21T20:16:36.050693+00:00"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 6.5
+    },
+    {
+      "system": "single_gemini",
+      "set": "heldout",
+      "url": "https://www.nerdwallet.com/",
+      "bug_type": "label_mismatch",
+      "seed": 2015,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 1,
+      "categories": [
+        "hide_focus"
+      ],
+      "findings": [
+        {
+          "category": "hide_focus",
+          "wcag": "2.4.7",
+          "element": "Interactive controls on the page (e.g., navigation links, buttons, search input)",
+          "detail": "Focused interactive elements lack a visible focus indicator (no outline or focus ring is displayed when tabbing through the page)."
+        }
+      ],
+      "manifest": {
+        "url": "https://www.nerdwallet.com/",
+        "bug_type": "label_mismatch",
+        "expected_check": "label_in_name",
+        "seed": 2015,
+        "target_selector": "#compass-auth-buttons > a:nth-of-type(1)",
+        "target_text": "SIGN IN",
+        "timestamp": "2026-11-21T20:16:42.642663+00:00"
+      },
+      "gemini_calls": 1,
+      "total_tokens": 1466,
+      "cost_usd": 0.00212,
+      "duration_s": 13.45
+    },
+    {
+      "system": "code_only",
+      "set": "heldout",
+      "url": "https://www.nerdwallet.com/",
+      "bug_type": "label_mismatch",
+      "seed": 2015,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 4,
+      "needs_human_count": 13,
+      "confirmed_checks": [
+        "label_in_name",
+        "focus_not_visible",
+        "focus_not_visible",
+        "focus_not_visible"
+      ],
+      "manifest": {
+        "url": "https://www.nerdwallet.com/",
+        "bug_type": "label_mismatch",
+        "expected_check": "label_in_name",
+        "seed": 2015,
+        "target_selector": "#compass-auth-buttons > a:nth-of-type(1)",
+        "target_text": "SIGN IN",
+        "timestamp": "2026-11-21T20:16:55.766836+00:00",
+        "sha256": "dba6796ff5f4d3f6de3de56ddff5dda210933d43dccec3a08f5b39e45dc52a8b"
+      },
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 33.34,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-151650-nerdwallet.com"
+    },
+    {
+      "system": "blindspot",
+      "set": "heldout",
+      "url": "https://www.nerdwallet.com/",
+      "bug_type": "label_mismatch",
+      "seed": 2015,
+      "status": "ok",
+      "caught": true,
+      "category_caught": true,
+      "exact_target_caught": true,
+      "confirmed_count": 9,
+      "needs_human_count": 29,
+      "confirmed_checks": [
+        "label_in_name",
+        "focus_not_visible",
+        "focus_not_visible",
+        "focus_not_visible",
+        "indicator_contrast",
+        "focus_not_visible",
+        "focus_not_visible",
+        "focus_not_visible",
+        "focus_not_visible"
+      ],
+      "manifest": {
+        "url": "https://www.nerdwallet.com/",
+        "bug_type": "label_mismatch",
+        "expected_check": "label_in_name",
+        "seed": 2015,
+        "target_selector": "#compass-auth-buttons > a:nth-of-type(1)",
+        "target_text": "SIGN IN",
+        "timestamp": "2026-11-21T20:17:30.555323+00:00",
+        "sha256": "3da686e6a4eb42b459b24d200b316a4c270c33c04d5e51a7aa1c3e0416c5d28e"
+      },
+      "gemini_calls": 81,
+      "total_tokens": 230995,
+      "cost_usd": 0.04164,
+      "duration_s": 43.97,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-151724-nerdwallet.com"
+    },
+    {
+      "system": "axe",
+      "set": "govuk",
+      "url": "https://alphagov.github.io/accessibility-tool-audit/test-cases.html",
+      "bug_type": null,
+      "seed": null,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 22,
+      "mapped_bugs": [
+        "positive_tabindex"
+      ],
+      "violations": [
+        "aria-allowed-role",
+        "aria-roles",
+        "blink",
+        "button-name",
+        "color-contrast",
+        "dlitem",
+        "empty-heading",
+        "empty-table-header",
+        "frame-title",
+        "heading-order",
+        "image-alt",
+        "image-redundant-alt",
+        "input-image-alt",
+        "label",
+        "landmark-unique",
+        "link-name",
+        "list",
+        "listitem",
+        "marquee",
+        "scrollable-region-focusable",
+        "tabindex",
+        "valid-lang"
+      ],
+      "manifest": null,
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 6.95
+    },
+    {
+      "system": "single_gemini",
+      "set": "govuk",
+      "url": "https://alphagov.github.io/accessibility-tool-audit/test-cases.html",
+      "bug_type": null,
+      "seed": null,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 2,
+      "categories": [
+        "hide_focus",
+        "other"
+      ],
+      "findings": [
+        {
+          "category": "hide_focus",
+          "wcag": "2.4.7",
+          "element": "Link and button under 'Focus not visible' section",
+          "detail": "The 'Focus not visible' test case under Colour and Contrast demonstrates interactive elements ('This link has no focus' and the 'Button' element) that suppress or lack a visible focus indicator when navigated via keyboard."
+        },
+        {
+          "category": "other",
+          "wcag": "1.4.3",
+          "element": "Low contrast text blocks under 'Colour and Contrast'",
+          "detail": "Multiple text blocks under 'Small text does not have a contrast ratio of at least 4.5:1' and 'Large text does not have a contrast ratio of at least 3:1' visibly fail WCAG 1.4.3 AA minimum contrast requirements (light grey text on a white ba"
+        }
+      ],
+      "manifest": null,
+      "gemini_calls": 1,
+      "total_tokens": 1592,
+      "cost_usd": 0.00269,
+      "duration_s": 15.74
+    },
+    {
+      "system": "code_only",
+      "set": "govuk",
+      "url": "https://alphagov.github.io/accessibility-tool-audit/test-cases.html",
+      "bug_type": null,
+      "seed": null,
+      "status": "ok",
+      "caught": false,
+      "category_caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 1,
+      "needs_human_count": 30,
+      "confirmed_checks": [
+        "focus_order"
+      ],
+      "manifest": null,
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 25.04,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-151830-alphagov.github.io"
+    },
+    {
+      "system": "blindspot",
+      "set": "govuk",
+      "url": "https://alphagov.github.io/accessibility-tool-audit/test-cases.html",
+      "bug_type": null,
+      "seed": null,
+      "status": "ok",
+      "caught": false,
+      "category_caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 8,
+      "needs_human_count": 47,
+      "confirmed_checks": [
+        "focus_order",
+        "indicator_contrast",
+        "indicator_contrast",
+        "indicator_contrast",
+        "indicator_contrast",
+        "indicator_contrast",
+        "indicator_contrast",
+        "indicator_contrast"
+      ],
+      "manifest": null,
+      "gemini_calls": 81,
+      "total_tokens": 224372,
+      "cost_usd": 0.03712,
+      "duration_s": 25.45,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-151856-alphagov.github.io"
+    },
+    {
+      "system": "axe",
+      "set": "w3c_clean",
+      "url": "https://www.w3.org/WAI/demos/bad/after/home.html",
+      "bug_type": null,
+      "seed": null,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 2,
+      "mapped_bugs": [],
+      "violations": [
+        "landmark-one-main",
+        "region"
+      ],
+      "manifest": null,
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 2.23
+    },
+    {
+      "system": "single_gemini",
+      "set": "w3c_clean",
+      "url": "https://www.w3.org/WAI/demos/bad/after/home.html",
+      "bug_type": null,
+      "seed": null,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 0,
+      "categories": [],
+      "findings": [],
+      "manifest": null,
+      "gemini_calls": 1,
+      "total_tokens": 1447,
+      "cost_usd": 0.00184,
+      "duration_s": 7.5
+    },
+    {
+      "system": "code_only",
+      "set": "w3c_clean",
+      "url": "https://www.w3.org/WAI/demos/bad/after/home.html",
+      "bug_type": null,
+      "seed": null,
+      "status": "ok",
+      "caught": false,
+      "category_caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 0,
+      "needs_human_count": 1,
+      "confirmed_checks": [],
+      "manifest": null,
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 23.28,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-151931-w3.org"
+    },
+    {
+      "system": "blindspot",
+      "set": "w3c_clean",
+      "url": "https://www.w3.org/WAI/demos/bad/after/home.html",
+      "bug_type": null,
+      "seed": null,
+      "status": "ok",
+      "caught": false,
+      "category_caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 0,
+      "needs_human_count": 4,
+      "confirmed_checks": [],
+      "manifest": null,
+      "gemini_calls": 81,
+      "total_tokens": 226815,
+      "cost_usd": 0.03879,
+      "duration_s": 27.63,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-151954-w3.org"
+    },
+    {
+      "system": "axe",
+      "set": "w3c_clean",
+      "url": "https://www.w3.org/WAI/demos/bad/after/news.html",
+      "bug_type": null,
+      "seed": null,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 2,
+      "mapped_bugs": [],
+      "violations": [
+        "landmark-one-main",
+        "region"
+      ],
+      "manifest": null,
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 3.73
+    },
+    {
+      "system": "single_gemini",
+      "set": "w3c_clean",
+      "url": "https://www.w3.org/WAI/demos/bad/after/news.html",
+      "bug_type": null,
+      "seed": null,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 0,
+      "categories": [],
+      "findings": [],
+      "manifest": null,
+      "gemini_calls": 1,
+      "total_tokens": 1450,
+      "cost_usd": 0.00184,
+      "duration_s": 9.59
+    },
+    {
+      "system": "code_only",
+      "set": "w3c_clean",
+      "url": "https://www.w3.org/WAI/demos/bad/after/news.html",
+      "bug_type": null,
+      "seed": null,
+      "status": "ok",
+      "caught": false,
+      "category_caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 0,
+      "needs_human_count": 0,
+      "confirmed_checks": [],
+      "manifest": null,
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 25.68,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-152035-w3.org"
+    },
+    {
+      "system": "blindspot",
+      "set": "w3c_clean",
+      "url": "https://www.w3.org/WAI/demos/bad/after/news.html",
+      "bug_type": null,
+      "seed": null,
+      "status": "ok",
+      "caught": false,
+      "category_caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 0,
+      "needs_human_count": 6,
+      "confirmed_checks": [],
+      "manifest": null,
+      "gemini_calls": 81,
+      "total_tokens": 225357,
+      "cost_usd": 0.03797,
+      "duration_s": 27.4,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-152101-w3.org"
+    },
+    {
+      "system": "axe",
+      "set": "w3c_clean",
+      "url": "https://www.w3.org/WAI/demos/bad/after/tickets.html",
+      "bug_type": null,
+      "seed": null,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 2,
+      "mapped_bugs": [],
+      "violations": [
+        "landmark-one-main",
+        "region"
+      ],
+      "manifest": null,
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 4.1
+    },
+    {
+      "system": "single_gemini",
+      "set": "w3c_clean",
+      "url": "https://www.w3.org/WAI/demos/bad/after/tickets.html",
+      "bug_type": null,
+      "seed": null,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 0,
+      "categories": [],
+      "findings": [],
+      "manifest": null,
+      "gemini_calls": 1,
+      "total_tokens": 1465,
+      "cost_usd": 0.00188,
+      "duration_s": 7.62
+    },
+    {
+      "system": "code_only",
+      "set": "w3c_clean",
+      "url": "https://www.w3.org/WAI/demos/bad/after/tickets.html",
+      "bug_type": null,
+      "seed": null,
+      "status": "ok",
+      "caught": false,
+      "category_caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 0,
+      "needs_human_count": 0,
+      "confirmed_checks": [],
+      "manifest": null,
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 22.31,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-152140-w3.org"
+    },
+    {
+      "system": "blindspot",
+      "set": "w3c_clean",
+      "url": "https://www.w3.org/WAI/demos/bad/after/tickets.html",
+      "bug_type": null,
+      "seed": null,
+      "status": "ok",
+      "caught": false,
+      "category_caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 0,
+      "needs_human_count": 6,
+      "confirmed_checks": [],
+      "manifest": null,
+      "gemini_calls": 81,
+      "total_tokens": 226706,
+      "cost_usd": 0.03882,
+      "duration_s": 27.33,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-152202-w3.org"
+    },
+    {
+      "system": "axe",
+      "set": "w3c_clean",
+      "url": "https://www.w3.org/WAI/demos/bad/after/survey.html",
+      "bug_type": null,
+      "seed": null,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 4,
+      "mapped_bugs": [],
+      "violations": [
+        "empty-table-header",
+        "label-title-only",
+        "landmark-one-main",
+        "region"
+      ],
+      "manifest": null,
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 4.05
+    },
+    {
+      "system": "single_gemini",
+      "set": "w3c_clean",
+      "url": "https://www.w3.org/WAI/demos/bad/after/survey.html",
+      "bug_type": null,
+      "seed": null,
+      "status": "ok",
+      "caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 0,
+      "categories": [],
+      "findings": [],
+      "manifest": null,
+      "gemini_calls": 1,
+      "total_tokens": 1443,
+      "cost_usd": 0.00183,
+      "duration_s": 7.52
+    },
+    {
+      "system": "code_only",
+      "set": "w3c_clean",
+      "url": "https://www.w3.org/WAI/demos/bad/after/survey.html",
+      "bug_type": null,
+      "seed": null,
+      "status": "ok",
+      "caught": false,
+      "category_caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 0,
+      "needs_human_count": 0,
+      "confirmed_checks": [],
+      "manifest": null,
+      "gemini_calls": 0,
+      "total_tokens": 0,
+      "cost_usd": 0.0,
+      "duration_s": 24.33,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-152241-w3.org"
+    },
+    {
+      "system": "blindspot",
+      "set": "w3c_clean",
+      "url": "https://www.w3.org/WAI/demos/bad/after/survey.html",
+      "bug_type": null,
+      "seed": null,
+      "status": "ok",
+      "caught": false,
+      "category_caught": false,
+      "exact_target_caught": false,
+      "confirmed_count": 0,
+      "needs_human_count": 7,
+      "confirmed_checks": [],
+      "manifest": null,
+      "gemini_calls": 81,
+      "total_tokens": 229024,
+      "cost_usd": 0.04063,
+      "duration_s": 32.44,
+      "out_dir": "/Users/vedant/blindspot/runs/20261121-152305-w3.org"
+    }
+  ]
+}
